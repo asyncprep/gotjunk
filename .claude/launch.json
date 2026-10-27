@@ -4,8 +4,21 @@
     {
       "name": "backend-explorer",
       "runtimeExecutable": "node",
-      "runtimeArgs": ["tools/dbtest/explorer.mjs"],
+      "runtimeArgs": [
+        "tools/dbtest/explorer.mjs"
+      ],
       "port": 4321
+    },
+    {
+      "name": "admin-web",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        "apps/admin",
+        "run",
+        "dev"
+      ],
+      "port": 5173
     }
   ]
 }

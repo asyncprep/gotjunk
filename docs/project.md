@@ -92,9 +92,9 @@ A separate production project (also ca-central-1, Pro plan) is planned before th
 | --- | --- | --- |
 | 0 – Setup and decisions | Stack decision doc, repo, data dictionary, open-item defaults | Done, except client sign-off and offline spike |
 | 1 – Backend foundation | Schema, workflow, calculations, RLS, audit, seed, 25 tests, local explorer | **Done**; deployed to `gotjunk-ca` (Canada) on Oct 27, 2026 |
-| 2 – First crew slice | Flutter: login, today's shift, start shift, add job, offline sync on a real iPhone | Next |
-| 3 – Crew app complete | Disposal + photos, cancellations, cash, end-of-shift review, scoreboard, fr/en | Planned |
-| 4 – Admin web app | Assignments, acceptance/lock, cancellations, config, roster, audit, export | Planned |
+| 2 – Admin web app (moved first) | Daily board and shift creation, review/accept/return/reopen, cash count, checklist, cancellations, config and rates, roster and ranks, user invites, audit log, CSV export, fr/en | **Built** (`apps/admin`); hosting and first login pending |
+| 3 – First crew slice | Flutter: login, today's shift, start shift, add job, offline sync on a real iPhone | Next |
+| 4 – Crew app complete | Disposal + photos, cancellations, cash, end-of-shift review, scoreboard, fr/en | Planned |
 | 5 – Pilot | 1–2 trucks alongside the paper journal for 2–4 weeks, then rollout | Planned |
 | 6 – Integrations (V1b) | Profit share, Stripe, scales, roster/Ceridian, exceptions queue | Blocked on client answers |
 
