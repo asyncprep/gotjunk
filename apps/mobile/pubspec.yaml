@@ -1,0 +1,29 @@
+name: truck_team_os
+description: "Truck Team OS – crew app (Montréal 1-800-GOT-JUNK? truck teams)."
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.12.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  flutter_riverpod: ^3.4.3
+  intl: ^0.20.2
+  path: ^1.9.0
+  path_provider: ^2.1.6
+  powersync: ^2.5.0
+  supabase_flutter: ^2.18.3
+  uuid: ^4.6.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  generate: true

@@ -1,0 +1,45 @@
+# PowerSync Sync Streams for the crew app (draft: validate in the PowerSync dashboard).
+# Each server primary key is aliased to `id`, which the app's local schema expects.
+# Crews receive only the shifts they are on, plus the reference lists they need.
+config:
+  edition: 3
+
+streams:
+  reference:
+    auto_subscribe: true
+    queries:
+      - SELECT truck_id AS id, unit_number FROM truck WHERE active = true
+      - SELECT phone_id AS id, label FROM phone WHERE active = true
+      - SELECT code AS id, name_fr, name_en, is_cash, active FROM payment_method
+      - SELECT reason_id AS id, name_fr, name_en FROM cancellation_reason WHERE active = true
+      - SELECT key AS id, value FROM app_setting
+
+  me:
+    auto_subscribe: true
+    queries:
+      - SELECT user_id AS id, employee_id, role FROM app_user WHERE user_id = auth.user_id()
+
+  my_shifts:
+    auto_subscribe: true
+    queries:
+      - >-
+        SELECT s.shift_id AS id, s.* FROM shift s
+        INNER JOIN shift_crew_member m ON m.shift_id = s.shift_id
+        INNER JOIN app_user u ON u.employee_id = m.employee_id
+        WHERE u.user_id = auth.user_id()
+      - >-
+        SELECT c.shift_crew_id AS id, c.* FROM shift_crew_member c
+        INNER JOIN shift_crew_member m ON m.shift_id = c.shift_id
+        INNER JOIN app_user u ON u.employee_id = m.employee_id
+        WHERE u.user_id = auth.user_id()
+      - >-
+        SELECT j.job_id AS id, j.* FROM job j
+        INNER JOIN shift_crew_member m ON m.shift_id = j.shift_id
+        INNER JOIN app_user u ON u.employee_id = m.employee_id
+        WHERE u.user_id = auth.user_id()
+      - >-
+        SELECT e.employee_id AS id, e.full_name FROM employee e
+        INNER JOIN shift_crew_member c ON c.employee_id = e.employee_id
+        INNER JOIN shift_crew_member m ON m.shift_id = c.shift_id
+        INNER JOIN app_user u ON u.employee_id = m.employee_id
+        WHERE u.user_id = auth.user_id()
