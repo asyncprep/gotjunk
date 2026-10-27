@@ -1,8 +1,11 @@
 # Truck Team OS
 
 Mobile-first replacement for the Montréal truck teams' paper Daily Route Journal.
-Spec: `Truck Team OS – Product Specification v0.1.pdf` (content is v0.3). Working defaults for open
-items: [docs/decisions.md](docs/decisions.md).
+- [Project overview](docs/project.md): goal, systems, stack, scope, plan and status
+- [Questions for the client](docs/client-questions.md): what still needs an answer, and what it blocks
+- [Working defaults](docs/decisions.md): what the build assumes until those answers arrive
+
+The product specification (v0.3) is a client document and is not stored in this repo.
 
 ## Layout
 
