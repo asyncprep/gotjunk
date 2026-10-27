@@ -12,3 +12,4 @@ supabase/.branches/
 # Build output
 dist/
 *.tsbuildinfo
+!apps/admin/.env.production
