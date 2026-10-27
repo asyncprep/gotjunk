@@ -8,3 +8,7 @@ supabase/.branches/
 
 # Client documents stay out of the repo
 *.pdf
+
+# Build output
+dist/
+*.tsbuildinfo
