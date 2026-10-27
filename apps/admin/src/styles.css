@@ -194,3 +194,28 @@ code { font-size: 12.5px; background: var(--chip); padding: 1px 5px; border-radi
   .topbar { padding: 10px 16px; gap: 10px; }
   .grid2 { grid-template-columns: 1fr; }
 }
+
+/* Project page */
+.spec-group > h2 { margin: 22px 0 10px; }
+.spec-card h3 { font-size: 16px; margin: 10px 0 6px; }
+.spec-card p { margin: 6px 0; }
+.spec-card.status-answered, .spec-card.status-resolved { border-left: 4px solid var(--green); }
+.spec-card.status-asked { border-left: 4px solid var(--amber); }
+.spec-card.status-deferred { opacity: 0.7; }
+.pill.ref { background: var(--blue); color: #fff; font-weight: 700; }
+.pill.prio-blocker { background: var(--red-light); color: var(--red); }
+.pill.prio-pilot { background: var(--amber-light); color: var(--amber); }
+.pill.prio-v1b { background: var(--blue-light); color: var(--blue); }
+.spec-meta { display: grid; grid-template-columns: max-content 1fr; gap: 4px 12px; margin: 8px 0; font-size: 13.5px; }
+.spec-meta dt { color: var(--muted); font-weight: 500; }
+.spec-meta dd { margin: 0; }
+.answer { background: var(--green-light); border-radius: 8px; padding: 8px 12px; margin-top: 8px; }
+.answer p { margin: 4px 0; white-space: pre-wrap; }
+
+@media print {
+  .topbar, .no-print, .toasts { display: none !important; }
+  body { background: #fff; color: #000; font-size: 12px; }
+  main { padding: 0; max-width: none; }
+  .card { box-shadow: none; break-inside: avoid; padding: 10px 12px; margin-bottom: 8px; }
+  .tiles { grid-template-columns: repeat(4, 1fr); }
+}

@@ -10,6 +10,7 @@ import ShiftReview from './pages/ShiftReview';
 import Config from './pages/Config';
 import Team from './pages/Team';
 import Audit from './pages/Audit';
+import Project from './pages/Project';
 import Brand from './components/Brand';
 import Toasts from './components/Toasts';
 
@@ -42,6 +43,7 @@ export default function App() {
           <NavLink to="/config">{t('nav.config')}</NavLink>
           <NavLink to="/team">{t('nav.team')}</NavLink>
           <NavLink to="/audit">{t('nav.audit')}</NavLink>
+          <NavLink to="/project">{t('nav.project')}</NavLink>
         </nav>
         <span className="spacer" />
         <span className="who">{session.user.email} · {t(`role.${role}`)}</span>
@@ -62,6 +64,7 @@ export default function App() {
           <Route path="/config" element={<Config />} />
           <Route path="/team" element={<Team />} />
           <Route path="/audit" element={<Audit />} />
+          <Route path="/project" element={<Project />} />
           <Route path="*" element={<Board />} />
         </Routes>
       </main>

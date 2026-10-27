@@ -8,7 +8,7 @@ const fr = {
     dragHandle: 'Déplacer', updatedAt: 'Mis à jour à {{time}}', refresh: 'Actualiser', unsaved: 'Modifications non enregistrées',
     codeAuto: 'Généré automatiquement si vide',
   },
-  nav: { board: 'Tableau', config: 'Configuration', team: 'Équipe', audit: 'Journal', signOut: 'Se déconnecter' },
+  nav: { board: 'Tableau', config: 'Configuration', team: 'Équipe', audit: 'Journal', project: 'Projet', signOut: 'Se déconnecter' },
   common: {
     save: 'Enregistrer', cancel: 'Annuler', add: 'Ajouter', loading: 'Chargement…', none: 'Aucun',
     active: 'Actif', inactive: 'Inactif', yes: 'Oui', no: 'Non', name: 'Nom', code: 'Code', back: 'Retour',
@@ -90,6 +90,20 @@ const fr = {
     inviteSent: 'Invitation envoyée.', configRights: 'Droits de configuration', deactivate: 'Désactiver', activate: 'Activer',
   },
   role: { ttm: 'Membre d’équipe', dispatcher: 'Répartiteur', admin: 'Administration', senior_ops: 'Direction' },
+  project: {
+    title: 'Projet', print: 'Imprimer', search: 'Rechercher…', empty: 'Rien dans ce filtre.',
+    tab_question: 'Questions pour le client', tab_inconsistency: 'Incohérences du cahier des charges',
+    introQuestions: 'Questions à régler avec le client pour finaliser le produit. « En attendant » indique ce que l’application fait d’ici la réponse.',
+    introIssues: 'Contradictions et oublis relevés dans le cahier des charges (fichier v0.1, contenu v0.3), avec leur impact et la façon dont le développement les traite.',
+    questionsAnswered: 'Questions répondues', issuesResolved: 'Incohérences résolues', openBlockers: 'Points bloquants ouverts', waitingClient: 'En attente du client',
+    priority: 'Priorité', statusLabel: 'Statut',
+    prio_blocker: 'Bloquant', prio_pilot: 'Avant le pilote', prio_v1b: 'Avant V1b', prio_info: 'Information',
+    status_todo: 'À traiter', status_all: 'Tous', status_open: 'Ouvert', status_asked: 'Posé au client',
+    status_answered: 'Répondu', status_resolved: 'Résolu', status_deferred: 'Reporté',
+    specRefs: 'Sections', blocks: 'Bloque', impact: 'Impact', meanwhile: 'En attendant', handling: 'Traitement',
+    answer: 'Réponse du client', resolution: 'Résolution', addAnswer: 'Ajouter la réponse du client', addResolution: 'Ajouter la résolution',
+    answerPlaceholder: 'Réponse du client…', resolutionPlaceholder: 'Comment c’est réglé…',
+  },
   audit: { title: 'Journal d’audit', when: 'Quand', record: 'Enregistrement', action: 'Action', by: 'Par', reason: 'Raison', changes: 'Changements', exportTitle: 'Exporter les quarts', fromDate: 'Du', toDate: 'Au' },
 };
 
@@ -102,7 +116,7 @@ const en: Dict = {
     dragHandle: 'Move', updatedAt: 'Updated at {{time}}', refresh: 'Refresh', unsaved: 'Unsaved changes',
     codeAuto: 'Generated automatically if empty',
   },
-  nav: { board: 'Board', config: 'Configuration', team: 'Team', audit: 'Audit log', signOut: 'Sign out' },
+  nav: { board: 'Board', config: 'Configuration', team: 'Team', audit: 'Audit log', project: 'Project', signOut: 'Sign out' },
   common: {
     save: 'Save', cancel: 'Cancel', add: 'Add', loading: 'Loading…', none: 'None',
     active: 'Active', inactive: 'Inactive', yes: 'Yes', no: 'No', name: 'Name', code: 'Code', back: 'Back',
@@ -184,6 +198,20 @@ const en: Dict = {
     inviteSent: 'Invitation sent.', configRights: 'Configuration rights', deactivate: 'Deactivate', activate: 'Activate',
   },
   role: { ttm: 'Truck team member', dispatcher: 'Dispatcher', admin: 'Administration', senior_ops: 'Senior ops' },
+  project: {
+    title: 'Project', print: 'Print', search: 'Search…', empty: 'Nothing matches this filter.',
+    tab_question: 'Client questions', tab_inconsistency: 'Spec inconsistencies',
+    introQuestions: 'Questions to settle with the client to finalize the product. "Meanwhile" shows what the app does until there is an answer.',
+    introIssues: 'Contradictions and gaps found in the product spec (file v0.1, content v0.3), with their impact and how development handles them.',
+    questionsAnswered: 'Questions answered', issuesResolved: 'Inconsistencies resolved', openBlockers: 'Open blockers', waitingClient: 'Waiting on the client',
+    priority: 'Priority', statusLabel: 'Status',
+    prio_blocker: 'Blocker', prio_pilot: 'Before pilot', prio_v1b: 'Before V1b', prio_info: 'Info',
+    status_todo: 'To do', status_all: 'All', status_open: 'Open', status_asked: 'Asked',
+    status_answered: 'Answered', status_resolved: 'Resolved', status_deferred: 'Deferred',
+    specRefs: 'Sections', blocks: 'Blocks', impact: 'Impact', meanwhile: 'Meanwhile', handling: 'Handling',
+    answer: 'Client answer', resolution: 'Resolution', addAnswer: 'Add the client answer', addResolution: 'Add the resolution',
+    answerPlaceholder: 'Client answer…', resolutionPlaceholder: 'How it was settled…',
+  },
   audit: { title: 'Audit log', when: 'When', record: 'Record', action: 'Action', by: 'By', reason: 'Reason', changes: 'Changes', exportTitle: 'Export shifts', fromDate: 'From', toDate: 'To' },
 };
 
