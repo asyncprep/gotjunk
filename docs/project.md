@@ -56,6 +56,16 @@ entered; external systems are matched automatically; admins handle only true exc
                                  Stripe · Scales · Ceridian/roster (in)   Google Sheets (out)
 ```
 
+## Environments
+
+| Environment | Supabase project | Region | Deploys |
+| --- | --- | --- | --- |
+| Development (current) | `gotjunk-ca` (`vrtvjnaykhlzyfbrllup`) | Canada (Central), ca-central-1 | Automatically from `main` via the Supabase GitHub integration |
+| Local | PGlite (`tools/dbtest`) | Your machine | `npm test`, `node explorer.mjs` |
+
+A separate production project (also ca-central-1, Pro plan) is planned before the pilot. The earlier
+`gotjunk` project in us-west-2 is paused and not used.
+
 ## Scope
 
 **V1a – paper journal replacement (in progress)**
