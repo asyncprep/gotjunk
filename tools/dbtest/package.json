@@ -1,0 +1,12 @@
+{
+  "name": "tto-dbtest",
+  "private": true,
+  "type": "module",
+  "description": "Runs Supabase migrations and SQL tests in PGlite (no Docker needed)",
+  "scripts": {
+    "test": "node run.mjs"
+  },
+  "dependencies": {
+    "@electric-sql/pglite": "0.5.12"
+  }
+}

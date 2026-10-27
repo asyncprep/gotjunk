@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Backend Explorer</title>
+<style>
+  :root {
+    --bg: #f6f7f9; --card: #fff; --ink: #1d2330; --muted: #667085; --line: #e3e6eb;
+    --accent: #1f6feb; --good: #1a7f37; --warn: #9a6700; --bad: #c62828; --chip: #eef2f7;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--ink); background: var(--bg); }
+  header { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; padding: 12px 20px; background: var(--card); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 2; }
+  header h1 { font-size: 16px; margin: 0 12px 0 0; }
+  header .spacer { flex: 1; }
+  select, input, button, textarea { font: inherit; }
+  select, input, textarea { padding: 5px 8px; border: 1px solid var(--line); border-radius: 6px; background: #fff; color: var(--ink); }
+  button { padding: 5px 10px; border: 1px solid var(--line); border-radius: 6px; background: #fff; cursor: pointer; color: var(--ink); }
+  button:hover { border-color: var(--accent); }
+  button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .tabs button { border: none; border-bottom: 2px solid transparent; border-radius: 0; background: none; }
+  .tabs button.on { border-bottom-color: var(--accent); color: var(--accent); }
+  #last { padding: 10px 20px; border-bottom: 1px solid var(--line); background: #fff; display: none; }
+  #last.ok { border-left: 4px solid var(--good); }
+  #last.err { border-left: 4px solid var(--bad); }
+  #last code { display: block; white-space: pre-wrap; color: var(--muted); font-size: 12px; margin-top: 4px; }
+  main { display: grid; grid-template-columns: 220px 1fr; gap: 16px; padding: 16px 20px; }
+  @media (max-width: 800px) { main { grid-template-columns: 1fr; } }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; margin-bottom: 16px; }
+  .card h2 { font-size: 14px; margin: 0 0 10px; display: flex; gap: 8px; align-items: center; }
+  .card h2 .hint { font-weight: 400; color: var(--muted); font-size: 12px; }
+  .shift-btn { display: block; width: 100%; text-align: left; margin-bottom: 8px; padding: 8px 10px; }
+  .shift-btn.on { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+  .pill { display: inline-block; padding: 1px 8px; border-radius: 999px; background: var(--chip); font-size: 12px; }
+  .pill.in_progress { background: #e6f0ff; } .pill.submitted { background: #fff4d6; }
+  .pill.locked, .pill.reconciled { background: #e3f4e8; } .pill.returned, .pill.reopened { background: #fde7e7; }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 6px 0; }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
+  .tile { border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; }
+  .tile .v { font-size: 20px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .tile .k { color: var(--muted); font-size: 12px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 500; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .problem.error { color: var(--bad); } .problem.warning { color: var(--warn); }
+  .muted { color: var(--muted); }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 1100px) { .grid2 { grid-template-columns: 1fr; } }
+  textarea { width: 100%; min-height: 120px; font-family: ui-monospace, Consolas, monospace; font-size: 13px; }
+  .scroll { overflow-x: auto; }
+  .hidden { display: none; }
+  input.small { width: 90px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Truck Team OS · Backend explorer</h1>
+  <label>Acting as <select id="user"></select></label>
+  <span class="tabs"><button data-tab="shift" class="on">Shift workflow</button><button data-tab="sql">SQL console</button><button data-tab="schema">Schema</button></span>
+  <span class="spacer"></span>
+  <button id="reset" title="Reload migrations, seed and demo data">Reset demo data</button>
+</header>
+<div id="last"></div>
+
+<section id="tab-shift">
+<main>
+  <aside>
+    <div class="card"><h2>Shifts <span class="hint">visible to this user</span></h2><div id="shifts"></div></div>
+    <div class="card muted" style="font-size:12px">Every button sends the SQL the apps would send. The database decides: refusals come from its triggers, checks and row-level security.</div>
+  </aside>
+  <div id="detail"></div>
+</main>
+</section>
+
+<section id="tab-sql" class="hidden"><main style="grid-template-columns:1fr">
+  <div class="card">
+    <h2>SQL console <span class="hint">runs as the selected user, in one transaction</span></h2>
+    <textarea id="sql">select * from v_shift_totals;</textarea>
+    <div class="row"><button class="primary" id="runSql">Run</button></div>
+    <div id="sqlOut" class="scroll"></div>
+  </div>
+</main></section>
+
+<section id="tab-schema" class="hidden"><main style="grid-template-columns:1fr"><div class="card"><h2>Tables and views</h2><div id="schema" class="scroll"></div></div></main></section>
+
+<script>
+const USERS = [
+  { id: 'a0000000-0000-0000-0000-000000000001', name: 'Crew One · TTM on T-01' },
+  { id: 'a0000000-0000-0000-0000-000000000002', name: 'Crew Two · TTM on T-01' },
+  { id: 'a0000000-0000-0000-0000-000000000003', name: 'Crew Three · TTM on T-02' },
+  { id: 'a0000000-0000-0000-0000-000000000010', name: 'Dispatcher' },
+  { id: 'a0000000-0000-0000-0000-000000000020', name: 'Admin (config rights)' },
+  { id: '', name: 'System · backend, no RLS' },
+];
+let me = USERS[0].id;
+let shiftId = null;
+let lookups = {};
+let stage = 'submit';
+
+const $ = (s) => document.querySelector(s);
+const esc = (v) => String(v ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const lit = (v) => v === null || v === undefined || v === '' ? 'null'
+  : typeof v === 'number' ? String(v) : `'${String(v).replace(/'/g, "''")}'`;
+const money = (v) => v === null || v === undefined ? '—' : Number(v).toLocaleString('en-CA', { style: 'currency', currency: 'CAD' });
+const num = (v) => (v === '' || v === null || v === undefined) ? null : Number(v);
+
+async function api(sql, params, as = me) {
+  const r = await fetch('/api/run', { method: 'POST', headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ as, sql, params }) });
+  return r.json();
+}
+
+// User actions: run, show the SQL and the database's answer, refresh.
+async function act(label, sql, params) {
+  const r = await api(sql, params);
+  const box = $('#last');
+  box.style.display = 'block';
+  const shown = params ? `${sql.trim()}\n-- params: ${JSON.stringify(params)}` : sql.trim();
+  if (r.error) {
+    box.className = 'err';
+    box.innerHTML = `<strong>Refused:</strong> ${esc(label)} — ${esc(r.error)}<code>${esc(shown)}</code>`;
+  } else {
+    box.className = 'ok';
+    const note = /^\s*(update|delete)/i.test(sql) && r.affectedRows === 0
+      ? ' — 0 rows changed (row-level security hides this record from this user)' : '';
+    box.innerHTML = `<strong>OK:</strong> ${esc(label)}${esc(note)}<code>${esc(shown)}</code>`;
+  }
+  await render();
+}
+
+function table(rows, cols, opts = {}) {
+  if (!rows || !rows.length) return `<div class="muted">${opts.empty || 'None'}</div>`;
+  return `<div class="scroll"><table><tr>${cols.map((c) => `<th>${esc(c.label)}</th>`).join('')}</tr>${
+    rows.map((r) => `<tr>${cols.map((c) => `<td class="${c.num ? 'num' : ''}">${c.html ? c.html(r) : esc(c.fmt ? c.fmt(r[c.key], r) : r[c.key])}</td>`).join('')}</tr>`).join('')
+  }</table></div>`;
+}
+
+async function loadLookups() {
+  const q = (sql) => api(sql, null, '').then((r) => r.rows || []);
+  lookups.sites = await q('select site_id, name from site where active order by name');
+  lookups.materials = await q('select material_type_id, code, name_en from material_type where active order by name_en');
+  lookups.methods = await q('select code, name_en from payment_method where active order by code');
+  lookups.reasons = await q('select reason_id, name_en from cancellation_reason where active order by sort_order');
+}
+
+const opts = (rows, val, label, sel) => rows.map((r) => `<option value="${esc(r[val])}" ${r[val] === sel ? 'selected' : ''}>${esc(r[label])}</option>`).join('');
+
+async function render() {
+  const shifts = (await api(`select s.shift_id, s.status, t.unit_number, s.shift_date
+                               from shift s join truck t using (truck_id) order by t.unit_number`)).rows || [];
+  if (!shifts.find((s) => s.shift_id === shiftId)) shiftId = shifts[0]?.shift_id ?? null;
+  $('#shifts').innerHTML = shifts.length ? shifts.map((s) => `<button class="shift-btn ${s.shift_id === shiftId ? 'on' : ''}" data-shift="${s.shift_id}">
+      <strong>${esc(s.unit_number)}</strong> <span class="pill ${s.status}">${esc(s.status)}</span></button>`).join('')
+    : '<div class="muted">No shifts visible</div>';
+  if (!shiftId) { $('#detail').innerHTML = ''; return; }
+
+  const P = [shiftId];
+  const [shiftR, totalsR, problemsR, jobsR, dispR, cashR, checkR, crewR, auditR] = await Promise.all([
+    api(`select s.*, t.unit_number, p.label as phone from shift s join truck t using (truck_id) join phone p using (phone_id) where shift_id = $1`, P),
+    api('select * from v_shift_totals where shift_id = $1', P),
+    api('select severity, code, entity_type, detail from shift_problems($1, $2)', [shiftId, stage]),
+    api(`select j.job_id, j.opportunity_id, j.outcome, j.payment_method_code, j.revenue_pre_tax, j.revenue_total_incl_tax,
+                j.tip_amount, cr.name_en as reason
+           from job j left join cancellation_reason cr on cr.reason_id = j.cancellation_reason_id
+          where j.shift_id = $1 order by j.created_at`, P),
+    api(`select v.disposal_visit_id, st.name as site, v.ticket_number,
+                (select count(*) from photo p where p.entity_id = v.disposal_visit_id) as photos,
+                m.name_en as material, t.weight_kg, t.billable_kg, t.rate_per_ton_applied, t.direction, t.signed_amount
+           from disposal_visit v join site st using (site_id)
+           left join disposal_material_txn t using (disposal_visit_id)
+           left join material_type m using (material_type_id)
+          where v.shift_id = $1 order by v.created_at, t.created_at`, P),
+    api(`select c.*, (select count(*) from photo p where p.entity_id = c.cash_submission_id) as photos
+           from cash_submission c where shift_id = $1`, P),
+    api(`select ci.item_id, ci.label_en, coalesce(c.checked, false) as checked
+           from checklist_item ci left join shift_checklist_check c on c.item_id = ci.item_id and c.shift_id = $1
+          where ci.active order by ci.sort_order`, P),
+    api(`select e.full_name, r.code as rank, coalesce(tb.tips, 0) as tips, m.left_at, rs.code as rank_frozen
+           from shift_crew_member m join employee e using (employee_id)
+           left join rank r on r.rank_id = rank_on(m.employee_id, (select shift_date from shift where shift_id = $1))
+           left join rank rs on rs.rank_id = m.rank_id_snapshot
+           left join v_shift_tips_by_employee tb on tb.shift_id = m.shift_id and tb.employee_id = m.employee_id
+          where m.shift_id = $1 order by e.full_name`, P),
+    api(`select occurred_at, entity_type, action, actor_role, reason, field_changes from audit_log order by audit_id desc limit 15`),
+  ]);
+  const s = shiftR.rows?.[0];
+  if (!s) { $('#detail').innerHTML = `<div class="card">${esc(shiftR.error || 'Not visible')}</div>`; return; }
+  const t = totalsR.rows?.[0] || {};
+  const visits = {};
+  for (const r of dispR.rows || []) (visits[r.disposal_visit_id] ||= { ...r, lines: [] }).lines.push(r);
+
+  $('#detail').innerHTML = `
+  <div class="card">
+    <h2>${esc(s.unit_number)} · ${esc(s.phone)} <span class="pill ${s.status}">${esc(s.status)}</span>
+      <span class="hint">${esc(String(s.shift_date).slice(0, 10))} · hours type: ${esc(s.hours_type || '—')}${s.hours_type_confirmed_at ? ' (confirmed)' : ''}</span></h2>
+    <div class="row"><span class="muted">Crew:</span>
+      <select id="hoursType"><option value="regular_junk">Regular junk</option><option value="warehouse">Warehouse</option><option value="non_junk">Non-junk</option></select>
+      <button data-a="start">Start shift</button><button data-a="finish">Set finish time = now</button><button data-a="submit">Submit shift</button></div>
+    <div class="row"><span class="muted">Dispatch:</span>
+      <button data-a="confirmHours">Confirm hours type</button><button data-a="return">Return for correction…</button>
+      <button data-a="lock" class="primary">Accept & lock</button><button data-a="reopen">Reopen…</button>
+      <span class="muted">Admin:</span><button data-a="reconcile">Mark reconciled</button></div>
+    <div class="muted" style="font-size:12px">Start ${esc(s.start_time ? new Date(s.start_time).toLocaleString() : '—')} · Finish ${esc(s.finish_time ? new Date(s.finish_time).toLocaleString() : '—')}
+      ${s.return_reason ? ` · Returned: “${esc(s.return_reason)}”` : ''}${s.reopen_reason ? ` · Reopened: “${esc(s.reopen_reason)}”` : ''}</div>
+  </div>
+
+  <div class="card"><h2>Live scoreboard <span class="hint">v_shift_totals</span></h2><div class="tiles">
+    <div class="tile"><div class="v">${money(t.revenue_pre_tax)}</div><div class="k">Revenue before tax</div></div>
+    <div class="tile"><div class="v">${esc(t.jobs_completed ?? 0)}</div><div class="k">Jobs completed</div></div>
+    <div class="tile"><div class="v">${money(t.tips)}</div><div class="k">Tips</div></div>
+    <div class="tile"><div class="v">${money(t.net_disposal)}</div><div class="k">Net disposal</div></div>
+    <div class="tile"><div class="v">${money(t.expected_cash)}</div><div class="k">Expected cash</div></div>
+    <div class="tile"><div class="v">${t.revenue_per_hour ? money(t.revenue_per_hour) : '—'}</div><div class="k">Revenue / hour</div></div>
+  </div></div>
+
+  <div class="card"><h2>Readiness checks <span class="hint">shift_problems()</span>
+      <select id="stage"><option value="submit" ${stage === 'submit' ? 'selected' : ''}>for submit</option><option value="lock" ${stage === 'lock' ? 'selected' : ''}>for lock</option></select></h2>
+    ${problemsR.error ? `<div class="problem error">${esc(problemsR.error)}</div>`
+      : (problemsR.rows.length ? problemsR.rows.map((p) => `<div class="problem ${p.severity}">${p.severity === 'error' ? '✕' : '!'} ${esc(p.code)}${p.detail ? ` <span class="muted">(${esc(p.detail)})</span>` : ''}</div>`).join('')
+      : '<div style="color:var(--good)">✓ Ready</div>')}
+  </div>
+
+  <div class="grid2">
+  <div class="card"><h2>Jobs</h2>
+    ${table(jobsR.rows, [
+      { label: 'Opportunity', key: 'opportunity_id' },
+      { label: 'Outcome', key: 'outcome', fmt: (v) => v || 'draft' },
+      { label: 'Method', key: 'payment_method_code' },
+      { label: 'Pre-tax', key: 'revenue_pre_tax', num: true, fmt: money },
+      { label: 'Incl. tax', key: 'revenue_total_incl_tax', num: true, fmt: money },
+      { label: 'Tip', key: 'tip_amount', num: true, fmt: money },
+      { label: '', html: (r) => r.outcome === 'cancelled_pending'
+          ? `<select data-reason="${r.job_id}">${opts(lookups.reasons, 'reason_id', 'name_en')}</select> <button data-a="finalize" data-id="${r.job_id}">Finalize</button>`
+          : r.outcome === 'cancelled_confirmed' ? esc(r.reason) : `<button data-a="delJob" data-id="${r.job_id}">Delete</button>` },
+    ], { empty: 'No jobs yet' })}
+    <div class="row" style="margin-top:10px">
+      <input id="jOpp" class="small" placeholder="OPP-123">
+      <select id="jOutcome"><option value="completed">completed</option><option value="cancelled_pending">cancelled (pending)</option><option value="">draft</option></select>
+      <select id="jMethod">${opts(lookups.methods, 'code', 'name_en')}</select>
+    </div>
+    <div class="row">
+      <input id="jPre" class="small" placeholder="pre-tax" inputmode="decimal">
+      <input id="jTotal" class="small" placeholder="incl. tax" inputmode="decimal">
+      <button data-a="tax" title="Fill total = pre-tax × 1.14975">+tax</button>
+      <input id="jTip" class="small" placeholder="tip" inputmode="decimal">
+      <button data-a="addJob" class="primary">Add job</button>
+    </div>
+  </div>
+
+  <div class="card"><h2>Disposal</h2>
+    ${Object.values(visits).length ? Object.values(visits).map((v) => `
+      <div style="margin-bottom:10px"><strong>${esc(v.site)}</strong> · ticket ${esc(v.ticket_number || '—')} · ${v.photos} photo(s)
+        <button data-a="ticketPhoto" data-id="${v.disposal_visit_id}">Attach ticket photo</button>
+        ${table(v.lines.filter((l) => l.material), [
+          { label: 'Material', key: 'material' },
+          { label: 'Weight kg', key: 'weight_kg', num: true },
+          { label: 'Billable kg', key: 'billable_kg', num: true },
+          { label: '$/t', key: 'rate_per_ton_applied', num: true },
+          { label: 'Amount', key: 'signed_amount', num: true, fmt: money },
+        ], { empty: 'No material lines' })}</div>`).join('') : '<div class="muted">No visits yet</div>'}
+    <div class="row" style="margin-top:10px">
+      <select id="dSite">${opts(lookups.sites, 'site_id', 'name')}</select>
+      <input id="dTicket" class="small" placeholder="ticket #">
+    </div>
+    <div class="row">
+      <select id="dMat">${opts(lookups.materials, 'material_type_id', 'name_en')}</select>
+      <input id="dKg" class="small" placeholder="kg" inputmode="decimal">
+      <button data-a="addVisit" class="primary">Add visit + line</button>
+    </div>
+  </div>
+
+  <div class="card"><h2>Cash</h2>
+    ${(cashR.rows || []).length ? (() => { const c = cashR.rows[0]; return `
+      <div>Photos: ${c.photos} · Counted: ${money(c.counted_cash)} · Expected at lock: ${money(c.expected_cash_snapshot)}</div>
+      ${c.mismatch_resolution ? `<div class="muted">Resolution: ${esc(c.mismatch_resolution)}</div>` : ''}`; })()
+      : '<div class="muted">No cash submission yet</div>'}
+    <div class="row"><span class="muted">Crew:</span><button data-a="cashPhoto">Create cash record + photo</button></div>
+    <div class="row"><span class="muted">Dispatch:</span><input id="cCount" class="small" placeholder="counted $"><button data-a="count">Record count</button>
+      <input id="cNote" placeholder="mismatch resolution"><button data-a="resolve">Save note</button></div>
+  </div>
+
+  <div class="card"><h2>Dispatcher checklist</h2>
+    ${(checkR.rows || []).map((c) => `<label style="display:block"><input type="checkbox" data-check="${c.item_id}" ${c.checked ? 'checked' : ''}> ${esc(c.label_en)}</label>`).join('')}
+    <div class="row"><button data-a="checkAll">Check all</button></div>
+  </div>
+
+  <div class="card"><h2>Crew and tips <span class="hint">v_tip_split, rank from roster</span></h2>
+    ${table(crewR.rows, [
+      { label: 'Name', key: 'full_name' },
+      { label: 'Rank today', key: 'rank' },
+      { label: 'Rank frozen at lock', key: 'rank_frozen' },
+      { label: 'Tip share', key: 'tips', num: true, fmt: money },
+    ])}
+  </div>
+
+  <div class="card"><h2>Audit log <span class="hint">latest 15 · staff only</span></h2>
+    ${table(auditR.rows, [
+      { label: 'When', key: 'occurred_at', fmt: (v) => new Date(v).toLocaleTimeString() },
+      { label: 'Record', key: 'entity_type' },
+      { label: 'Action', key: 'action' },
+      { label: 'By', key: 'actor_role' },
+      { label: 'Reason', key: 'reason' },
+    ], { empty: 'Nothing visible (crew cannot read the audit log)' })}
+  </div>
+  </div>`;
+  if (s.hours_type) $('#hoursType').value = s.hours_type;
+}
+
+const ACTIONS = {
+  start: () => act('Start shift', `update shift set hours_type = $2, status = 'in_progress' where shift_id = $1`, [shiftId, $('#hoursType').value]),
+  finish: () => act('Set finish time', 'update shift set finish_time = now() where shift_id = $1', [shiftId]),
+  submit: () => act('Submit shift', `update shift set status = 'submitted' where shift_id = $1`, [shiftId]),
+  confirmHours: () => act('Confirm hours type', 'update shift set hours_type_confirmed_at = now() where shift_id = $1', [shiftId]),
+  lock: () => act('Accept & lock', `update shift set status = 'locked' where shift_id = $1`, [shiftId]),
+  reconcile: () => act('Mark reconciled', `update shift set status = 'reconciled' where shift_id = $1`, [shiftId]),
+  return: () => { const r = prompt('Reason for returning the shift (leave empty to see the refusal):') ?? '';
+    act('Return for correction', `update shift set status = 'returned', return_reason = $2 where shift_id = $1`, [shiftId, r || null]); },
+  reopen: () => { const r = prompt('Reason for reopening (leave empty to see the refusal):') ?? '';
+    act('Reopen', `update shift set status = 'reopened', reopen_reason = $2 where shift_id = $1`, [shiftId, r || null]); },
+  tax: () => { const p = num($('#jPre').value); if (p !== null) $('#jTotal').value = (Math.round(p * 1.14975 * 100) / 100).toFixed(2); },
+  addJob: () => act('Add job', `insert into job (job_id, shift_id, opportunity_id, outcome, payment_method_code, revenue_pre_tax, revenue_total_incl_tax, tip_amount)
+      values ($1, $2, $3, $4, $5, $6, $7, $8)`,
+    [crypto.randomUUID(), shiftId, $('#jOpp').value || `OPP-${Math.floor(Math.random() * 9000 + 1000)}`,
+     $('#jOutcome').value || null, $('#jOutcome').value === 'completed' ? $('#jMethod').value : null,
+     num($('#jPre').value), num($('#jTotal').value), num($('#jTip').value) ?? 0]),
+  delJob: (id) => act('Delete job', 'delete from job where job_id = $1', [id]),
+  finalize: (id) => act('Finalize cancellation', `update job set outcome = 'cancelled_confirmed', cancellation_reason_id = $2 where job_id = $1`,
+    [id, document.querySelector(`[data-reason="${id}"]`).value]),
+  addVisit: () => { const v = crypto.randomUUID();
+    act('Add disposal visit + line',
+      `insert into disposal_visit (disposal_visit_id, shift_id, site_id, ticket_number) values (${lit(v)}, ${lit(shiftId)}, ${lit($('#dSite').value)}, ${lit($('#dTicket').value)});
+insert into disposal_material_txn (disposal_visit_id, material_type_id, weight_kg) values (${lit(v)}, ${lit($('#dMat').value)}, ${lit(num($('#dKg').value))});`); },
+  ticketPhoto: (id) => act('Attach ticket photo', `insert into photo (shift_id, photo_kind, entity_type, entity_id, storage_path)
+      values ($1, 'disposal_ticket', 'disposal_visit', $2, $3)`, [shiftId, id, `${shiftId}/${crypto.randomUUID()}.jpg`]),
+  cashPhoto: () => { const c = crypto.randomUUID();
+    act('Create cash record + photo',
+      `insert into cash_submission (cash_submission_id, shift_id) values (${lit(c)}, ${lit(shiftId)});
+insert into photo (shift_id, photo_kind, entity_type, entity_id, storage_path) values (${lit(shiftId)}, 'cash_submission', 'cash_submission', ${lit(c)}, ${lit(`${shiftId}/${c}.jpg`)});`); },
+  count: () => act('Record cash count', 'update cash_submission set counted_cash = $2 where shift_id = $1', [shiftId, num($('#cCount').value)]),
+  resolve: () => act('Save cash note', 'update cash_submission set mismatch_resolution = $2 where shift_id = $1', [shiftId, $('#cNote').value || null]),
+  checkAll: () => act('Check all checklist items', `insert into shift_checklist_check (shift_id, item_id, checked)
+      select $1, item_id, true from checklist_item where active
+      on conflict (shift_id, item_id) do update set checked = true`, [shiftId]),
+};
+
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('button');
+  if (!b) return;
+  if (b.dataset.shift) { shiftId = b.dataset.shift; render(); }
+  else if (b.dataset.a) ACTIONS[b.dataset.a](b.dataset.id);
+  else if (b.dataset.tab) {
+    document.querySelectorAll('.tabs button').forEach((x) => x.classList.toggle('on', x === b));
+    for (const t of ['shift', 'sql', 'schema']) $(`#tab-${t}`).classList.toggle('hidden', t !== b.dataset.tab);
+    if (b.dataset.tab === 'schema') renderSchema();
+  }
+});
+document.addEventListener('change', (e) => {
+  if (e.target.id === 'stage') { stage = e.target.value; render(); }
+  if (e.target.dataset.check) act('Toggle checklist item', `insert into shift_checklist_check (shift_id, item_id, checked) values ($1, $2, $3)
+      on conflict (shift_id, item_id) do update set checked = excluded.checked`, [shiftId, e.target.dataset.check, e.target.checked]);
+});
+$('#user').innerHTML = USERS.map((u) => `<option value="${u.id}">${esc(u.name)}</option>`).join('');
+$('#user').addEventListener('change', (e) => { me = e.target.value; $('#last').style.display = 'none'; render(); });
+$('#reset').addEventListener('click', async () => { await fetch('/api/reset', { method: 'POST' }); $('#last').style.display = 'none'; await render(); });
+$('#runSql').addEventListener('click', async () => {
+  const r = await api($('#sql').value);
+  $('#sqlOut').innerHTML = r.error ? `<div class="problem error">${esc(r.error)}</div>`
+    : r.fields.length ? table(r.rows, r.fields.map((f) => ({ label: f, key: f, fmt: (v) => typeof v === 'object' && v !== null ? JSON.stringify(v) : v })))
+    : `<div class="muted">OK · ${r.affectedRows} row(s) affected</div>`;
+});
+
+async function renderSchema() {
+  const r = await api(`select c.table_name, t.table_type, string_agg(c.column_name || ' ' || c.data_type, ', ' order by c.ordinal_position) as columns
+      from information_schema.columns c join information_schema.tables t using (table_schema, table_name)
+     where c.table_schema = 'public' group by c.table_name, t.table_type order by t.table_type, c.table_name`, null, '');
+  $('#schema').innerHTML = table(r.rows, [
+    { label: 'Name', key: 'table_name' },
+    { label: 'Kind', key: 'table_type', fmt: (v) => v === 'VIEW' ? 'view' : 'table' },
+    { label: 'Columns', key: 'columns' },
+  ]);
+}
+
+loadLookups().then(render);
+</script>
+</body>
+</html>
