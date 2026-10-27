@@ -29,8 +29,8 @@ class TruckTeamApp extends ConsumerWidget {
     return MaterialApp(
       onGenerateTitle: (context) => L10n.of(context).appTitle,
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(colorSchemeSeed: const Color(0xFF1F6FEB), useMaterial3: true),
-      darkTheme: ThemeData(colorSchemeSeed: const Color(0xFF1F6FEB), brightness: Brightness.dark, useMaterial3: true),
+      theme: ThemeData(colorSchemeSeed: const Color(0xFF00539F), useMaterial3: true),
+      darkTheme: ThemeData(colorSchemeSeed: const Color(0xFF00539F), brightness: Brightness.dark, useMaterial3: true),
       locale: ref.watch(localeProvider),
       supportedLocales: L10n.supportedLocales,
       localizationsDelegates: const [

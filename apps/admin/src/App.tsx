@@ -10,6 +10,8 @@ import ShiftReview from './pages/ShiftReview';
 import Config from './pages/Config';
 import Team from './pages/Team';
 import Audit from './pages/Audit';
+import Brand from './components/Brand';
+import Toasts from './components/Toasts';
 
 export default function App() {
   const { t, i18n } = useTranslation();
@@ -17,11 +19,12 @@ export default function App() {
 
   if (needsPassword && session) return <SetPassword />;
   if (!session) return <Login />;
-  if (loading) return <div className="center muted">{t('common.loading')}</div>;
+  if (loading) return <div className="loading-screen">{t('common.loading')}</div>;
   if (!role || role === 'ttm') {
     return (
       <div className="center">
         <div className="card auth-card stack">
+          <Brand size="large" />
           <p>{t('login.noAccess')}</p>
           <button onClick={() => supabase.auth.signOut()}>{t('nav.signOut')}</button>
         </div>
@@ -31,8 +34,9 @@ export default function App() {
 
   return (
     <>
+      <Toasts />
       <header className="topbar">
-        <span className="brand">{t('app.title')}</span>
+        <Brand />
         <nav>
           <NavLink to="/" end>{t('nav.board')}</NavLink>
           <NavLink to="/config">{t('nav.config')}</NavLink>

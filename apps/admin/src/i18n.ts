@@ -2,7 +2,12 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
 const fr = {
-  app: { title: 'Truck Team OS', subtitle: 'Répartition et administration' },
+  app: { title: 'Truck Team OS', subtitle: 'Répartition et administration', region: 'Montréal', product: 'Répartition' },
+  ui: {
+    saved: 'Enregistré', dragHint: 'Glissez les lignes pour changer l’ordre', reordered: 'Ordre enregistré',
+    dragHandle: 'Déplacer', updatedAt: 'Mis à jour à {{time}}', refresh: 'Actualiser', unsaved: 'Modifications non enregistrées',
+    codeAuto: 'Généré automatiquement si vide',
+  },
   nav: { board: 'Tableau', config: 'Configuration', team: 'Équipe', audit: 'Journal', signOut: 'Se déconnecter' },
   common: {
     save: 'Enregistrer', cancel: 'Annuler', add: 'Ajouter', loading: 'Chargement…', none: 'Aucun',
@@ -25,6 +30,8 @@ const fr = {
     title: 'Quarts du jour', newShift: 'Nouveau quart', truck: 'Camion', phone: 'Téléphone', crew: 'Équipe',
     status: 'Statut', revenue: 'Revenus', jobs: 'Travaux', issues: 'À régler', create: 'Créer le quart',
     pickCrew: 'Choisir 2 ou 3 membres', empty: 'Aucun quart pour cette date.', open: 'Ouvrir',
+    toReview: 'À réviser', today: 'Aujourd’hui', inProgress: 'En cours', done: 'Acceptés', created: 'Quart créé',
+    noMatch: 'Aucun quart dans ce filtre.',
   },
   shift: {
     confirmHours: 'Confirmer le type d’heures', return: 'Retourner pour correction', lock: 'Accepter et verrouiller',
@@ -43,6 +50,10 @@ const fr = {
     crew: 'Équipe et pourboires', rankToday: 'Rang', rankFrozen: 'Rang figé', tipShare: 'Part des pourboires',
     addMember: 'Ajouter un membre', markLeft: 'A quitté', left: 'Parti à',
     returnedFor: 'Retourné', reopenedFor: 'Rouvert',
+    returnTitle: 'Retourner le quart à l’équipe', returnHelp: 'L’équipe verra cette raison sur son téléphone.',
+    reopenTitle: 'Rouvrir un quart accepté', reopenHelp: 'La raison est conservée dans le journal d’audit.',
+    locked: 'Quart accepté et verrouillé', returned: 'Quart retourné à l’équipe', reopened: 'Quart rouvert',
+    finalized: 'Annulation finalisée', countSaved: 'Comptant enregistré',
   },
   outcome: { completed: 'Complété', cancelled_pending: 'Annulé (à confirmer)', cancelled_confirmed: 'Annulé', draft: 'Brouillon' },
   problem: {
@@ -69,6 +80,8 @@ const fr = {
     transaction: 'Par pesée', never: 'Jamais', readOnly: 'Lecture seule : droits de configuration requis.',
     unit: 'Numéro', label: 'Libellé', siteType: 'Type de site', issuesTickets: 'Émet des billets',
     needsPhoto: 'Photo obligatoire', isCash: 'Comptant', value: 'Valeur', description: 'Description',
+    endRateTitle: 'Terminer ce tarif', endRateHelp: 'Dernier jour où ce tarif s’applique. Ajoutez ensuite le nouveau tarif.',
+    rateAdded: 'Tarif ajouté', rateEnded: 'Tarif terminé', pastRates: 'Tarifs antérieurs', ranks: 'Rangs',
   },
   team: {
     title: 'Équipe', employees: 'Employés', users: 'Utilisateurs', newEmployee: 'Nouvel employé',
@@ -83,7 +96,12 @@ const fr = {
 type Dict = typeof fr;
 
 const en: Dict = {
-  app: { title: 'Truck Team OS', subtitle: 'Dispatch and administration' },
+  app: { title: 'Truck Team OS', subtitle: 'Dispatch and administration', region: 'Montréal', product: 'Dispatch' },
+  ui: {
+    saved: 'Saved', dragHint: 'Drag rows to change the order', reordered: 'Order saved',
+    dragHandle: 'Move', updatedAt: 'Updated at {{time}}', refresh: 'Refresh', unsaved: 'Unsaved changes',
+    codeAuto: 'Generated automatically if empty',
+  },
   nav: { board: 'Board', config: 'Configuration', team: 'Team', audit: 'Audit log', signOut: 'Sign out' },
   common: {
     save: 'Save', cancel: 'Cancel', add: 'Add', loading: 'Loading…', none: 'None',
@@ -106,6 +124,8 @@ const en: Dict = {
     title: 'Shifts', newShift: 'New shift', truck: 'Truck', phone: 'Phone', crew: 'Crew',
     status: 'Status', revenue: 'Revenue', jobs: 'Jobs', issues: 'To fix', create: 'Create shift',
     pickCrew: 'Pick 2 or 3 members', empty: 'No shifts for this date.', open: 'Open',
+    toReview: 'To review', today: 'Today', inProgress: 'In progress', done: 'Accepted', created: 'Shift created',
+    noMatch: 'No shifts match this filter.',
   },
   shift: {
     confirmHours: 'Confirm hours type', return: 'Return for correction', lock: 'Accept & lock',
@@ -124,6 +144,10 @@ const en: Dict = {
     crew: 'Crew and tips', rankToday: 'Rank', rankFrozen: 'Rank frozen', tipShare: 'Tip share',
     addMember: 'Add member', markLeft: 'Left', left: 'Left at',
     returnedFor: 'Returned', reopenedFor: 'Reopened',
+    returnTitle: 'Return the shift to the crew', returnHelp: 'The crew will see this reason on their phone.',
+    reopenTitle: 'Reopen an accepted shift', reopenHelp: 'The reason is kept in the audit log.',
+    locked: 'Shift accepted and locked', returned: 'Shift returned to the crew', reopened: 'Shift reopened',
+    finalized: 'Cancellation finalized', countSaved: 'Cash count saved',
   },
   outcome: { completed: 'Completed', cancelled_pending: 'Cancelled (to confirm)', cancelled_confirmed: 'Cancelled', draft: 'Draft' },
   problem: {
@@ -150,6 +174,8 @@ const en: Dict = {
     transaction: 'Per weigh-in', never: 'Never', readOnly: 'Read only: configuration rights required.',
     unit: 'Unit', label: 'Label', siteType: 'Site type', issuesTickets: 'Issues tickets',
     needsPhoto: 'Photo required', isCash: 'Cash', value: 'Value', description: 'Description',
+    endRateTitle: 'End this rate', endRateHelp: 'Last day this rate applies. Then add the new rate.',
+    rateAdded: 'Rate added', rateEnded: 'Rate ended', pastRates: 'Past rates', ranks: 'Ranks',
   },
   team: {
     title: 'Team', employees: 'Employees', users: 'Users', newEmployee: 'New employee',

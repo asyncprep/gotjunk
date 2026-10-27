@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { dateTime, isAdminRole, money, must, supabase, time, type ShiftStatus } from '../lib/supabase';
 import { useAction, useLoad } from '../lib/hooks';
 import { useAuth } from '../lib/auth';
+import AskDialog from '../components/AskDialog';
 
 type Named = { name_fr: string; name_en: string } | null;
 const named = (n: Named, lang: string) => (n ? (lang === 'en' ? n.name_en : n.name_fr) : '');
@@ -42,6 +43,7 @@ export default function ShiftReview() {
   const [reasonPick, setReasonPick] = useState<Record<string, string>>({});
   const [cashForm, setCashForm] = useState<{ counted?: string; envelope?: string; resolution?: string }>({});
   const [newMember, setNewMember] = useState('');
+  const [asking, setAsking] = useState<'return' | 'reopen' | null>(null);
 
   if (!view.data) return <p className="muted">{view.error ?? t('common.loading')}</p>;
   const d = view.data;
@@ -54,12 +56,8 @@ export default function ShiftReview() {
   const photosFor = (entityId: string) => d.photos.filter((p: any) => p.entity_id === entityId);
   const tipFor = (employeeId: string) => d.tips.find((x: any) => x.employee_id === employeeId)?.tips ?? 0;
 
-  const updateShift = (patch: Record<string, unknown>) =>
-    action.run(() => must(supabase.from('shift').update(patch).eq('shift_id', shiftId).select()));
-  const withReason = (field: string, nextStatus: string) => {
-    const reason = window.prompt(t('shift.reasonPrompt'));
-    if (reason && reason.trim()) updateShift({ status: nextStatus, [field]: reason.trim() });
-  };
+  const updateShift = (patch: Record<string, unknown>, okText?: string) =>
+    action.run(() => must(supabase.from('shift').update(patch).eq('shift_id', shiftId).select()), okText);
   const openPhoto = async (path: string) => {
     const { data } = await supabase.storage.from('photos').createSignedUrl(path, 300);
     if (data?.signedUrl) window.open(data.signedUrl, '_blank', 'noopener');
@@ -69,7 +67,7 @@ export default function ShiftReview() {
     ...(cashForm.envelope !== undefined ? { envelope_id: cashForm.envelope || null } : {}),
     ...(cashForm.resolution !== undefined ? { mismatch_resolution: cashForm.resolution || null } : {}),
     received_by: session?.user.id,
-  }).eq('shift_id', shiftId).select()));
+  }).eq('shift_id', shiftId).select()), t('shift.countSaved'));
   const toggleCheck = (itemId: string, value: boolean) => action.run(() => must(
     supabase.from('shift_checklist_check').upsert({ shift_id: shiftId, item_id: itemId, checked: value }, { onConflict: 'shift_id,item_id' }).select()));
   const checkAll = () => action.run(() => must(supabase.from('shift_checklist_check').upsert(
@@ -78,7 +76,6 @@ export default function ShiftReview() {
   return (
     <>
       <p><Link to="/">← {t('common.back')}</Link></p>
-      {action.notice && <div className={`notice ${action.notice.ok ? 'ok' : 'err'}`}>{action.notice.text}</div>}
 
       <div className="card">
         <div className="row">
@@ -94,17 +91,17 @@ export default function ShiftReview() {
         </p>
         <div className="row">
           {['submitted', 'reopened', 'returned', 'in_progress'].includes(status) && s.hours_type && !s.hours_type_confirmed_at && (
-            <button disabled={action.busy} onClick={() => updateShift({ hours_type_confirmed_at: new Date().toISOString() })}>{t('shift.confirmHours')}</button>
+            <button disabled={action.busy} onClick={() => updateShift({ hours_type_confirmed_at: new Date().toISOString() }, t('ui.saved'))}>{t('shift.confirmHours')}</button>
           )}
           {status === 'submitted' && <>
-            <button disabled={action.busy} onClick={() => withReason('return_reason', 'returned')}>{t('shift.return')}</button>
-            <button className="primary" disabled={action.busy} onClick={() => updateShift({ status: 'locked' })}>{t('shift.lock')}</button>
+            <button disabled={action.busy} onClick={() => setAsking('return')}>{t('shift.return')}</button>
+            <button className="go" disabled={action.busy} onClick={() => updateShift({ status: 'locked' }, t('shift.locked'))}>{t('shift.lock')}</button>
           </>}
           {(status === 'locked' || (status === 'reconciled' && isAdminRole(role))) && (
-            <button disabled={action.busy} onClick={() => withReason('reopen_reason', 'reopened')}>{t('shift.reopen')}</button>
+            <button disabled={action.busy} onClick={() => setAsking('reopen')}>{t('shift.reopen')}</button>
           )}
           {status === 'locked' && isAdminRole(role) && (
-            <button disabled={action.busy} onClick={() => updateShift({ status: 'reconciled' })}>{t('shift.reconcile')}</button>
+            <button disabled={action.busy} onClick={() => updateShift({ status: 'reconciled' }, t('ui.saved'))}>{t('shift.reconcile')}</button>
           )}
         </div>
       </div>
@@ -161,7 +158,7 @@ export default function ShiftReview() {
                           </select>
                           <button disabled={!reasonPick[j.job_id] || action.busy} onClick={() => action.run(() => must(supabase.from('job')
                             .update({ outcome: 'cancelled_confirmed', cancellation_reason_id: reasonPick[j.job_id] })
-                            .eq('job_id', j.job_id).select()))}>{t('shift.finalize')}</button>
+                            .eq('job_id', j.job_id).select()), t('shift.finalized'))}>{t('shift.finalize')}</button>
                         </div>
                       )}
                     </td>
@@ -279,6 +276,21 @@ export default function ShiftReview() {
           </div>
         </div>
       </div>
+      <AskDialog
+        open={asking !== null}
+        kind="text"
+        title={asking === 'reopen' ? t('shift.reopenTitle') : t('shift.returnTitle')}
+        message={asking === 'reopen' ? t('shift.reopenHelp') : t('shift.returnHelp')}
+        confirmLabel={asking === 'reopen' ? t('shift.reopen') : t('shift.return')}
+        danger
+        onClose={() => setAsking(null)}
+        onConfirm={(reason) => {
+          const kind = asking;
+          setAsking(null);
+          if (kind === 'reopen') updateShift({ status: 'reopened', reopen_reason: reason }, t('shift.reopened'));
+          else updateShift({ status: 'returned', return_reason: reason }, t('shift.returned'));
+        }}
+      />
     </>
   );
 }

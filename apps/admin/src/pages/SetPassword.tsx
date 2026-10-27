@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../lib/auth';
+import Brand from '../components/Brand';
 
 // Shown after following an invite or password-reset link.
 export default function SetPassword() {
@@ -24,7 +25,8 @@ export default function SetPassword() {
   return (
     <div className="center">
       <form className="card auth-card" onSubmit={save}>
-        <h1>{t('login.setTitle')}</h1>
+        <Brand size="large" />
+        <h2>{t('login.setTitle')}</h2>
         {error && <div className="notice err">{error}</div>}
         <label>
           {t('login.password')}
@@ -32,7 +34,7 @@ export default function SetPassword() {
             onChange={(e) => setPassword(e.target.value)} />
           <span className="muted small">{t('login.minLength')}</span>
         </label>
-        <button className="primary">{t('login.setSubmit')}</button>
+        <button className="go">{t('login.setSubmit')}</button>
       </form>
     </div>
   );

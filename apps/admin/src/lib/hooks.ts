@@ -1,14 +1,16 @@
 import { useCallback, useEffect, useState } from 'react';
 import { explainError } from '../i18n';
+import { toast } from '../components/Toasts';
 
 // Loads data, exposes reload(), and turns failures into a readable message.
+// `quiet` reloads keep the current data on screen (no loading flash), for background refresh.
 export function useLoad<T>(load: () => Promise<T>, deps: unknown[]) {
   const [data, setData] = useState<T | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const reload = useCallback(async () => {
-    setLoading(true);
+  const reload = useCallback(async (quiet = false) => {
+    if (!quiet) setLoading(true);
     try {
       setData(await load());
       setError(null);
@@ -24,26 +26,28 @@ export function useLoad<T>(load: () => Promise<T>, deps: unknown[]) {
     reload();
   }, [reload]);
 
-  return { data, error, loading, reload };
+  return { data, error, loading, reload, setData };
 }
 
-// Runs an action, reports its outcome, then refreshes.
-export function useAction(onDone: () => unknown) {
+// Runs an action, reports the outcome as a toast, then refreshes quietly.
+export function useAction(onDone: (quiet?: boolean) => unknown) {
   const [busy, setBusy] = useState(false);
-  const [notice, setNotice] = useState<{ ok: boolean; text: string } | null>(null);
 
   const run = useCallback(async (fn: () => Promise<unknown>, okText?: string) => {
     setBusy(true);
     try {
       await fn();
-      setNotice(okText ? { ok: true, text: okText } : null);
-      await onDone();
+      if (okText) toast(okText);
+      await onDone(true);
+      return true;
     } catch (e) {
-      setNotice({ ok: false, text: explainError((e as Error).message) });
+      toast(explainError((e as Error).message), false);
+      await onDone(true);
+      return false;
     } finally {
       setBusy(false);
     }
   }, [onDone]);
 
-  return { busy, notice, setNotice, run };
+  return { busy, run };
 }

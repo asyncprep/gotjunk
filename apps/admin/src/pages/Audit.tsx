@@ -17,7 +17,7 @@ export default function Audit() {
 
   return (
     <>
-      <h1>{t('audit.title')}</h1>
+      <div className="page-head"><h1>{t('audit.title')}</h1></div>
       <Export />
       <div className="card">
         <div className="row" style={{ marginBottom: 10 }}>
@@ -101,7 +101,6 @@ function Export() {
   return (
     <div className="card">
       <h2>{t('audit.exportTitle')}</h2>
-      {action.notice && <div className={`notice ${action.notice.ok ? 'ok' : 'err'}`}>{action.notice.text}</div>}
       <div className="row">
         <label>{t('audit.fromDate')} <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} /></label>
         <label>{t('audit.toDate')} <input type="date" value={to} onChange={(e) => setTo(e.target.value)} /></label>

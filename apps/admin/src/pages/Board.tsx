@@ -1,26 +1,38 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { businessToday, money, must, supabase, type ShiftStatus } from '../lib/supabase';
+import { businessToday, money, must, supabase, time, type ShiftStatus } from '../lib/supabase';
 import { useAction, useLoad } from '../lib/hooks';
 
 type BoardShift = {
   shift_id: string;
   status: ShiftStatus;
-  hours_type: string | null;
+  truck_id: string;
+  phone_id: string;
   truck: { unit_number: string } | null;
   phone: { label: string } | null;
-  crew: { left_at: string | null; employee: { full_name: string } | null }[];
+  crew: { employee_id: string; left_at: string | null; employee: { full_name: string } | null }[];
   revenue: number;
   jobs: number;
   errors: number;
 };
 
+// Filter groups, in the order dispatch works through them.
+const GROUPS = {
+  all: null,
+  review: ['submitted'],
+  active: ['open', 'in_progress', 'returned', 'reopened'],
+  done: ['locked', 'reconciled'],
+} as const;
+type Group = keyof typeof GROUPS;
+const GROUP_LABEL: Record<Group, string> = { all: 'common.all', review: 'board.toReview', active: 'board.inProgress', done: 'board.done' };
+const RANK: Partial<Record<ShiftStatus, number>> = { submitted: 0, returned: 1, reopened: 1, in_progress: 2, open: 3, locked: 4, reconciled: 5 };
+
 async function loadBoard(date: string): Promise<BoardShift[]> {
   const shifts = await must(
     supabase
       .from('shift')
-      .select('shift_id, status, hours_type, truck:truck_id(unit_number), phone:phone_id(label), crew:shift_crew_member(left_at, employee:employee_id(full_name))')
+      .select('shift_id, status, truck_id, phone_id, truck:truck_id(unit_number), phone:phone_id(label), crew:shift_crew_member(employee_id, left_at, employee:employee_id(full_name))')
       .eq('shift_date', date)
       .neq('status', 'archived'),
   ) as unknown as Omit<BoardShift, 'revenue' | 'jobs' | 'errors'>[];
@@ -30,37 +42,97 @@ async function loadBoard(date: string): Promise<BoardShift[]> {
     : [];
   const errors = await Promise.all(ids.map(async (id) => {
     const rows = await must(supabase.rpc('shift_problems', { p_shift_id: id, p_stage: 'lock' }));
-    return (rows as { severity: string }[]).filter((p) => p.severity === 'error').length;
+    return new Set((rows as { severity: string; code: string }[]).filter((p) => p.severity === 'error').map((p) => p.code)).size;
   }));
   return shifts
     .map((s, i) => {
       const tot = totals.find((x) => x.shift_id === s.shift_id);
       return { ...s, revenue: Number(tot?.revenue_pre_tax ?? 0), jobs: Number(tot?.jobs_completed ?? 0), errors: errors[i] };
     })
-    .sort((a, b) => (a.truck?.unit_number ?? '').localeCompare(b.truck?.unit_number ?? ''));
+    .sort((a, b) => (RANK[a.status] ?? 9) - (RANK[b.status] ?? 9)
+      || (a.truck?.unit_number ?? '').localeCompare(b.truck?.unit_number ?? ''));
 }
+
+const shiftDay = (date: string, days: number) => {
+  const d = new Date(`${date}T12:00:00`);
+  d.setDate(d.getDate() + days);
+  return d.toISOString().slice(0, 10);
+};
 
 export default function Board() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [date, setDate] = useState(businessToday());
+  const [group, setGroup] = useState<Group>('all');
   const [showNew, setShowNew] = useState(false);
-  const board = useLoad(() => loadBoard(date), [date]);
+  const [updatedAt, setUpdatedAt] = useState<string>(new Date().toISOString());
+  const board = useLoad(async () => {
+    const data = await loadBoard(date);
+    setUpdatedAt(new Date().toISOString());
+    return data;
+  }, [date]);
+
+  // Keep the board current without a manual refresh: every minute and when the tab regains focus.
+  useEffect(() => {
+    const refresh = () => {
+      if (document.visibilityState === 'visible') board.reload(true);
+    };
+    const timer = setInterval(refresh, 60_000);
+    window.addEventListener('focus', refresh);
+    return () => {
+      clearInterval(timer);
+      window.removeEventListener('focus', refresh);
+    };
+  }, [board.reload]);
+
+  const all = board.data ?? [];
+  const inGroup = (g: Group, s: BoardShift) => GROUPS[g] === null || (GROUPS[g] as readonly string[]).includes(s.status);
+  const shown = all.filter((s) => inGroup(group, s));
 
   return (
     <>
-      <div className="row" style={{ marginBottom: 16 }}>
-        <h1 style={{ margin: 0 }}>{t('board.title')}</h1>
-        <input type="date" value={date} onChange={(e) => setDate(e.target.value)} aria-label={t('common.date')} />
-        <button className="primary right" onClick={() => setShowNew((v) => !v)}>{t('board.newShift')}</button>
+      <div className="page-head">
+        <h1>{t('board.title')}</h1>
+        <div className="row">
+          <button className="ghost" aria-label="−1" onClick={() => setDate(shiftDay(date, -1))}>‹</button>
+          <input type="date" value={date} onChange={(e) => e.target.value && setDate(e.target.value)} aria-label={t('common.date')} />
+          <button className="ghost" aria-label="+1" onClick={() => setDate(shiftDay(date, 1))}>›</button>
+          {date !== businessToday() && <button className="link" onClick={() => setDate(businessToday())}>{t('board.today')}</button>}
+        </div>
+        <span className="muted small">
+          {t('ui.updatedAt', { time: time(updatedAt, i18n.language) })}{' '}
+          <button className="link" onClick={() => board.reload(true)}>{t('ui.refresh')}</button>
+        </span>
+        <button className="go right" onClick={() => setShowNew((v) => !v)}>+ {t('board.newShift')}</button>
       </div>
 
-      {showNew && <NewShift date={date} onCreated={() => { setShowNew(false); board.reload(); }} />}
+      {showNew && (
+        <NewShift
+          date={date}
+          taken={all}
+          onCreated={() => { setShowNew(false); board.reload(true); }}
+          onCancel={() => setShowNew(false)}
+        />
+      )}
+
+      <div className="chips" role="tablist">
+        {(Object.keys(GROUPS) as Group[]).map((g) => {
+          const n = all.filter((s) => inGroup(g, s)).length;
+          return (
+            <button key={g} role="tab" aria-selected={group === g}
+              className={`chip ${group === g ? 'on' : ''} ${g === 'review' && n > 0 ? 'attention' : ''}`}
+              onClick={() => setGroup(g)}>
+              {t(GROUP_LABEL[g])} <span className="n">{n}</span>
+            </button>
+          );
+        })}
+      </div>
 
       <div className="card">
         {board.error && <div className="notice err">{board.error}</div>}
         {board.loading && !board.data ? <p className="muted">{t('common.loading')}</p>
-          : !board.data?.length ? <p className="muted">{t('board.empty')}</p>
+          : !all.length ? <div className="empty">{t('board.empty')}</div>
+          : !shown.length ? <div className="empty">{t('board.noMatch')}</div>
           : (
             <div className="table-wrap">
               <table>
@@ -72,8 +144,10 @@ export default function Board() {
                   </tr>
                 </thead>
                 <tbody>
-                  {board.data.map((s) => (
-                    <tr key={s.shift_id} className="clickable" onClick={() => navigate(`/shift/${s.shift_id}`)}>
+                  {shown.map((s) => (
+                    <tr key={s.shift_id} className="clickable" tabIndex={0}
+                      onClick={() => navigate(`/shift/${s.shift_id}`)}
+                      onKeyDown={(e) => e.key === 'Enter' && navigate(`/shift/${s.shift_id}`)}>
                       <td><strong>{s.truck?.unit_number}</strong></td>
                       <td>{s.phone?.label}</td>
                       <td>{s.crew.filter((c) => !c.left_at).map((c) => c.employee?.full_name).join(', ')}</td>
@@ -92,7 +166,9 @@ export default function Board() {
   );
 }
 
-function NewShift({ date, onCreated }: { date: string; onCreated: () => void }) {
+function NewShift({ date, taken, onCreated, onCancel }: {
+  date: string; taken: BoardShift[]; onCreated: () => void; onCancel: () => void;
+}) {
   const { t } = useTranslation();
   const options = useLoad(async () => ({
     trucks: await must(supabase.from('truck').select('truck_id, unit_number').eq('active', true).order('unit_number')),
@@ -105,12 +181,17 @@ function NewShift({ date, onCreated }: { date: string; onCreated: () => void }) 
   const action = useAction(onCreated);
 
   if (!options.data) return <div className="card muted">{options.error ?? t('common.loading')}</div>;
-  const { trucks, phones, employees } = options.data;
+  // Only offer what isn't already on a shift that day.
+  const usedTrucks = new Set(taken.map((s) => s.truck_id));
+  const usedPhones = new Set(taken.map((s) => s.phone_id));
+  const usedPeople = new Set(taken.flatMap((s) => s.crew.map((c) => c.employee_id)));
+  const trucks = options.data.trucks.filter((x) => !usedTrucks.has(x.truck_id));
+  const phones = options.data.phones.filter((x) => !usedPhones.has(x.phone_id));
+  const employees = options.data.employees.filter((x) => !usedPeople.has(x.employee_id));
 
   return (
     <div className="card">
       <h2>{t('board.newShift')} · {date}</h2>
-      {action.notice && <div className={`notice ${action.notice.ok ? 'ok' : 'err'}`}>{action.notice.text}</div>}
       <div className="row">
         <select value={truck} onChange={(e) => setTruck(e.target.value)} aria-label={t('board.truck')}>
           <option value="">{t('board.truck')}…</option>
@@ -121,10 +202,10 @@ function NewShift({ date, onCreated }: { date: string; onCreated: () => void }) 
           {phones.map((x) => <option key={x.phone_id} value={x.phone_id}>{x.label}</option>)}
         </select>
       </div>
-      <p className="muted small">{t('board.pickCrew')}</p>
+      <p className="muted small">{t('board.pickCrew')} ({crew.length})</p>
       <div className="row checks">
         {employees.map((e) => (
-          <label key={e.employee_id}>
+          <label key={e.employee_id} className="chip" style={{ cursor: 'pointer' }}>
             <input
               type="checkbox"
               checked={crew.includes(e.employee_id)}
@@ -134,16 +215,17 @@ function NewShift({ date, onCreated }: { date: string; onCreated: () => void }) 
           </label>
         ))}
       </div>
-      <div className="row">
+      <div className="row" style={{ marginTop: 12 }}>
         <button
-          className="primary"
+          className="go"
           disabled={action.busy || !truck || !phone || crew.length === 0}
           onClick={() => action.run(() => must(supabase.rpc('create_shift', {
             p_shift_date: date, p_truck_id: truck, p_phone_id: phone, p_crew: crew,
-          })))}
+          })), t('board.created'))}
         >
           {t('board.create')}
         </button>
+        <button className="ghost" onClick={onCancel}>{t('common.cancel')}</button>
       </div>
     </div>
   );

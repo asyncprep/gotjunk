@@ -3,14 +3,13 @@ import { useTranslation } from 'react-i18next';
 import { businessToday, isAdminRole, must, supabase, type Role } from '../lib/supabase';
 import { useAction, useLoad } from '../lib/hooks';
 import { useAuth } from '../lib/auth';
-import { explainError } from '../i18n';
 
 export default function Team() {
   const { t } = useTranslation();
   const [tab, setTab] = useState<'employees' | 'users'>('employees');
   return (
     <>
-      <h1>{t('team.title')}</h1>
+      <div className="page-head"><h1>{t('team.title')}</h1></div>
       <div className="tabs">
         <button className={tab === 'employees' ? 'on' : ''} onClick={() => setTab('employees')}>{t('team.employees')}</button>
         <button className={tab === 'users' ? 'on' : ''} onClick={() => setTab('users')}>{t('team.users')}</button>
@@ -43,7 +42,6 @@ function Employees() {
 
   return (
     <div className="card">
-      {action.notice && <div className={`notice ${action.notice.ok ? 'ok' : 'err'}`}>{action.notice.text}</div>}
       <div className="table-wrap">
         <table>
           <thead><tr>
@@ -72,7 +70,7 @@ function Employees() {
                             p_employee_id: e.employee_id, p_rank_id: editing.rank_id, p_effective_from: editing.from,
                           }));
                           setRankEdit(null);
-                        })}>{t('common.save')}</button>
+                        }, t('ui.saved'))}>{t('common.save')}</button>
                         <button onClick={() => setRankEdit(null)}>{t('common.cancel')}</button>
                       </div>
                     ) : rankName(cur?.rank_id ?? null)}
@@ -101,12 +99,12 @@ function Employees() {
           <select value={draft.preferred_language} onChange={(e) => setDraft({ ...draft, preferred_language: e.target.value })}>
             <option value="fr">FR</option><option value="en">EN</option>
           </select>
-          <button className="primary" disabled={!draft.full_name.trim() || action.busy} onClick={() => action.run(async () => {
+          <button className="go" disabled={!draft.full_name.trim() || action.busy} onClick={() => action.run(async () => {
             await must(supabase.from('employee').insert({
               full_name: draft.full_name.trim(), ceridian_id: draft.ceridian_id.trim() || null, preferred_language: draft.preferred_language,
             }).select());
             setDraft({ full_name: '', ceridian_id: '', preferred_language: 'fr' });
-          })}>{t('team.newEmployee')}</button>
+          }, t('ui.saved'))}>{t('team.newEmployee')}</button>
         </div>
       )}
     </div>
@@ -141,7 +139,6 @@ function Users() {
 
   return (
     <div className="card">
-      {action.notice && <div className={`notice ${action.notice.ok ? 'ok' : 'err'}`}>{explainError(action.notice.text)}</div>}
       <div className="table-wrap">
         <table>
           <thead><tr>
@@ -185,7 +182,7 @@ function Users() {
               <label className="row"><input type="checkbox" checked={invite.can_edit_config}
                 onChange={(e) => setInvite({ ...invite, can_edit_config: e.target.checked })} /> {t('team.configRights')}</label>
             )}
-            <button className="primary" disabled={!invite.email || action.busy || (invite.role === 'ttm' && !invite.employee_id)}
+            <button className="go" disabled={!invite.email || action.busy || (invite.role === 'ttm' && !invite.employee_id)}
               onClick={() => action.run(sendInvite, t('team.inviteSent'))}>{t('team.sendInvite')}</button>
           </div>
         </>

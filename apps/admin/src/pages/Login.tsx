@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '../lib/supabase';
+import Brand from '../components/Brand';
 
 export default function Login() {
   const { t } = useTranslation();
@@ -26,8 +27,8 @@ export default function Login() {
   return (
     <div className="center">
       <form className="card auth-card" onSubmit={signIn}>
-        <h1>{t('app.title')}</h1>
-        <p className="muted">{t('app.subtitle')}</p>
+        <Brand size="large" />
+        <h2>{t('login.title')}</h2>
         {message && <div className={`notice ${message.ok ? 'ok' : 'err'}`}>{message.text}</div>}
         <label>
           {t('login.email')}
@@ -38,8 +39,10 @@ export default function Login() {
           <input type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} />
         </label>
         <div className="row">
-          <button className="primary" disabled={busy}>{t('login.submit')}</button>
-          <button type="button" className="link right" onClick={forgot}>{t('login.forgot')}</button>
+          <button className="go" disabled={busy}>{t('login.submit')}</button>
+        </div>
+        <div className="row" style={{ marginTop: 12 }}>
+          <button type="button" className="link" onClick={forgot}>{t('login.forgot')}</button>
         </div>
       </form>
     </div>
