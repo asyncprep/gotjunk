@@ -61,6 +61,7 @@ entered; external systems are matched automatically; admins handle only true exc
 | Environment | Supabase project | Region | Deploys |
 | --- | --- | --- | --- |
 | Development (current) | `gotjunk-ca` (`vrtvjnaykhlzyfbrllup`) | Canada (Central), ca-central-1 | Automatically from `main` via the Supabase GitHub integration |
+| Admin web app | Vercel `gotjunk-admin` (Hobby for now; upgrade to Pro before the pilot) | https://gotjunk.innodigital.ca (also gotjunk-admin.vercel.app) | Automatically from `main`, root `apps/admin` |
 | Local | PGlite (`tools/dbtest`) | Your machine | `npm test`, `node explorer.mjs` |
 
 A separate production project (also ca-central-1, Pro plan) is planned before the pilot. The earlier
