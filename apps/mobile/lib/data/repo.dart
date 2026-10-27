@@ -51,12 +51,12 @@ class Repo {
         coalesce(sum(
           CASE WHEN j.outcome = 'completed' AND j.tip_amount > 0 AND EXISTS (
             SELECT 1 FROM shift_crew_member me WHERE me.shift_id = j.shift_id AND me.employee_id = ?
-              AND me.joined_at <= coalesce(j.completed_at, j.created_at)
-              AND (me.left_at IS NULL OR me.left_at > coalesce(j.completed_at, j.created_at)))
+              AND julianday(me.joined_at) <= julianday(coalesce(j.completed_at, j.created_at))
+              AND (me.left_at IS NULL OR julianday(me.left_at) > julianday(coalesce(j.completed_at, j.created_at))))
           THEN j.tip_amount / (
             SELECT count(*) FROM shift_crew_member m WHERE m.shift_id = j.shift_id
-              AND m.joined_at <= coalesce(j.completed_at, j.created_at)
-              AND (m.left_at IS NULL OR m.left_at > coalesce(j.completed_at, j.created_at)))
+              AND julianday(m.joined_at) <= julianday(coalesce(j.completed_at, j.created_at))
+              AND (m.left_at IS NULL OR julianday(m.left_at) > julianday(coalesce(j.completed_at, j.created_at))))
           END), 0) AS my_tips
       FROM job j WHERE j.shift_id = ?''', parameters: [employeeId, shiftId]).map((rows) {
         final r = rows.first;

@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import { NavLink, Route, Routes } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from './lib/auth';
@@ -5,12 +6,13 @@ import { supabase } from './lib/supabase';
 import { setLanguage } from './i18n';
 import Login from './pages/Login';
 import SetPassword from './pages/SetPassword';
-import Board from './pages/Board';
-import ShiftReview from './pages/ShiftReview';
-import Config from './pages/Config';
-import Team from './pages/Team';
-import Audit from './pages/Audit';
-import Project from './pages/Project';
+// Pages load on demand so the sign-in screen and first page arrive quickly.
+const Board = lazy(() => import('./pages/Board'));
+const ShiftReview = lazy(() => import('./pages/ShiftReview'));
+const Config = lazy(() => import('./pages/Config'));
+const Team = lazy(() => import('./pages/Team'));
+const Audit = lazy(() => import('./pages/Audit'));
+const Project = lazy(() => import('./pages/Project'));
 import Brand from './components/Brand';
 import Toasts from './components/Toasts';
 
@@ -58,6 +60,7 @@ export default function App() {
         <button onClick={() => supabase.auth.signOut()}>{t('nav.signOut')}</button>
       </header>
       <main>
+        <Suspense fallback={<div className="muted">{t('common.loading')}</div>}>
         <Routes>
           <Route path="/" element={<Board />} />
           <Route path="/shift/:shiftId" element={<ShiftReview />} />
@@ -67,6 +70,7 @@ export default function App() {
           <Route path="/project" element={<Project />} />
           <Route path="*" element={<Board />} />
         </Routes>
+        </Suspense>
       </main>
     </>
   );

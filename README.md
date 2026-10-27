@@ -15,17 +15,20 @@ The product specification (v0.3) is a client document and is not stored in this 
 | `supabase/seed.sql` | Development reference data (sites, rates, lookups, demo fleet) |
 | `supabase/tests/` | SQL tests: `_fixture.sql` per test, `*.test.sql` cases |
 | `tools/dbtest/` | Test runner: migrations + tests in PGlite, no Docker needed |
-| `apps/mobile/` | Flutter crew app (next) |
+| `apps/mobile/` | Flutter crew app (Android first): `flutter run` (sync needs `--dart-define=POWERSYNC_URL=…`, see [docs/powersync-setup.md](docs/powersync-setup.md)) |
 | `apps/admin/` | React dispatch/admin web app: `npm install && npm run dev` (needs `.env.local`, see `.env.example`) |
 | `supabase/functions/` | Edge Functions (`invite-user`), deployed with the migrations |
 
-## Database tests
+## Tests
 
-```bash
-cd tools/dbtest && npm install && npm test
-```
+Run all four before pushing; none needs Docker.
 
-Filter by name: `node run.mjs "tip split"`.
+| What | Command | Covers |
+| --- | --- | --- |
+| Database | `cd tools/dbtest && npm install && npm test` | Migrations, rules, RLS, calculations (filter: `node run.mjs "tip split"`) |
+| Admin app | `cd apps/admin && npm run build` | Type-check and production build |
+| Crew app (unit/widget) | `cd apps/mobile && flutter analyze && flutter test` | Amount parsing, refusal messages, retry rules, sign-in screen fr/en |
+| Crew app (on device) | `cd apps/mobile && flutter test integration_test -d <device>` | On-phone database: queries, scoreboard and tip split, upload queue, refusals |
 
 ## How the backend works
 
