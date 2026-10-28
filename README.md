@@ -13,6 +13,7 @@ The product specification (v0.3) is a client document and is not stored in this 
 | --- | --- |
 | `supabase/migrations/` | Database schema, business rules, permissions (the system of record) |
 | `supabase/seed.sql` | Development reference data (sites, rates, lookups, demo fleet) |
+| `supabase/demo-data.sql` | **Dev only.** Demo employees (“(démo)”), trucks DÉMO-1…3 and shifts in every state; remove with `demo-data-cleanup.sql` |
 | `supabase/tests/` | SQL tests: `_fixture.sql` per test, `*.test.sql` cases |
 | `tools/dbtest/` | Test runner: migrations + tests in PGlite, no Docker needed |
 | `apps/mobile/` | Flutter crew app (Android first): `flutter run` (sync needs `--dart-define=POWERSYNC_URL=…`, see [docs/powersync-setup.md](docs/powersync-setup.md)) |
