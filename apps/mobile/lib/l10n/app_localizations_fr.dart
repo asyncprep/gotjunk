@@ -257,4 +257,100 @@ class L10nFr extends L10n {
 
   @override
   String get language => 'Langue';
+
+  @override
+  String get disposal => 'Dépotoir';
+
+  @override
+  String get addVisit => 'Ajouter une visite';
+
+  @override
+  String get visitTitle => 'Visite au dépotoir';
+
+  @override
+  String get site => 'Site';
+
+  @override
+  String get ticketNumber => 'No de billet';
+
+  @override
+  String get ticketPhoto => 'Photo du billet';
+
+  @override
+  String get takePhoto => 'Prendre une photo';
+
+  @override
+  String get retakePhoto => 'Ajouter une photo';
+
+  @override
+  String photosCount(int count) {
+    return '$count photo(s)';
+  }
+
+  @override
+  String get material => 'Matière';
+
+  @override
+  String get weightKg => 'Poids (kg)';
+
+  @override
+  String get addMaterial => 'Ajouter la pesée';
+
+  @override
+  String get noVisits => 'Aucune visite au dépotoir.';
+
+  @override
+  String get noLines => 'Aucune pesée.';
+
+  @override
+  String get estimate => 'estimé';
+
+  @override
+  String get netDisposal => 'Dépotoir net';
+
+  @override
+  String get noRate => 'Aucun tarif pour cette matière à ce site';
+
+  @override
+  String get deleteVisit => 'Supprimer la visite';
+
+  @override
+  String get cash => 'Comptant';
+
+  @override
+  String get expectedCash => 'Comptant à remettre';
+
+  @override
+  String get cashPhoto => 'Photo du comptant';
+
+  @override
+  String get cashPhotoHint => 'Étalez le comptant et prenez-le en photo.';
+
+  @override
+  String get cashPhotoDone => 'Photo du comptant prise';
+
+  @override
+  String get noCash => 'Aucun travail payé comptant.';
+
+  @override
+  String get fixFirst => 'À régler avant de soumettre :';
+
+  @override
+  String photosWaiting(int count) {
+    return '$count photo(s) en attente d’envoi';
+  }
+
+  @override
+  String reasonIs(String reason) {
+    return 'Raison : $reason';
+  }
+
+  @override
+  String get cameraError => 'Impossible d’ouvrir la caméra';
+
+  @override
+  String get invalidWeight => 'Poids invalide';
+
+  @override
+  String get done => 'Terminé';
 }

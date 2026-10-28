@@ -13,6 +13,12 @@ streams:
       - SELECT code AS id, name_fr, name_en, is_cash, active FROM payment_method
       - SELECT reason_id AS id, name_fr, name_en FROM cancellation_reason WHERE active = true
       - SELECT key AS id, value FROM app_setting
+      - SELECT site_id AS id, code, name, issues_tickets, requires_ticket_photo, active FROM site
+      - SELECT material_type_id AS id, code, name_fr, name_en, active FROM material_type
+      - >-
+        SELECT rate_config_id AS id, site_id, material_type_id, rate_per_ton, direction, min_billable_kg,
+               min_applies_to, effective_from, effective_to, active
+        FROM site_rate_config
 
   me:
     auto_subscribe: true
@@ -35,6 +41,28 @@ streams:
       - >-
         SELECT j.job_id AS id, j.* FROM job j
         INNER JOIN shift_crew_member m ON m.shift_id = j.shift_id
+        INNER JOIN app_user u ON u.employee_id = m.employee_id
+        WHERE u.user_id = auth.user_id()
+      - >-
+        SELECT v.disposal_visit_id AS id, v.* FROM disposal_visit v
+        INNER JOIN shift_crew_member m ON m.shift_id = v.shift_id
+        INNER JOIN app_user u ON u.employee_id = m.employee_id
+        WHERE u.user_id = auth.user_id()
+      - >-
+        SELECT t.material_txn_id AS id, t.* FROM disposal_material_txn t
+        INNER JOIN disposal_visit v ON v.disposal_visit_id = t.disposal_visit_id
+        INNER JOIN shift_crew_member m ON m.shift_id = v.shift_id
+        INNER JOIN app_user u ON u.employee_id = m.employee_id
+        WHERE u.user_id = auth.user_id()
+      - >-
+        SELECT c.cash_submission_id AS id, c.shift_id, c.counted_cash, c.created_at FROM cash_submission c
+        INNER JOIN shift_crew_member m ON m.shift_id = c.shift_id
+        INNER JOIN app_user u ON u.employee_id = m.employee_id
+        WHERE u.user_id = auth.user_id()
+      - >-
+        SELECT p.photo_id AS id, p.shift_id, p.photo_kind, p.entity_type, p.entity_id, p.storage_path,
+               p.captured_at, p.uploaded_at FROM photo p
+        INNER JOIN shift_crew_member m ON m.shift_id = p.shift_id
         INNER JOIN app_user u ON u.employee_id = m.employee_id
         WHERE u.user_id = auth.user_id()
       - >-

@@ -28,7 +28,7 @@ Run all four before pushing; none needs Docker.
 | Database | `cd tools/dbtest && npm install && npm test` | Migrations, rules, RLS, calculations (filter: `node run.mjs "tip split"`) |
 | Admin app | `cd apps/admin && npm run build` | Type-check and production build |
 | Crew app (unit/widget) | `cd apps/mobile && flutter analyze && flutter test` | Amount parsing, refusal messages, retry rules, sign-in screen fr/en |
-| Crew app (on device) | `cd apps/mobile && flutter test integration_test -d <device>` | On-phone database: queries, scoreboard and tip split, upload queue, refusals |
+| Crew app (on device) | `cd apps/mobile && flutter test integration_test -d <device>` | On-phone database and screens: shift, jobs, scoreboard and tip split, disposal pricing, cash, photos and their upload queue, pre-submit checks, refusals; taps through the real screens |
 
 ## How the backend works
 

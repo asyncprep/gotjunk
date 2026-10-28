@@ -25,7 +25,13 @@
   "statusReopened": "Rouvert",
   "statusReconciled": "Rapproché",
   "returnedBecause": "Retourné : {reason}",
-  "@returnedBecause": { "placeholders": { "reason": { "type": "String" } } },
+  "@returnedBecause": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
   "scoreboard": "Tableau de bord",
   "revenue": "Revenus avant taxes",
   "jobsDone": "Travaux",
@@ -64,7 +70,13 @@
   "syncing": "Synchronisation…",
   "synced": "À jour",
   "pendingUploads": "{count} modification(s) en attente",
-  "@pendingUploads": { "placeholders": { "count": { "type": "int" } } },
+  "@pendingUploads": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "rejected": "Refusé par le serveur",
   "dismiss": "OK",
   "problem_crew_size": "Taille d’équipe invalide",
@@ -80,5 +92,56 @@
   "err_shift_locked": "Le quart est verrouillé",
   "err_not_allowed": "Action non permise",
   "err_hours_type_missing": "Choisissez le type d’heures",
-  "language": "Langue"
+  "language": "Langue",
+  "disposal": "Dépotoir",
+  "addVisit": "Ajouter une visite",
+  "visitTitle": "Visite au dépotoir",
+  "site": "Site",
+  "ticketNumber": "No de billet",
+  "ticketPhoto": "Photo du billet",
+  "takePhoto": "Prendre une photo",
+  "retakePhoto": "Ajouter une photo",
+  "photosCount": "{count} photo(s)",
+  "material": "Matière",
+  "weightKg": "Poids (kg)",
+  "addMaterial": "Ajouter la pesée",
+  "noVisits": "Aucune visite au dépotoir.",
+  "noLines": "Aucune pesée.",
+  "estimate": "estimé",
+  "netDisposal": "Dépotoir net",
+  "noRate": "Aucun tarif pour cette matière à ce site",
+  "deleteVisit": "Supprimer la visite",
+  "cash": "Comptant",
+  "expectedCash": "Comptant à remettre",
+  "cashPhoto": "Photo du comptant",
+  "cashPhotoHint": "Étalez le comptant et prenez-le en photo.",
+  "cashPhotoDone": "Photo du comptant prise",
+  "noCash": "Aucun travail payé comptant.",
+  "fixFirst": "À régler avant de soumettre :",
+  "photosWaiting": "{count} photo(s) en attente d’envoi",
+  "reasonIs": "Raison : {reason}",
+  "cameraError": "Impossible d’ouvrir la caméra",
+  "invalidWeight": "Poids invalide",
+  "done": "Terminé",
+  "@photosCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@photosWaiting": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@reasonIs": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  }
 }

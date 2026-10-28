@@ -108,6 +108,7 @@ IDs A–G match the spec's §15 open items; R1–R5 came from the spec review; S
 | P1 | Confirm French as the default language for crews and dispatch | French default, English available |
 | P2 | How long should cash and ticket photos be kept? Who is the Law 25 privacy officer? | Not set |
 | P3 | Can the product spec PDF be stored in the code repository? | Kept out of the repo |
+| P4 🟠 | Offline sync (PowerSync Cloud) has no Canadian region, so its synced copy of crew data (shifts, jobs, amounts, crew names) is hosted in the **US** for the pilot. The main database stays in Canada. Is that acceptable for the pilot, and must production keep everything in Canada? | US region for the pilot; self-host PowerSync in Canada before production unless the client accepts the US region |
 
 ## Pilot and rollout
 

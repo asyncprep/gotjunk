@@ -39,8 +39,10 @@ class Repo {
       FROM shift_crew_member m LEFT JOIN employee e ON e.id = m.employee_id
       WHERE m.shift_id = ? ORDER BY m.joined_at, e.full_name''', parameters: [shiftId]).map(_list);
 
-  Stream<List<Map<String, dynamic>>> jobs(String shiftId) => db.watch(
-      'SELECT * FROM job WHERE shift_id = ? ORDER BY created_at, id', parameters: [shiftId]).map(_list);
+  Stream<List<Map<String, dynamic>>> jobs(String shiftId) => db.watch('''
+      SELECT j.*, r.name_fr AS reason_fr, r.name_en AS reason_en
+      FROM job j LEFT JOIN cancellation_reason r ON r.id = j.cancellation_reason_id
+      WHERE j.shift_id = ? ORDER BY j.created_at, j.id''', parameters: [shiftId]).map(_list);
 
   /// Live scoreboard, calculated on the phone so it works offline.
   Stream<Scoreboard> scoreboard(String shiftId, String employeeId) => db.watch('''

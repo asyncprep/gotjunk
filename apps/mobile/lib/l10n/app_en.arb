@@ -25,7 +25,13 @@
   "statusReopened": "Reopened",
   "statusReconciled": "Reconciled",
   "returnedBecause": "Returned: {reason}",
-  "@returnedBecause": { "placeholders": { "reason": { "type": "String" } } },
+  "@returnedBecause": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
   "scoreboard": "Scoreboard",
   "revenue": "Revenue before tax",
   "jobsDone": "Jobs",
@@ -64,7 +70,13 @@
   "syncing": "Syncing…",
   "synced": "Up to date",
   "pendingUploads": "{count} change(s) waiting to send",
-  "@pendingUploads": { "placeholders": { "count": { "type": "int" } } },
+  "@pendingUploads": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "rejected": "Refused by the server",
   "dismiss": "OK",
   "problem_crew_size": "Invalid crew size",
@@ -80,5 +92,35 @@
   "err_shift_locked": "The shift is locked",
   "err_not_allowed": "Not allowed",
   "err_hours_type_missing": "Choose the hours type",
-  "language": "Language"
+  "language": "Language",
+  "disposal": "Disposal",
+  "addVisit": "Add a visit",
+  "visitTitle": "Disposal visit",
+  "site": "Site",
+  "ticketNumber": "Ticket number",
+  "ticketPhoto": "Ticket photo",
+  "takePhoto": "Take a photo",
+  "retakePhoto": "Add a photo",
+  "photosCount": "{count} photo(s)",
+  "material": "Material",
+  "weightKg": "Weight (kg)",
+  "addMaterial": "Add weigh-in",
+  "noVisits": "No disposal visits.",
+  "noLines": "No weigh-ins.",
+  "estimate": "estimate",
+  "netDisposal": "Net disposal",
+  "noRate": "No rate for this material at this site",
+  "deleteVisit": "Delete visit",
+  "cash": "Cash",
+  "expectedCash": "Cash to hand in",
+  "cashPhoto": "Cash photo",
+  "cashPhotoHint": "Lay the cash out and photograph it.",
+  "cashPhotoDone": "Cash photo taken",
+  "noCash": "No cash jobs.",
+  "fixFirst": "Fix before submitting:",
+  "photosWaiting": "{count} photo(s) waiting to upload",
+  "reasonIs": "Reason: {reason}",
+  "cameraError": "Couldn't open the camera",
+  "invalidWeight": "Invalid weight",
+  "done": "Done"
 }

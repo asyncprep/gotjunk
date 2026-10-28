@@ -253,4 +253,100 @@ class L10nEn extends L10n {
 
   @override
   String get language => 'Language';
+
+  @override
+  String get disposal => 'Disposal';
+
+  @override
+  String get addVisit => 'Add a visit';
+
+  @override
+  String get visitTitle => 'Disposal visit';
+
+  @override
+  String get site => 'Site';
+
+  @override
+  String get ticketNumber => 'Ticket number';
+
+  @override
+  String get ticketPhoto => 'Ticket photo';
+
+  @override
+  String get takePhoto => 'Take a photo';
+
+  @override
+  String get retakePhoto => 'Add a photo';
+
+  @override
+  String photosCount(int count) {
+    return '$count photo(s)';
+  }
+
+  @override
+  String get material => 'Material';
+
+  @override
+  String get weightKg => 'Weight (kg)';
+
+  @override
+  String get addMaterial => 'Add weigh-in';
+
+  @override
+  String get noVisits => 'No disposal visits.';
+
+  @override
+  String get noLines => 'No weigh-ins.';
+
+  @override
+  String get estimate => 'estimate';
+
+  @override
+  String get netDisposal => 'Net disposal';
+
+  @override
+  String get noRate => 'No rate for this material at this site';
+
+  @override
+  String get deleteVisit => 'Delete visit';
+
+  @override
+  String get cash => 'Cash';
+
+  @override
+  String get expectedCash => 'Cash to hand in';
+
+  @override
+  String get cashPhoto => 'Cash photo';
+
+  @override
+  String get cashPhotoHint => 'Lay the cash out and photograph it.';
+
+  @override
+  String get cashPhotoDone => 'Cash photo taken';
+
+  @override
+  String get noCash => 'No cash jobs.';
+
+  @override
+  String get fixFirst => 'Fix before submitting:';
+
+  @override
+  String photosWaiting(int count) {
+    return '$count photo(s) waiting to upload';
+  }
+
+  @override
+  String reasonIs(String reason) {
+    return 'Reason: $reason';
+  }
+
+  @override
+  String get cameraError => 'Couldn\'t open the camera';
+
+  @override
+  String get invalidWeight => 'Invalid weight';
+
+  @override
+  String get done => 'Done';
 }

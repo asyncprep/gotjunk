@@ -42,6 +42,69 @@ const schema = Schema([
   ], indexes: [
     Index('by_shift', [IndexedColumn('shift_id')]),
   ]),
+  Table('disposal_visit', [
+    Column.text('shift_id'),
+    Column.text('site_id'),
+    Column.text('visit_at'),
+    Column.text('ticket_number'),
+    Column.text('notes'),
+    Column.text('created_at'),
+  ], indexes: [
+    Index('by_shift', [IndexedColumn('shift_id')]),
+  ]),
+  // Price columns are filled by the server; the phone shows a local estimate until then.
+  Table('disposal_material_txn', [
+    Column.text('disposal_visit_id'),
+    Column.text('material_type_id'),
+    Column.real('weight_kg'),
+    Column.real('rate_per_ton_applied'),
+    Column.text('direction'),
+    Column.real('billable_kg'),
+    Column.real('signed_amount'),
+    Column.text('created_at'),
+  ], indexes: [
+    Index('by_visit', [IndexedColumn('disposal_visit_id')]),
+  ]),
+  Table('cash_submission', [
+    Column.text('shift_id'),
+    Column.real('counted_cash'),
+    Column.text('created_at'),
+  ]),
+  Table('photo', [
+    Column.text('shift_id'),
+    Column.text('photo_kind'),
+    Column.text('entity_type'),
+    Column.text('entity_id'),
+    Column.text('storage_path'),
+    Column.text('captured_at'),
+    Column.text('uploaded_at'),
+  ], indexes: [
+    Index('by_entity', [IndexedColumn('entity_id')]),
+  ]),
+  Table('site', [
+    Column.text('code'),
+    Column.text('name'),
+    Column.integer('issues_tickets'),
+    Column.integer('requires_ticket_photo'),
+    Column.integer('active'),
+  ]),
+  Table('material_type', [
+    Column.text('code'),
+    Column.text('name_fr'),
+    Column.text('name_en'),
+    Column.integer('active'),
+  ]),
+  Table('site_rate_config', [
+    Column.text('site_id'),
+    Column.text('material_type_id'),
+    Column.real('rate_per_ton'),
+    Column.text('direction'),
+    Column.real('min_billable_kg'),
+    Column.text('min_applies_to'),
+    Column.text('effective_from'),
+    Column.text('effective_to'),
+    Column.integer('active'),
+  ]),
   Table('employee', [Column.text('full_name')]),
   Table('app_user', [Column.text('employee_id'), Column.text('role')]),
   Table('truck', [Column.text('unit_number')]),
@@ -54,6 +117,14 @@ const schema = Schema([
   ]),
   Table('cancellation_reason', [Column.text('name_fr'), Column.text('name_en')]),
   Table('app_setting', [Column.text('value')]),
+  // Photo files waiting to reach storage (the photo row itself syncs normally). Never uploaded.
+  Table.localOnly('photo_upload_queue', [
+    Column.text('photo_id'),
+    Column.text('local_path'),
+    Column.text('storage_path'),
+    Column.integer('attempts'),
+    Column.text('last_error'),
+  ]),
   // Writes the server refused (e.g. a submit that wasn't ready). Never uploaded.
   Table.localOnly('sync_rejection', [
     Column.text('table_name'),

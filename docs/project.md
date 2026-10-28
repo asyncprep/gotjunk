@@ -94,8 +94,8 @@ A separate production project (also ca-central-1, Pro plan) is planned before th
 | 0 – Setup and decisions | Stack decision doc, repo, data dictionary, open-item defaults | Done, except client sign-off and offline spike |
 | 1 – Backend foundation | Schema, workflow, calculations, RLS, audit, seed, 25 tests, local explorer | **Done**; deployed to `gotjunk-ca` (Canada) on Oct 27, 2026 |
 | 2 – Admin web app (moved first) | Daily board and shift creation, review/accept/return/reopen, cash count, checklist, cancellations, config and rates, roster and ranks, user invites, audit log, CSV export, fr/en | **Built** (`apps/admin`); hosting and first login pending |
-| 3 – First crew slice | Flutter (Android first): login, today's shift, start shift, jobs, live scoreboard, submit, offline storage and sync status | **Built** (`apps/mobile`); needs a PowerSync instance ([setup](powersync-setup.md)) and an Android emulator/device to try; iOS after the Apple account |
-| 4 – Crew app complete | Disposal + photos, cancellations, cash, end-of-shift review, scoreboard, fr/en | Planned |
+| 3 – First crew slice | Flutter (Android first): login, today's shift, start shift, jobs, live scoreboard, submit, offline storage and sync status | **Built** (`apps/mobile`), tested on an Android emulator |
+| 4 – Crew app complete | Disposal visits and weigh-ins with price estimates, ticket and cash photos (queued offline), expected cash, pre-submit checklist, confirmed cancellation reasons, net disposal on the scoreboard | **Built**, tested on an Android emulator; live sync waits on the PowerSync database login ([setup](powersync-setup.md)); background photo upload and iOS still to do |
 | 5 – Pilot | 1–2 trucks alongside the paper journal for 2–4 weeks, then rollout | Planned |
 | 6 – Integrations (V1b) | Profit share, Stripe, scales, roster/Ceridian, exceptions queue | Blocked on client answers |
 

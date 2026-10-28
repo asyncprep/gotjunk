@@ -19,6 +19,8 @@ setting or seed value that can change without a redesign. Confirm or correct the
 | Statuses | Adds `in_progress` and `returned` to the spec's list | `shift_status` enum |
 | Drafts | A job with no outcome is a draft; drafts block submission | `job.outcome` |
 
+| Data residency (sync) | PowerSync Cloud, **US region**, for the pilot (no Canadian region offered). Supabase, the system of record, stays in ca-central-1. Revisit self-hosting PowerSync in Canada before production (client question P4) | PowerSync dashboard, `docs/powersync-setup.md` |
+
 Placeholders that must be replaced: cancellation reasons, payment method list, rank list (Trainer).
 
 Not built yet (V1b): profit share engine, Stripe ingestion, scale import, reconciliation exceptions.

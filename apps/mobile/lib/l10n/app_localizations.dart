@@ -570,6 +570,186 @@ abstract class L10n {
   /// In fr, this message translates to:
   /// **'Langue'**
   String get language;
+
+  /// No description provided for @disposal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dépotoir'**
+  String get disposal;
+
+  /// No description provided for @addVisit.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter une visite'**
+  String get addVisit;
+
+  /// No description provided for @visitTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Visite au dépotoir'**
+  String get visitTitle;
+
+  /// No description provided for @site.
+  ///
+  /// In fr, this message translates to:
+  /// **'Site'**
+  String get site;
+
+  /// No description provided for @ticketNumber.
+  ///
+  /// In fr, this message translates to:
+  /// **'No de billet'**
+  String get ticketNumber;
+
+  /// No description provided for @ticketPhoto.
+  ///
+  /// In fr, this message translates to:
+  /// **'Photo du billet'**
+  String get ticketPhoto;
+
+  /// No description provided for @takePhoto.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prendre une photo'**
+  String get takePhoto;
+
+  /// No description provided for @retakePhoto.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter une photo'**
+  String get retakePhoto;
+
+  /// No description provided for @photosCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} photo(s)'**
+  String photosCount(int count);
+
+  /// No description provided for @material.
+  ///
+  /// In fr, this message translates to:
+  /// **'Matière'**
+  String get material;
+
+  /// No description provided for @weightKg.
+  ///
+  /// In fr, this message translates to:
+  /// **'Poids (kg)'**
+  String get weightKg;
+
+  /// No description provided for @addMaterial.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter la pesée'**
+  String get addMaterial;
+
+  /// No description provided for @noVisits.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune visite au dépotoir.'**
+  String get noVisits;
+
+  /// No description provided for @noLines.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune pesée.'**
+  String get noLines;
+
+  /// No description provided for @estimate.
+  ///
+  /// In fr, this message translates to:
+  /// **'estimé'**
+  String get estimate;
+
+  /// No description provided for @netDisposal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dépotoir net'**
+  String get netDisposal;
+
+  /// No description provided for @noRate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun tarif pour cette matière à ce site'**
+  String get noRate;
+
+  /// No description provided for @deleteVisit.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimer la visite'**
+  String get deleteVisit;
+
+  /// No description provided for @cash.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comptant'**
+  String get cash;
+
+  /// No description provided for @expectedCash.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comptant à remettre'**
+  String get expectedCash;
+
+  /// No description provided for @cashPhoto.
+  ///
+  /// In fr, this message translates to:
+  /// **'Photo du comptant'**
+  String get cashPhoto;
+
+  /// No description provided for @cashPhotoHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Étalez le comptant et prenez-le en photo.'**
+  String get cashPhotoHint;
+
+  /// No description provided for @cashPhotoDone.
+  ///
+  /// In fr, this message translates to:
+  /// **'Photo du comptant prise'**
+  String get cashPhotoDone;
+
+  /// No description provided for @noCash.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun travail payé comptant.'**
+  String get noCash;
+
+  /// No description provided for @fixFirst.
+  ///
+  /// In fr, this message translates to:
+  /// **'À régler avant de soumettre :'**
+  String get fixFirst;
+
+  /// No description provided for @photosWaiting.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} photo(s) en attente d’envoi'**
+  String photosWaiting(int count);
+
+  /// No description provided for @reasonIs.
+  ///
+  /// In fr, this message translates to:
+  /// **'Raison : {reason}'**
+  String reasonIs(String reason);
+
+  /// No description provided for @cameraError.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impossible d’ouvrir la caméra'**
+  String get cameraError;
+
+  /// No description provided for @invalidWeight.
+  ///
+  /// In fr, this message translates to:
+  /// **'Poids invalide'**
+  String get invalidWeight;
+
+  /// No description provided for @done.
+  ///
+  /// In fr, this message translates to:
+  /// **'Terminé'**
+  String get done;
 }
 
 class _L10nDelegate extends LocalizationsDelegate<L10n> {

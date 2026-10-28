@@ -6,9 +6,9 @@ instance is configured, the app signs in but has no data to show.
 ## 1. Account and instance (owner: you)
 
 1. Create an account at powersync.com, ideally under the business's email.
-2. Create an instance. **Check the available regions**: if there is no Canadian region, the
-   synced copy of crew data would sit outside Canada. Options: accept a US region for the pilot
-   and note it for the client (Law 25), or self-host the PowerSync service later.
+2. Project `gotjunk` (instances: Development, Production), **US region** — PowerSync Cloud has
+   no Canadian region. Decided Oct 27, 2026: US for the pilot, revisit self-hosting in Canada
+   before production (client question P4).
 
 ## 2. Database user for replication (owner: you, in the Supabase SQL editor)
 

@@ -1,10 +1,15 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'app_config.dart';
 import 'data/database.dart';
+import 'data/photo_uploader.dart';
 import 'data/repo.dart';
 import 'l10n/app_localizations.dart';
 import 'providers.dart';
@@ -15,8 +20,14 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Supabase.initialize(url: AppConfig.supabaseUrl, publishableKey: AppConfig.supabasePublishableKey);
   final db = await openDatabase();
+  final photoDir = Directory(p.join((await getApplicationDocumentsDirectory()).path, 'photos'));
+  final uploader = PhotoUploader(db)..start();
   runApp(ProviderScope(
-    overrides: [repoProvider.overrideWithValue(Repo(db))],
+    overrides: [
+      repoProvider.overrideWithValue(Repo(db)),
+      photoDirProvider.overrideWithValue(photoDir),
+      photoUploaderProvider.overrideWithValue(uploader),
+    ],
     child: const TruckTeamApp(),
   ));
 }

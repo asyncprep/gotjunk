@@ -14,6 +14,10 @@ String clock(BuildContext context, String? iso) {
   return t == null ? '—' : DateFormat.Hm(Localizations.localeOf(context).languageCode).format(t);
 }
 
+/// "Label: value" with French typography ("Libellé : valeur").
+String labelled(BuildContext context, String label, String value) =>
+    Localizations.localeOf(context).languageCode == 'fr' ? '$label : $value' : '$label: $value';
+
 double? parseAmount(String text) {
   final cleaned = text.trim().replaceAll(' ', '').replaceAll(r'$', '').replaceAll(',', '.');
   if (cleaned.isEmpty) return null;
