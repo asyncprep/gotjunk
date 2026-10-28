@@ -10,32 +10,28 @@ instance is configured, the app signs in but has no data to show.
    no Canadian region. Decided Oct 27, 2026: US for the pilot, revisit self-hosting in Canada
    before production (client question P4).
 
-## 2. Database user for replication (owner: you, in the Supabase SQL editor)
+## 2. Connection (done Oct 28, 2026)
 
-Choose a strong password and keep it in your password manager. Never commit it.
+Set up with PowerSync's guided Supabase setup on the **Development** instance:
+- PowerSync created its own replication role in `gotjunk-ca` with read access to the 20 tables
+  in the `powersync` publication. Left out on purpose: `audit_log`, `employee_rank_history`,
+  `spec_item`.
+- Client auth: Supabase Auth via the project's JWKS
+  (`https://vrtvjnaykhlzyfbrllup.supabase.co/auth/v1/.well-known/jwks.json`); development tokens off.
+- Sync streams: `supabase/powersync/sync-streams.yaml`, validated and deployed. Source tables are
+  not aliased (an alias renames the table on the phone) and only the columns the app uses are sent.
+- Instance URL (public endpoint, the app's default):
+  `https://6ae136d7fb9e144e4ed9a04e.powersync.journeyapps.com`
 
-```sql
-create role powersync_role with replication bypassrls login password 'CHOOSE_A_STRONG_PASSWORD';
-grant select on all tables in schema public to powersync_role;
-alter default privileges in schema public grant select on tables to powersync_role;
-```
+## 3. Changing the sync rules
 
-The `powersync` publication already exists (migration 600).
+Edit `supabase/powersync/sync-streams.yaml`, paste it into PowerSync → Sync Streams, **Validate**
+(fix every warning), then **Deploy**. Keep the file and the dashboard identical.
 
-## 3. Connect the instance
+## 4. Production instance (before the pilot)
 
-- **Database connection:** the Supabase direct connection string for `gotjunk-ca`, user
-  `powersync_role`, SSL mode `verify-full`.
-- **Client auth:** Supabase Auth. The project uses JWT signing keys, so leave the JWT secret empty.
-- **Sync config:** paste `supabase/powersync/sync-streams.yaml` and validate it.
-
-## 4. Point the app at it
-
-Build or run the app with the instance URL:
-
-```
-flutter run --dart-define=POWERSYNC_URL=https://YOUR-INSTANCE.powersync.journeyapps.com
-```
+Repeat the guided setup on the Production instance and build the app with
+`--dart-define=POWERSYNC_URL=<production instance URL>`.
 
 ## How uploads behave
 

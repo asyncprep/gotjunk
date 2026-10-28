@@ -1,4 +1,4 @@
-# PowerSync Sync Streams for the crew app (draft: validate in the PowerSync dashboard).
+# PowerSync Sync Streams for the crew app (deployed to the Development instance).
 # Each server primary key is aliased to `id`, which the app's local schema expects.
 # Crews receive only the shifts they are on, plus the reference lists they need.
 config:
@@ -25,49 +25,69 @@ streams:
     queries:
       - SELECT user_id AS id, employee_id, role FROM app_user WHERE user_id = auth.user_id()
 
+  # Source tables keep their own names (an alias would rename the synced table on the phone);
+  # only the columns the crew app uses are sent. `m`/`u` are filter joins: my crew rows.
   my_shifts:
     auto_subscribe: true
     queries:
       - >-
-        SELECT s.shift_id AS id, s.* FROM shift s
-        INNER JOIN shift_crew_member m ON m.shift_id = s.shift_id
+        SELECT shift.shift_id AS id, shift.shift_date, shift.status, shift.truck_id, shift.phone_id,
+               shift.hours_type, shift.hours_type_confirmed_at, shift.start_time, shift.finish_time,
+               shift.total_hours, shift.return_reason, shift.reopen_reason, shift.submitted_at
+        FROM shift
+        INNER JOIN shift_crew_member m ON m.shift_id = shift.shift_id
         INNER JOIN app_user u ON u.employee_id = m.employee_id
         WHERE u.user_id = auth.user_id()
       - >-
-        SELECT c.shift_crew_id AS id, c.* FROM shift_crew_member c
-        INNER JOIN shift_crew_member m ON m.shift_id = c.shift_id
+        SELECT shift_crew_member.shift_crew_id AS id, shift_crew_member.shift_id,
+               shift_crew_member.employee_id, shift_crew_member.joined_at, shift_crew_member.left_at
+        FROM shift_crew_member
+        INNER JOIN shift_crew_member m ON m.shift_id = shift_crew_member.shift_id
         INNER JOIN app_user u ON u.employee_id = m.employee_id
         WHERE u.user_id = auth.user_id()
       - >-
-        SELECT j.job_id AS id, j.* FROM job j
-        INNER JOIN shift_crew_member m ON m.shift_id = j.shift_id
+        SELECT job.job_id AS id, job.shift_id, job.opportunity_id, job.outcome, job.payment_method_code,
+               job.discount_amount, job.revenue_pre_tax, job.revenue_total_incl_tax, job.tip_amount,
+               job.cancellation_reason_id, job.completed_at, job.created_at
+        FROM job
+        INNER JOIN shift_crew_member m ON m.shift_id = job.shift_id
         INNER JOIN app_user u ON u.employee_id = m.employee_id
         WHERE u.user_id = auth.user_id()
       - >-
-        SELECT v.disposal_visit_id AS id, v.* FROM disposal_visit v
+        SELECT disposal_visit.disposal_visit_id AS id, disposal_visit.shift_id, disposal_visit.site_id,
+               disposal_visit.visit_at, disposal_visit.ticket_number, disposal_visit.notes, disposal_visit.created_at
+        FROM disposal_visit
+        INNER JOIN shift_crew_member m ON m.shift_id = disposal_visit.shift_id
+        INNER JOIN app_user u ON u.employee_id = m.employee_id
+        WHERE u.user_id = auth.user_id()
+      - >-
+        SELECT disposal_material_txn.material_txn_id AS id, disposal_material_txn.disposal_visit_id,
+               disposal_material_txn.material_type_id, disposal_material_txn.weight_kg,
+               disposal_material_txn.rate_per_ton_applied, disposal_material_txn.direction,
+               disposal_material_txn.billable_kg, disposal_material_txn.signed_amount, disposal_material_txn.created_at
+        FROM disposal_material_txn
+        INNER JOIN disposal_visit v ON v.disposal_visit_id = disposal_material_txn.disposal_visit_id
         INNER JOIN shift_crew_member m ON m.shift_id = v.shift_id
         INNER JOIN app_user u ON u.employee_id = m.employee_id
         WHERE u.user_id = auth.user_id()
       - >-
-        SELECT t.material_txn_id AS id, t.* FROM disposal_material_txn t
-        INNER JOIN disposal_visit v ON v.disposal_visit_id = t.disposal_visit_id
-        INNER JOIN shift_crew_member m ON m.shift_id = v.shift_id
+        SELECT cash_submission.cash_submission_id AS id, cash_submission.shift_id,
+               cash_submission.counted_cash, cash_submission.created_at
+        FROM cash_submission
+        INNER JOIN shift_crew_member m ON m.shift_id = cash_submission.shift_id
         INNER JOIN app_user u ON u.employee_id = m.employee_id
         WHERE u.user_id = auth.user_id()
       - >-
-        SELECT c.cash_submission_id AS id, c.shift_id, c.counted_cash, c.created_at FROM cash_submission c
-        INNER JOIN shift_crew_member m ON m.shift_id = c.shift_id
+        SELECT photo.photo_id AS id, photo.shift_id, photo.photo_kind, photo.entity_type, photo.entity_id,
+               photo.storage_path, photo.captured_at, photo.uploaded_at
+        FROM photo
+        INNER JOIN shift_crew_member m ON m.shift_id = photo.shift_id
         INNER JOIN app_user u ON u.employee_id = m.employee_id
         WHERE u.user_id = auth.user_id()
       - >-
-        SELECT p.photo_id AS id, p.shift_id, p.photo_kind, p.entity_type, p.entity_id, p.storage_path,
-               p.captured_at, p.uploaded_at FROM photo p
-        INNER JOIN shift_crew_member m ON m.shift_id = p.shift_id
-        INNER JOIN app_user u ON u.employee_id = m.employee_id
-        WHERE u.user_id = auth.user_id()
-      - >-
-        SELECT e.employee_id AS id, e.full_name FROM employee e
-        INNER JOIN shift_crew_member c ON c.employee_id = e.employee_id
+        SELECT employee.employee_id AS id, employee.full_name
+        FROM employee
+        INNER JOIN shift_crew_member c ON c.employee_id = employee.employee_id
         INNER JOIN shift_crew_member m ON m.shift_id = c.shift_id
         INNER JOIN app_user u ON u.employee_id = m.employee_id
         WHERE u.user_id = auth.user_id()

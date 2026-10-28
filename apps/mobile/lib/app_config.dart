@@ -4,9 +4,12 @@ class AppConfig {
   static const supabaseUrl = 'https://vrtvjnaykhlzyfbrllup.supabase.co';
   static const supabasePublishableKey = 'sb_publishable_i7X4yASErntePq4th3kAEA_-xOv32g9';
 
-  // PowerSync instance URL. Empty until the instance exists: the app then works
-  // fully offline on the phone and starts syncing once this is set.
-  static const powersyncUrl = String.fromEnvironment('POWERSYNC_URL');
+  // PowerSync Development instance (US region for the pilot, see docs/decisions.md).
+  // Override per build with --dart-define=POWERSYNC_URL=… (e.g. the Production instance).
+  static const powersyncUrl = String.fromEnvironment(
+    'POWERSYNC_URL',
+    defaultValue: 'https://6ae136d7fb9e144e4ed9a04e.powersync.journeyapps.com',
+  );
 
   static const timeZoneNote = 'Business dates follow the phone clock (Montréal).';
 }
