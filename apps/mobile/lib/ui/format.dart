@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 
+import '../business_time.dart';
 import '../l10n/app_localizations.dart';
 
 String money(BuildContext context, num? value) {
@@ -8,9 +9,11 @@ String money(BuildContext context, num? value) {
   return NumberFormat.simpleCurrency(locale: locale, name: 'CAD').format(value ?? 0);
 }
 
+/// Time of day in Montréal, whatever the phone's own time zone.
 String clock(BuildContext context, String? iso) {
   if (iso == null) return '—';
-  final t = DateTime.tryParse(iso)?.toLocal();
+  final parsed = DateTime.tryParse(iso);
+  final t = parsed == null ? null : inBusinessZone(parsed);
   return t == null ? '—' : DateFormat.Hm(Localizations.localeOf(context).languageCode).format(t);
 }
 

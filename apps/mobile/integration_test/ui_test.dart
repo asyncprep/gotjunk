@@ -75,6 +75,15 @@ void main() {
     }
   }
 
+  /// Closes the keyboard and scrolls the front page until [finder] is on screen, so taps work on
+  /// short phone screens too (pages are lazy lists: off-screen rows aren't built).
+  Future<void> reveal(WidgetTester tester, Finder finder, {double step = 300}) async {
+    FocusManager.instance.primaryFocus?.unfocus();
+    await settle(tester);
+    await tester.scrollUntilVisible(finder, step, scrollable: find.byType(Scrollable).hitTestable().last);
+    await settle(tester);
+  }
+
   setUp(() async {
     dir = await getTemporaryDirectory();
     path = join(dir.path, 'ui_test_${DateTime.now().microsecondsSinceEpoch}.db');
@@ -120,6 +129,7 @@ void main() {
     await settle(tester);
     expect(find.text('229.95'), findsOneWidget);
     await tester.enterText(find.widgetWithText(TextFormField, 'Tip'), '20');
+    await reveal(tester, find.widgetWithText(FilledButton, 'Save'));
     await tester.tap(find.widgetWithText(FilledButton, 'Save'));
     await settle(tester);
 
@@ -137,6 +147,7 @@ void main() {
     await tester.enterText(find.widgetWithText(TextFormField, 'Opportunity ID'), 'OPP-1');
     await tester.enterText(find.widgetWithText(TextFormField, 'Amount before tax'), '100');
     await tester.enterText(find.widgetWithText(TextFormField, 'Total including tax'), '90');
+    await reveal(tester, find.widgetWithText(FilledButton, 'Save'));
     await tester.tap(find.widgetWithText(FilledButton, 'Save'));
     await settle(tester);
     expect(find.text("Total can't be lower than the amount before tax"), findsOneWidget);
@@ -168,8 +179,7 @@ void main() {
     await settle(tester);
     expect(find.text('\$45.00 (estimate)'), findsOneWidget);
 
-    await tester.scrollUntilVisible(find.widgetWithText(FilledButton, 'Done'), 300,
-        scrollable: find.byType(Scrollable).last);
+    await reveal(tester, find.widgetWithText(FilledButton, 'Done'));
     await tester.tap(find.widgetWithText(FilledButton, 'Done'));
     await settle(tester);
     await tester.scrollUntilVisible(find.text('Eco-Junk'), 300);
@@ -204,6 +214,7 @@ void main() {
     await tester.tap(find.widgetWithText(FilledButton, 'Submit shift').last);
     await settle(tester);
     expect((await db.get('SELECT status FROM shift WHERE id = ?', [shiftId]))['status'], 'submitted');
+    await reveal(tester, find.text('Submitted — under review'), step: -300);
     expect(find.text('Submitted — under review'), findsOneWidget);
     expect(find.text('Add a job'), findsNothing, reason: 'read-only after submit');
   });

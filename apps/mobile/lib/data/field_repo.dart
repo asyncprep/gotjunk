@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 import 'package:uuid/uuid.dart';
 
+import '../business_time.dart';
 import 'repo.dart';
 
 const _uuid = Uuid();
@@ -16,12 +17,12 @@ const lineAmountSql = '''
     / 1000.0 * r.rate_per_ton, 2)
     * CASE r.direction WHEN 'cost' THEN 1 WHEN 'credit' THEN -1 ELSE 0 END)''';
 
-/// Rate in effect for the line: same site + material, active, covering the visit's local date.
-const rateJoinSql = '''
+/// Rate in effect for the line: same site + material, active, covering the visit's Montréal date.
+String get rateJoinSql => '''
   LEFT JOIN site_rate_config r
     ON r.site_id = v.site_id AND r.material_type_id = t.material_type_id AND coalesce(r.active, 1) = 1
-   AND date(v.visit_at, 'localtime') >= r.effective_from
-   AND (r.effective_to IS NULL OR date(v.visit_at, 'localtime') <= r.effective_to)''';
+   AND date(v.visit_at, ${businessOffsetModifier()}) >= r.effective_from
+   AND (r.effective_to IS NULL OR date(v.visit_at, ${businessOffsetModifier()}) <= r.effective_to)''';
 
 /// Disposal, cash, photos and the pre-submit checks.
 extension FieldRepo on Repo {
@@ -35,10 +36,10 @@ extension FieldRepo on Repo {
   Stream<List<Map<String, dynamic>>> materialsForSite(String siteId) => db.watch('''
       SELECT DISTINCT m.* FROM material_type m
       JOIN site_rate_config r ON r.material_type_id = m.id AND r.site_id = ? AND coalesce(r.active, 1) = 1
-       AND date('now', 'localtime') >= r.effective_from
-       AND (r.effective_to IS NULL OR date('now', 'localtime') <= r.effective_to)
+       AND ? >= r.effective_from
+       AND (r.effective_to IS NULL OR ? <= r.effective_to)
       WHERE coalesce(m.active, 1) = 1
-      ORDER BY m.code''', parameters: [siteId]).map((rows) => rows.map(Map<String, dynamic>.of).toList());
+      ORDER BY m.code''', parameters: [siteId, businessToday(), businessToday()]).map((rows) => rows.map(Map<String, dynamic>.of).toList());
 
   // ---- Disposal ----
 

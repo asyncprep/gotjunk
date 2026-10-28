@@ -1,13 +1,15 @@
-import 'package:intl/intl.dart';
 import 'package:powersync/powersync.dart';
 import 'package:uuid/uuid.dart';
+
+import '../business_time.dart';
 
 /// Statuses in which the crew may change their shift (server enforces the same rule).
 const crewEditableStatuses = {'open', 'in_progress', 'returned', 'reopened'};
 const crewJobStatuses = {'in_progress', 'returned', 'reopened'};
 
 String nowUtc() => DateTime.now().toUtc().toIso8601String();
-String todayLocal() => DateFormat('yyyy-MM-dd').format(DateTime.now());
+/// Today's business (Montréal) date; shifts are dated by it.
+String todayLocal() => businessToday();
 
 /// All reads and writes the crew app makes against the on-phone database.
 class Repo {
