@@ -143,5 +143,15 @@
         "type": "String"
       }
     }
+  },
+  "signOutUnsent": "{count} élément(s) pas encore envoyé(s) au serveur. Si vous vous déconnectez maintenant, ils seront perdus.",
+  "signOutAnyway": "Se déconnecter quand même",
+  "staySignedIn": "Rester connecté",
+  "@signOutUnsent": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   }
 }

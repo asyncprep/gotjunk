@@ -19,6 +19,7 @@ dependencies:
   powersync: ^2.5.0
   supabase_flutter: ^2.18.3
   uuid: ^4.6.0
+  workmanager: ^0.10.10
 
 dev_dependencies:
   flutter_test:

@@ -21,12 +21,12 @@ The product specification (v0.3) is a client document and is not stored in this 
 
 ## Tests
 
-Run all four before pushing; none needs Docker.
+Run all of these before pushing; none needs Docker.
 
 | What | Command | Covers |
 | --- | --- | --- |
 | Database | `cd tools/dbtest && npm install && npm test` | Migrations, rules, RLS, calculations (filter: `node run.mjs "tip split"`) |
-| Admin app | `cd apps/admin && npm run build` | Type-check and production build |
+| Admin app | `cd apps/admin && npm test && npm run build` | Component tests (cash panel, photo gallery), type-check and production build |
 | Crew app (unit/widget) | `cd apps/mobile && flutter analyze && flutter test` | Amount parsing, refusal messages, retry rules, sign-in screen fr/en |
 | Crew app (on device) | `cd apps/mobile && flutter test integration_test -d <device>` | On-phone database and screens: shift, jobs, scoreboard and tip split, disposal pricing, cash, photos and their upload queue, pre-submit checks, refusals; taps through the real screens |
 

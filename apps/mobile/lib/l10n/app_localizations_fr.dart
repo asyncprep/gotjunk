@@ -353,4 +353,15 @@ class L10nFr extends L10n {
 
   @override
   String get done => 'Terminé';
+
+  @override
+  String signOutUnsent(int count) {
+    return '$count élément(s) pas encore envoyé(s) au serveur. Si vous vous déconnectez maintenant, ils seront perdus.';
+  }
+
+  @override
+  String get signOutAnyway => 'Se déconnecter quand même';
+
+  @override
+  String get staySignedIn => 'Rester connecté';
 }

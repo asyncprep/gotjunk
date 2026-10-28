@@ -750,6 +750,24 @@ abstract class L10n {
   /// In fr, this message translates to:
   /// **'Terminé'**
   String get done;
+
+  /// No description provided for @signOutUnsent.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} élément(s) pas encore envoyé(s) au serveur. Si vous vous déconnectez maintenant, ils seront perdus.'**
+  String signOutUnsent(int count);
+
+  /// No description provided for @signOutAnyway.
+  ///
+  /// In fr, this message translates to:
+  /// **'Se déconnecter quand même'**
+  String get signOutAnyway;
+
+  /// No description provided for @staySignedIn.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rester connecté'**
+  String get staySignedIn;
 }
 
 class _L10nDelegate extends LocalizationsDelegate<L10n> {

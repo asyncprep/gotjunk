@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../data/background.dart';
 import '../data/field_repo.dart';
 import '../l10n/app_localizations.dart';
 import '../providers.dart';
@@ -34,6 +35,7 @@ Future<bool> capturePhoto(
           photoDir: ref.read(photoDirProvider),
         );
     ref.read(photoUploaderProvider).runOnce();
+    schedulePhotoUpload().catchError((_) {}); // finishes even if the app is closed first
     return true;
   } catch (e) {
     messenger.showSnackBar(SnackBar(content: Text('$errorPrefix$e')));

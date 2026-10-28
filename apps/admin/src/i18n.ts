@@ -54,6 +54,11 @@ const fr = {
     reopenTitle: 'Rouvrir un quart accepté', reopenHelp: 'La raison est conservée dans le journal d’audit.',
     locked: 'Quart accepté et verrouillé', returned: 'Quart retourné à l’équipe', reopened: 'Quart rouvert',
     finalized: 'Annulation finalisée', countSaved: 'Comptant enregistré',
+    photoNotUploaded: 'Pas encore reçue du camion', photoTaken: 'prise le', openFull: 'Ouvrir en grand',
+    ticketPhoto: 'Photo du billet', cashPhoto: 'Photo du comptant', ticketPhotoMissing: 'Photo du billet manquante',
+    cashNotSubmitted: 'L’équipe n’a pas encore déclaré le comptant ni pris la photo.',
+    receivedBy: 'Reçu par', verifiedAt: 'Compté le', toCount: 'À compter', balanced: 'Équilibré',
+    over: 'Excédent', short: 'Manque',
   },
   outcome: { completed: 'Complété', cancelled_pending: 'Annulé (à confirmer)', cancelled_confirmed: 'Annulé', draft: 'Brouillon' },
   problem: {
@@ -162,6 +167,11 @@ const en: Dict = {
     reopenTitle: 'Reopen an accepted shift', reopenHelp: 'The reason is kept in the audit log.',
     locked: 'Shift accepted and locked', returned: 'Shift returned to the crew', reopened: 'Shift reopened',
     finalized: 'Cancellation finalized', countSaved: 'Cash count saved',
+    photoNotUploaded: 'Not received from the truck yet', photoTaken: 'taken', openFull: 'Open full size',
+    ticketPhoto: 'Ticket photo', cashPhoto: 'Cash photo', ticketPhotoMissing: 'Ticket photo missing',
+    cashNotSubmitted: 'The crew hasn’t declared the cash or taken the photo yet.',
+    receivedBy: 'Received by', verifiedAt: 'Counted', toCount: 'To count', balanced: 'Balanced',
+    over: 'Over', short: 'Short',
   },
   outcome: { completed: 'Completed', cancelled_pending: 'Cancelled (to confirm)', cancelled_confirmed: 'Cancelled', draft: 'Draft' },
   problem: {

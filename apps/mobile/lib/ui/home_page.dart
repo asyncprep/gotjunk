@@ -4,6 +4,7 @@ import 'package:powersync/powersync.dart' show SyncStatus;
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../app_config.dart';
+import '../data/database.dart';
 import '../data/field_repo.dart';
 import '../data/repo.dart';
 import '../l10n/app_localizations.dart';
@@ -28,7 +29,7 @@ class HomePage extends ConsumerWidget {
           PopupMenuButton<String>(
             onSelected: (v) async {
               if (v == 'fr' || v == 'en') ref.read(localeProvider.notifier).set(Locale(v));
-              if (v == 'signout') await Supabase.instance.client.auth.signOut();
+              if (v == 'signout' && context.mounted) await _signOut(context, repo);
             },
             itemBuilder: (_) => [
               const PopupMenuItem(value: 'fr', child: Text('Français')),
@@ -60,6 +61,27 @@ class HomePage extends ConsumerWidget {
       ),
     );
   }
+}
+
+/// Signing out wipes the phone (shared truck phones), so warn if anything hasn't been sent.
+Future<void> _signOut(BuildContext context, Repo repo) async {
+  final t = L10n.of(context);
+  final unsent = await unsentItems(repo.db);
+  if (unsent > 0 && context.mounted) {
+    final go = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(t.signOut),
+        content: Text(t.signOutUnsent(unsent)),
+        actions: [
+          FilledButton(onPressed: () => Navigator.pop(context, false), child: Text(t.staySignedIn)),
+          TextButton(onPressed: () => Navigator.pop(context, true), child: Text(t.signOutAnyway)),
+        ],
+      ),
+    );
+    if (go != true) return;
+  }
+  await Supabase.instance.client.auth.signOut();
 }
 
 /// Connection state and anything still waiting to upload.

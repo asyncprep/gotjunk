@@ -349,4 +349,15 @@ class L10nEn extends L10n {
 
   @override
   String get done => 'Done';
+
+  @override
+  String signOutUnsent(int count) {
+    return '$count item(s) not sent to the server yet. Signing out now will lose them.';
+  }
+
+  @override
+  String get signOutAnyway => 'Sign out anyway';
+
+  @override
+  String get staySignedIn => 'Stay signed in';
 }

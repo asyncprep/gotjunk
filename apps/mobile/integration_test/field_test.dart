@@ -8,6 +8,9 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:powersync/powersync.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:workmanager/workmanager.dart';
+import 'package:truck_team_os/data/background.dart';
+import 'package:truck_team_os/data/database.dart';
 import 'package:truck_team_os/data/field_repo.dart';
 import 'package:truck_team_os/data/photo_uploader.dart';
 import 'package:truck_team_os/data/repo.dart';
@@ -222,5 +225,44 @@ void main() {
     final line = ops.last.opData!;
     expect(line.keys.toSet(), {'disposal_visit_id', 'material_type_id', 'weight_kg', 'created_at'});
     expect(writablePrimaryKeys['disposal_material_txn'], 'material_txn_id');
+  });
+
+  testWidgets('background pass uploads queued photos and reports what is left', (_) async {
+    final visit = await repo.addVisit(shiftId, 'eco', 'EJ-B');
+    Future<void> queuePhoto(String name) async {
+      final pic = File(join(dir.path, '${name}_${DateTime.now().microsecondsSinceEpoch}.jpg'))..writeAsBytesSync([1]);
+      await repo.addPhoto(shiftId: shiftId, kind: 'disposal_ticket', entityType: 'disposal_visit',
+          entityId: visit, picture: pic, photoDir: Directory(join(dir.path, 'photos_bg')));
+    }
+
+    await queuePhoto('a');
+    await queuePhoto('b');
+    expect(await unsentItems(db), greaterThanOrEqualTo(2), reason: 'rows + files waiting');
+
+    final bucket = FakeBucket()..failWith = const SocketException('no signal');
+    expect(await uploadPhotosInBackground(db: db, bucket: bucket), isFalse, reason: 'ask Android to retry');
+    bucket.failWith = null;
+    expect(await uploadPhotosInBackground(db: db, bucket: bucket), isTrue);
+    expect(bucket.uploaded, hasLength(2));
+    expect(await repo.pendingPhotoUploads().first, 0);
+  });
+
+  testWidgets('a photo that keeps failing stops blocking the background job', (_) async {
+    final visit = await repo.addVisit(shiftId, 'eco', 'EJ-C');
+    final pic = File(join(dir.path, 'c_${DateTime.now().microsecondsSinceEpoch}.jpg'))..writeAsBytesSync([1]);
+    await repo.addPhoto(shiftId: shiftId, kind: 'disposal_ticket', entityType: 'disposal_visit',
+        entityId: visit, picture: pic, photoDir: Directory(join(dir.path, 'photos_bg2')));
+    await db.execute('UPDATE photo_upload_queue SET attempts = 20');
+    final bucket = FakeBucket()..failWith = const StorageException('forbidden', statusCode: '403');
+    expect(await uploadPhotosInBackground(db: db, bucket: bucket), isTrue);
+    expect(await repo.pendingPhotoUploads().first, 1, reason: 'kept on the phone, retried by the in-app uploader');
+  });
+
+  testWidgets('Android accepts the background upload schedule', (_) async {
+    if (!Platform.isAndroid) return;
+    await initBackgroundUploads();
+    await schedulePhotoUpload();
+    await schedulePhotoUpload(); // a second request while one is pending is ignored, not an error
+    await Workmanager().cancelAll();
   });
 }

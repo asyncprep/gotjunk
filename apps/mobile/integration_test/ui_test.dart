@@ -227,4 +227,19 @@ void main() {
     await settle(tester);
     expect(find.textContaining("isn't linked to a crew member"), findsOneWidget);
   });
+
+  testWidgets('signing out with unsent changes warns first', (tester) async {
+    await seed();
+    await Repo(db).saveJob(JobDraft(shiftId: shiftId, opportunityId: 'UNSENT', outcome: null));
+    await tester.pumpWidget(app(const Locale('en')));
+    await settle(tester);
+    await tester.tap(find.byType(PopupMenuButton<String>));
+    await settle(tester);
+    await tester.tap(find.text('Sign out'));
+    await settle(tester);
+    expect(find.textContaining('not sent to the server yet'), findsOneWidget);
+    await tester.tap(find.text('Stay signed in'));
+    await settle(tester);
+    expect(find.text('UNSENT'), findsOneWidget, reason: 'still signed in, nothing wiped');
+  });
 }

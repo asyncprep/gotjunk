@@ -5,6 +5,8 @@ import { dateTime, isAdminRole, money, must, supabase, time, type ShiftStatus } 
 import { useAction, useLoad } from '../lib/hooks';
 import { useAuth } from '../lib/auth';
 import AskDialog from '../components/AskDialog';
+import PhotoGallery from '../components/PhotoGallery';
+import CashPanel from '../components/CashPanel';
 
 type Named = { name_fr: string; name_en: string } | null;
 const named = (n: Named, lang: string) => (n ? (lang === 'en' ? n.name_en : n.name_fr) : '');
@@ -17,10 +19,10 @@ async function loadShift(id: string) {
       must(supabase.rpc('shift_problems', { p_shift_id: id, p_stage: 'lock' })),
       must(supabase.from('job').select('*, reason:cancellation_reason_id(name_fr, name_en)').eq('shift_id', id).order('created_at')),
       must(supabase.from('disposal_visit')
-        .select('*, site:site_id(name), lines:disposal_material_txn(*, material:material_type_id(name_fr, name_en))')
+        .select('*, site:site_id(name, requires_ticket_photo), lines:disposal_material_txn(*, material:material_type_id(name_fr, name_en))')
         .eq('shift_id', id).order('visit_at')),
-      must(supabase.from('photo').select('photo_id, entity_id, photo_kind, storage_path').eq('shift_id', id)),
-      must(supabase.from('cash_submission').select('*').eq('shift_id', id).maybeSingle()),
+      must(supabase.from('photo').select('photo_id, entity_id, photo_kind, storage_path, captured_at').eq('shift_id', id).order('captured_at')),
+      must(supabase.from('cash_submission').select('*, receiver:received_by(email)').eq('shift_id', id).maybeSingle()),
       must(supabase.from('checklist_item').select('item_id, label_fr, label_en, required').eq('active', true).order('sort_order')),
       must(supabase.from('shift_checklist_check').select('item_id, checked').eq('shift_id', id)),
       must(supabase.from('shift_crew_member')
@@ -58,10 +60,6 @@ export default function ShiftReview() {
 
   const updateShift = (patch: Record<string, unknown>, okText?: string) =>
     action.run(() => must(supabase.from('shift').update(patch).eq('shift_id', shiftId).select()), okText);
-  const openPhoto = async (path: string) => {
-    const { data } = await supabase.storage.from('photos').createSignedUrl(path, 300);
-    if (data?.signedUrl) window.open(data.signedUrl, '_blank', 'noopener');
-  };
   const saveCash = () => action.run(() => must(supabase.from('cash_submission').update({
     ...(cashForm.counted !== undefined ? { counted_cash: cashForm.counted === '' ? null : Number(cashForm.counted) } : {}),
     ...(cashForm.envelope !== undefined ? { envelope_id: cashForm.envelope || null } : {}),
@@ -178,10 +176,11 @@ export default function ShiftReview() {
               <div className="row">
                 <strong>{v.site?.name}</strong>
                 <span className="muted">{time(v.visit_at, lang)} · {t('shift.ticket')} {v.ticket_number ?? '—'}</span>
-                {photosFor(v.disposal_visit_id).map((p: any, i: number) => (
-                  <button key={p.photo_id} className="link" onClick={() => openPhoto(p.storage_path)}>📷 {i + 1}</button>
-                ))}
+                {v.site?.requires_ticket_photo && !photosFor(v.disposal_visit_id).length && (
+                  <span className="problem error small">✕ {t('shift.ticketPhotoMissing')}</span>
+                )}
               </div>
+              <PhotoGallery photos={photosFor(v.disposal_visit_id)} label={t('shift.ticketPhoto')} />
               <div className="table-wrap">
                 <table>
                   <thead><tr>
@@ -207,26 +206,15 @@ export default function ShiftReview() {
 
         <div className="card">
           <h2>{t('shift.cash')}</h2>
-          {!d.cash ? <p className="muted">{t('shift.noCash')}</p> : (
-            <div className="stack">
-              <div>
-                {t('shift.expectedCash')}: <strong>{money(tot.expected_cash, lang)}</strong> · {t('shift.counted')}: <strong>{money(d.cash.counted_cash, lang)}</strong>
-                {d.cash.counted_cash !== null && <> · {t('shift.variance')}: <strong>{money(Number(d.cash.counted_cash) - Number(tot.expected_cash ?? 0), lang)}</strong></>}
-                {photosFor(d.cash.cash_submission_id).map((p: any, i: number) => (
-                  <button key={p.photo_id} className="link" style={{ marginLeft: 8 }} onClick={() => openPhoto(p.storage_path)}>📷 {i + 1}</button>
-                ))}
-              </div>
-              <div className="row">
-                <input className="narrow" inputMode="decimal" placeholder={t('shift.counted')}
-                  defaultValue={d.cash.counted_cash ?? ''} onChange={(e) => setCashForm({ ...cashForm, counted: e.target.value })} />
-                <input className="narrow" placeholder={t('shift.envelope')}
-                  defaultValue={d.cash.envelope_id ?? ''} onChange={(e) => setCashForm({ ...cashForm, envelope: e.target.value })} />
-              </div>
-              <input style={{ width: '100%' }} placeholder={t('shift.resolution')}
-                defaultValue={d.cash.mismatch_resolution ?? ''} onChange={(e) => setCashForm({ ...cashForm, resolution: e.target.value })} />
-              <div><button disabled={action.busy} onClick={saveCash}>{t('shift.recordCount')}</button></div>
-            </div>
-          )}
+          <CashPanel
+            expected={Number(tot.expected_cash ?? 0)}
+            cash={d.cash}
+            photos={d.cash ? photosFor(d.cash.cash_submission_id) : []}
+            busy={action.busy}
+            lang={lang}
+            onChange={(patch) => setCashForm({ ...cashForm, ...patch })}
+            onSave={saveCash}
+          />
         </div>
 
         <div className="card">

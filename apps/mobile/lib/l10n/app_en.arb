@@ -122,5 +122,8 @@
   "reasonIs": "Reason: {reason}",
   "cameraError": "Couldn't open the camera",
   "invalidWeight": "Invalid weight",
-  "done": "Done"
+  "done": "Done",
+  "signOutUnsent": "{count} item(s) not sent to the server yet. Signing out now will lose them.",
+  "signOutAnyway": "Sign out anyway",
+  "staySignedIn": "Stay signed in"
 }
