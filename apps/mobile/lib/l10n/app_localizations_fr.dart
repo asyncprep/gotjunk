@@ -9,7 +9,13 @@ class L10nFr extends L10n {
   L10nFr([String locale = 'fr']) : super(locale);
 
   @override
-  String get appTitle => 'Truck Team OS';
+  String get appTitle => '1-800-GOT-JUNK? Équipe';
+
+  @override
+  String get brandRegion => 'Montréal';
+
+  @override
+  String get brandProduct => 'Équipe';
 
   @override
   String get signInTitle => 'Connexion';

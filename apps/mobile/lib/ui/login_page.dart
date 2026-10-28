@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../l10n/app_localizations.dart';
+import 'brand.dart';
 import 'quick_signin.dart';
 
 class LoginPage extends StatefulWidget {
@@ -69,8 +70,8 @@ class _LoginPageState extends State<LoginPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Text(t.appTitle, style: Theme.of(context).textTheme.headlineMedium),
-                    const SizedBox(height: 8),
+                    const Brand(large: true),
+                    const SizedBox(height: 28),
                     Text(t.signInTitle, style: Theme.of(context).textTheme.titleMedium),
                     const SizedBox(height: 24),
                     if (_error != null) ...[

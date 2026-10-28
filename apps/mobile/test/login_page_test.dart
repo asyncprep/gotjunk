@@ -33,7 +33,8 @@ void main() {
   test('both languages load and differ', () {
     final fr = lookupL10n(const Locale('fr'));
     final en = lookupL10n(const Locale('en'));
-    expect(fr.appTitle, en.appTitle);
+    expect(fr.appTitle, startsWith('1-800-GOT-JUNK?'));
+    expect(en.appTitle, startsWith('1-800-GOT-JUNK?'));
     expect(fr.signIn, isNot(en.signIn));
   });
 }

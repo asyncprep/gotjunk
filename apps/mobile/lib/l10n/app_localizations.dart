@@ -100,8 +100,20 @@ abstract class L10n {
   /// No description provided for @appTitle.
   ///
   /// In fr, this message translates to:
-  /// **'Truck Team OS'**
+  /// **'1-800-GOT-JUNK? Équipe'**
   String get appTitle;
+
+  /// No description provided for @brandRegion.
+  ///
+  /// In fr, this message translates to:
+  /// **'Montréal'**
+  String get brandRegion;
+
+  /// No description provided for @brandProduct.
+  ///
+  /// In fr, this message translates to:
+  /// **'Équipe'**
+  String get brandProduct;
 
   /// No description provided for @signInTitle.
   ///

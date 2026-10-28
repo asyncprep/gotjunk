@@ -12,6 +12,7 @@ import 'data/photo_uploader.dart';
 import 'data/repo.dart';
 import 'l10n/app_localizations.dart';
 import 'providers.dart';
+import 'ui/brand.dart';
 import 'ui/home_page.dart';
 import 'ui/login_page.dart';
 
@@ -87,8 +88,7 @@ class _BootAppState extends State<BootApp> {
   }
 }
 
-ThemeData _theme(Brightness brightness) =>
-    ThemeData(colorSchemeSeed: const Color(0xFF00539F), brightness: brightness, useMaterial3: true);
+ThemeData _theme(Brightness brightness) => brandTheme(brightness);
 
 class TruckTeamApp extends ConsumerWidget {
   const TruckTeamApp({super.key});

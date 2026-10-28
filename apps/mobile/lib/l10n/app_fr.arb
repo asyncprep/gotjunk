@@ -1,6 +1,8 @@
 {
   "@@locale": "fr",
-  "appTitle": "Truck Team OS",
+  "appTitle": "1-800-GOT-JUNK? Équipe",
+  "brandRegion": "Montréal",
+  "brandProduct": "Équipe",
   "signInTitle": "Connexion",
   "email": "Courriel",
   "password": "Mot de passe",

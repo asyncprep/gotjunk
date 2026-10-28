@@ -9,7 +9,13 @@ class L10nEn extends L10n {
   L10nEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'Truck Team OS';
+  String get appTitle => '1-800-GOT-JUNK? Crew';
+
+  @override
+  String get brandRegion => 'Montréal';
+
+  @override
+  String get brandProduct => 'Crew';
 
   @override
   String get signInTitle => 'Sign in';

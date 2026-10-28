@@ -9,6 +9,7 @@ import '../data/field_repo.dart';
 import '../data/repo.dart';
 import '../l10n/app_localizations.dart';
 import '../providers.dart';
+import 'brand.dart';
 import 'camera.dart';
 import 'disposal_page.dart';
 import 'format.dart';
@@ -24,7 +25,8 @@ class HomePage extends ConsumerWidget {
     final repo = ref.watch(repoProvider);
     return Scaffold(
       appBar: AppBar(
-        title: Text(t.todayShift),
+        toolbarHeight: 64,
+        title: Brand(subtitle: t.todayShift),
         actions: [
           PopupMenuButton<String>(
             onSelected: (v) async {
@@ -169,7 +171,7 @@ class ShiftView extends StatelessWidget {
                 const SizedBox(height: 20),
                 FilledButton.icon(
                   icon: const Icon(Icons.flag_outlined),
-                  style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
+                  style: goButtonStyle(),
                   onPressed: () => _confirmSubmit(context, shiftId),
                   label: Text(t.submitShift),
                 ),
@@ -242,7 +244,14 @@ class _ShiftHeader extends StatelessWidget {
           children: [
             Row(children: [
               Expanded(child: Text('${t.truck} ${shift['truck'] ?? '—'} · ${t.phone} ${shift['phone'] ?? '—'}', style: text.titleMedium)),
-              Chip(label: Text(statusLabel(t, status))),
+              Builder(builder: (context) {
+                final c = statusColors(context, status);
+                return Chip(
+                  label: Text(statusLabel(t, status), style: TextStyle(color: c.foreground, fontWeight: FontWeight.w600)),
+                  backgroundColor: c.background,
+                  side: BorderSide.none,
+                );
+              }),
             ]),
             if (status == 'returned' && shift['return_reason'] != null)
               Padding(
@@ -301,7 +310,7 @@ class _StartShiftState extends State<_StartShift> {
             const SizedBox(height: 8),
             FilledButton.icon(
               icon: const Icon(Icons.play_arrow),
-              style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
+              style: goButtonStyle(),
               onPressed: _hours == null ? null : () => widget.repo.startShift(widget.shiftId, _hours!),
               label: Text(t.startShift),
             ),
