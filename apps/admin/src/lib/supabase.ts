@@ -31,6 +31,13 @@ export function money(value: unknown, lang: string): string {
     .format(Number(value));
 }
 
+// Amounts typed in either language: '227,30', '227.30', '1 200,50 $'. Blank is null; junk is NaN.
+export function parseAmount(text: string): number | null {
+  const cleaned = text.replace(/[\s  $]/g, '').replace(',', '.');
+  if (cleaned === '') return null;
+  return /^\d+(\.\d{1,2})?$/.test(cleaned) ? Number(cleaned) : NaN;
+}
+
 export function time(value: string | null | undefined, lang: string): string {
   if (!value) return '—';
   return new Intl.DateTimeFormat(lang === 'en' ? 'en-CA' : 'fr-CA', {

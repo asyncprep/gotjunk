@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { dateTime, isAdminRole, money, must, supabase, time, type ShiftStatus } from '../lib/supabase';
+import { dateTime, isAdminRole, money, must, parseAmount, supabase, time, type ShiftStatus } from '../lib/supabase';
 import { useAction, useLoad } from '../lib/hooks';
 import { useAuth } from '../lib/auth';
 import AskDialog from '../components/AskDialog';
@@ -60,12 +60,16 @@ export default function ShiftReview() {
 
   const updateShift = (patch: Record<string, unknown>, okText?: string) =>
     action.run(() => must(supabase.from('shift').update(patch).eq('shift_id', shiftId).select()), okText);
-  const saveCash = () => action.run(() => must(supabase.from('cash_submission').update({
-    ...(cashForm.counted !== undefined ? { counted_cash: cashForm.counted === '' ? null : Number(cashForm.counted) } : {}),
+  const saveCash = () => action.run(async () => {
+    const counted = cashForm.counted === undefined ? undefined : parseAmount(cashForm.counted);
+    if (Number.isNaN(counted)) throw new Error(t('shift.invalidAmount'));
+    return must(supabase.from('cash_submission').update({
+    ...(counted !== undefined ? { counted_cash: counted } : {}),
     ...(cashForm.envelope !== undefined ? { envelope_id: cashForm.envelope || null } : {}),
     ...(cashForm.resolution !== undefined ? { mismatch_resolution: cashForm.resolution || null } : {}),
     received_by: session?.user.id,
-  }).eq('shift_id', shiftId).select()), t('shift.countSaved'));
+  }).eq('shift_id', shiftId).select());
+  }, t('shift.countSaved'));
   const toggleCheck = (itemId: string, value: boolean) => action.run(() => must(
     supabase.from('shift_checklist_check').upsert({ shift_id: shiftId, item_id: itemId, checked: value }, { onConflict: 'shift_id,item_id' }).select()));
   const checkAll = () => action.run(() => must(supabase.from('shift_checklist_check').upsert(
