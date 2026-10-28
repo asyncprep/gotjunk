@@ -18,10 +18,19 @@ Set up with PowerSync's guided Supabase setup on the **Development** instance:
   `spec_item`.
 - Client auth: Supabase Auth via the project's JWKS
   (`https://vrtvjnaykhlzyfbrllup.supabase.co/auth/v1/.well-known/jwks.json`); development tokens off.
+  **JWT Audience must include `authenticated`** (Supabase user tokens carry `aud: authenticated`).
+  The guided setup did not add it; without it every client gets
+  `401 PSYNC_S2105: Unexpected "aud" claim value: "authenticated"`.
 - Sync streams: `supabase/powersync/sync-streams.yaml`, validated and deployed. Source tables are
   not aliased (an alias renames the table on the phone) and only the columns the app uses are sent.
 - Instance URL (public endpoint, the app's default):
   `https://6ae136d7fb9e144e4ed9a04e.powersync.journeyapps.com`
+
+## Verified end to end (Oct 28, 2026)
+
+On the Android emulator, signed in as `crew.test@innodigital.ca` (crew, linked to the demo
+employee Alex Tremblay): today's DÉMO-1 shift downloaded with its jobs and scoreboard, and a job
+added on the phone reached `gotjunk-ca` with the server's completion time and a crew audit entry.
 
 ## 3. Changing the sync rules
 
@@ -30,7 +39,8 @@ Edit `supabase/powersync/sync-streams.yaml`, paste it into PowerSync → Sync St
 
 ## 4. Production instance (before the pilot)
 
-Repeat the guided setup on the Production instance and build the app with
+Repeat the guided setup on the Production instance, **add the `authenticated` JWT audience**,
+deploy the same sync streams, and build the app with
 `--dart-define=POWERSYNC_URL=<production instance URL>`.
 
 ## How uploads behave
