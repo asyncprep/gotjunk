@@ -364,4 +364,11 @@ class L10nFr extends L10n {
 
   @override
   String get staySignedIn => 'Rester connecté';
+
+  @override
+  String get quickTitle => 'Connexion rapide';
+
+  @override
+  String get quickHint =>
+      'Version de développement seulement : absent des versions installées par l’équipe.';
 }

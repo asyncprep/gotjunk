@@ -153,5 +153,7 @@
         "type": "int"
       }
     }
-  }
+  },
+  "quickTitle": "Connexion rapide",
+  "quickHint": "Version de développement seulement : absent des versions installées par l’équipe."
 }

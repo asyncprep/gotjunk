@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../l10n/app_localizations.dart';
+import 'quick_signin.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -16,14 +17,35 @@ class _LoginPageState extends State<LoginPage> {
   bool _busy = false;
   String? _error;
 
-  Future<void> _signIn() async {
+  final _passwordFocus = FocusNode();
+
+  @override
+  void dispose() {
+    _email.dispose();
+    _password.dispose();
+    _passwordFocus.dispose();
+    super.dispose();
+  }
+
+  Future<void> _signIn() => _signInWith(_email.text.trim(), _password.text);
+
+  void _quick(QuickAccount account) {
+    _email.text = account.email;
+    if (account.password != null) {
+      _signInWith(account.email, account.password!);
+    } else {
+      _password.clear();
+      _passwordFocus.requestFocus();
+    }
+  }
+
+  Future<void> _signInWith(String email, String password) async {
     setState(() {
       _busy = true;
       _error = null;
     });
     try {
-      await Supabase.instance.client.auth
-          .signInWithPassword(email: _email.text.trim(), password: _password.text);
+      await Supabase.instance.client.auth.signInWithPassword(email: email, password: password);
     } on AuthException catch (e) {
       setState(() => _error = e.message);
     } catch (e) {
@@ -64,6 +86,7 @@ class _LoginPageState extends State<LoginPage> {
                     const SizedBox(height: 12),
                     TextField(
                       controller: _password,
+                      focusNode: _passwordFocus,
                       obscureText: true,
                       autofillHints: const [AutofillHints.password],
                       onSubmitted: (_) => _signIn(),
@@ -75,6 +98,16 @@ class _LoginPageState extends State<LoginPage> {
                       style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
                       child: Text(t.signIn),
                     ),
+                    if (quickAccounts.isNotEmpty) ...[
+                      const SizedBox(height: 24),
+                      Text(t.quickTitle, style: Theme.of(context).textTheme.titleSmall),
+                      Text(t.quickHint, style: Theme.of(context).textTheme.bodySmall),
+                      const SizedBox(height: 8),
+                      Wrap(spacing: 8, runSpacing: 8, children: [
+                        for (final a in quickAccounts)
+                          OutlinedButton(onPressed: _busy ? null : () => _quick(a), child: Text(a.label)),
+                      ]),
+                    ],
                   ],
                 ),
               ),

@@ -31,6 +31,19 @@ Run all of these before pushing; none needs Docker.
 | Crew app (unit/widget) | `cd apps/mobile && flutter analyze && flutter test` | Amount parsing, refusal messages, retry rules, sign-in screen fr/en |
 | Crew app (on device) | `cd apps/mobile && flutter test integration_test -d <device>` | On-phone database and screens: shift, jobs, scoreboard and tip split, disposal pricing, cash, photos and their upload queue, pre-submit checks, refusals; taps through the real screens |
 
+## Quick sign-in for development
+
+One-click sign-in buttons for testing as different users. **Local development only**: they are
+compiled out of the Vercel site and of release builds of the crew app, and the accounts live in
+git-ignored files on your machine. Create the accounts first (admin app → Équipe → Utilisateurs);
+the password part is optional (without it a button only fills in the email).
+
+- **Admin app** (`npm run dev`): add to `apps/admin/.env.local`
+  `VITE_QUICK_SIGNIN="Direction|you@example.com|password;Répartition|dispatch@example.com"`
+- **Crew app** (debug builds): copy `apps/mobile/quick_signin.example.json` to
+  `apps/mobile/quick_signin.json`, edit it, then
+  `flutter run --dart-define-from-file=quick_signin.json`
+
 ## How the backend works
 
 - **Rules live in Postgres.** Both apps are thin; constraints, triggers and RLS enforce the spec.

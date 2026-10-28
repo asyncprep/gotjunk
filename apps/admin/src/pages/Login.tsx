@@ -1,7 +1,8 @@
-import { useState, type FormEvent } from 'react';
+import { useRef, useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '../lib/supabase';
 import Brand from '../components/Brand';
+import { quickAccounts, type QuickAccount } from '../lib/quickSignIn';
 
 export default function Login() {
   const { t } = useTranslation();
@@ -9,13 +10,28 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
   const [busy, setBusy] = useState(false);
+  const passwordInput = useRef<HTMLInputElement>(null);
+
+  async function signInWith(address: string, secret: string) {
+    setBusy(true);
+    const { error } = await supabase.auth.signInWithPassword({ email: address, password: secret });
+    setBusy(false);
+    if (error) setMessage({ ok: false, text: error.message });
+  }
 
   async function signIn(e: FormEvent) {
     e.preventDefault();
-    setBusy(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setBusy(false);
-    if (error) setMessage({ ok: false, text: error.message });
+    await signInWith(email, password);
+  }
+
+  function quick(account: QuickAccount) {
+    setEmail(account.email);
+    if (account.password) {
+      signInWith(account.email, account.password);
+    } else {
+      setPassword('');
+      passwordInput.current?.focus();
+    }
   }
 
   async function forgot() {
@@ -36,7 +52,7 @@ export default function Login() {
         </label>
         <label>
           {t('login.password')}
-          <input type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+          <input ref={passwordInput} type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} />
         </label>
         <div className="row">
           <button className="go" disabled={busy}>{t('login.submit')}</button>
@@ -44,6 +60,19 @@ export default function Login() {
         <div className="row" style={{ marginTop: 12 }}>
           <button type="button" className="link" onClick={forgot}>{t('login.forgot')}</button>
         </div>
+        {import.meta.env.DEV && quickAccounts.length > 0 && (
+          <div className="quick-signin">
+            <strong>{t('login.quickTitle')}</strong>
+            <span className="muted small">{t('login.quickHint')}</span>
+            <div className="row">
+              {quickAccounts.map((a) => (
+                <button key={a.email} type="button" disabled={busy} onClick={() => quick(a)} title={a.email}>
+                  {a.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </form>
     </div>
   );

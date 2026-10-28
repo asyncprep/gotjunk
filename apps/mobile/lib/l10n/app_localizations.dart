@@ -768,6 +768,18 @@ abstract class L10n {
   /// In fr, this message translates to:
   /// **'Rester connecté'**
   String get staySignedIn;
+
+  /// No description provided for @quickTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Connexion rapide'**
+  String get quickTitle;
+
+  /// No description provided for @quickHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Version de développement seulement : absent des versions installées par l’équipe.'**
+  String get quickHint;
 }
 
 class _L10nDelegate extends LocalizationsDelegate<L10n> {

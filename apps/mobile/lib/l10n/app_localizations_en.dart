@@ -360,4 +360,11 @@ class L10nEn extends L10n {
 
   @override
   String get staySignedIn => 'Stay signed in';
+
+  @override
+  String get quickTitle => 'Quick sign-in';
+
+  @override
+  String get quickHint =>
+      'Development build only: not in the builds crews install.';
 }

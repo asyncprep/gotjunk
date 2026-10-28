@@ -125,5 +125,7 @@
   "done": "Done",
   "signOutUnsent": "{count} item(s) not sent to the server yet. Signing out now will lose them.",
   "signOutAnyway": "Sign out anyway",
-  "staySignedIn": "Stay signed in"
+  "staySignedIn": "Stay signed in",
+  "quickTitle": "Quick sign-in",
+  "quickHint": "Development build only: not in the builds crews install."
 }

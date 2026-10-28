@@ -43,3 +43,6 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Local quick sign-in accounts for debug builds (never commit)
+quick_signin.json

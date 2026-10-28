@@ -20,6 +20,7 @@ const fr = {
     forgot: 'Mot de passe oublié?', resetSent: 'Si ce courriel existe, un lien de réinitialisation a été envoyé.',
     setTitle: 'Choisir un mot de passe', setSubmit: 'Enregistrer le mot de passe', minLength: '12 caractères minimum',
     noAccess: 'Cette application est réservée à la répartition et à l’administration.',
+    quickTitle: 'Connexion rapide', quickHint: 'Développement local seulement : absent du site en ligne.',
   },
   status: {
     open: 'Ouvert', in_progress: 'En cours', submitted: 'Soumis', returned: 'Retourné', locked: 'Accepté',
@@ -133,6 +134,7 @@ const en: Dict = {
     forgot: 'Forgot password?', resetSent: 'If this email exists, a reset link has been sent.',
     setTitle: 'Choose a password', setSubmit: 'Save password', minLength: 'At least 12 characters',
     noAccess: 'This app is for dispatch and administration only.',
+    quickTitle: 'Quick sign-in', quickHint: 'Local development only: not on the live site.',
   },
   status: {
     open: 'Open', in_progress: 'In progress', submitted: 'Submitted', returned: 'Returned', locked: 'Accepted',
