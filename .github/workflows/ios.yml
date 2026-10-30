@@ -51,9 +51,22 @@ jobs:
           xcrun simctl boot "$UDID"
           echo "UDID=$UDID" >> "$GITHUB_ENV"
       - name: Device tests on the simulator
+        # One file at a time: on the hosted simulator, relaunching the app for the next file
+        # sometimes can't reach the Dart VM in time. A file that can't connect gets one retry;
+        # a real test failure is not retried.
         run: |
           set -o pipefail
-          flutter test integration_test -d "$UDID" 2>&1 | tee "$RUNNER_TEMP/test.log" || {
-            grep -iE "error|failed|exception|\[E\]|Expected|Actual" "$RUNNER_TEMP/test.log" | tail -10 | while IFS= read -r line; do echo "::error::$line"; done
-            exit 1
-          }
+          failed=0
+          for file in integration_test/*_test.dart; do
+            for attempt in 1 2; do
+              if flutter test "$file" -d "$UDID" 2>&1 | tee "$RUNNER_TEMP/test.log"; then break; fi
+              if [ "$attempt" = 1 ] && grep -q "Connecting to the VM Service timed out" "$RUNNER_TEMP/test.log"; then
+                echo "::warning::$file could not connect to the simulator; retrying"
+                continue
+              fi
+              grep -iE "error|failed|exception|Expected|Actual" "$RUNNER_TEMP/test.log" | tail -10 | while IFS= read -r line; do echo "::error::$line"; done
+              failed=1
+              break
+            done
+          done
+          exit $failed

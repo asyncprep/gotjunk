@@ -1,0 +1,64 @@
+# Codemagic builds the crew app's iOS release and sends it to TestFlight: there is no Mac in
+# the team, and an iOS app can only be built and signed on macOS. Same setup as the
+# Poubelle du Ski app. GitHub Actions (.github/workflows/ios.yml) still checks every push.
+#
+# One-time setup, before the first run:
+#   1. Apple Developer: register the App ID com.innodigital.gotjunk.crew (no extra
+#      capabilities needed), then in App Store Connect create the app "GOT-JUNK Équipe"
+#      with that bundle ID.
+#   2. Codemagic: add this repository (asyncprep/gotjunk) as an app.
+#   3. Codemagic team settings -> Integrations -> Developer Portal: the App Store Connect API
+#      key `PDS App Store` already exists for the Poubelle du Ski app; it covers every app in
+#      the same Apple team, so it is reused here.
+#   4. Codemagic team settings -> Code signing identities: use the existing "Apple
+#      Distribution" certificate, then fetch the App Store profile for
+#      com.innodigital.gotjunk.crew.
+#   5. App settings -> Environment variables, group `gotjunk_ios`:
+#        APP_STORE_APP_ID   the numeric Apple ID from App Store Connect -> App Information
+#
+# Runs are started by hand from Codemagic; pushes do not trigger a build.
+workflows:
+  ios-release:
+    name: Crew app iOS release (TestFlight)
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    working_directory: apps/mobile
+    integrations:
+      app_store_connect: PDS App Store
+    environment:
+      flutter: 3.44.4
+      xcode: latest
+      groups:
+        - gotjunk_ios
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.innodigital.gotjunk.crew
+    scripts:
+      - name: Apply signing profiles
+        script: xcode-project use-profiles
+      - name: Get packages
+        script: flutter pub get
+      - name: Build ipa
+        script: |
+          # App Store Connect refuses a build number it has already seen, so a
+          # rebuild of the same version moves past the last uploaded build
+          # instead of failing on upload. pubspec.yaml still wins when it is ahead.
+          PUBSPEC_BUILD=$(grep '^version:' pubspec.yaml | sed 's/.*+//')
+          LATEST_BUILD=$(app-store-connect get-latest-testflight-build-number "$APP_STORE_APP_ID" || echo 0)
+          BUILD_NUMBER=$(( LATEST_BUILD >= PUBSPEC_BUILD ? LATEST_BUILD + 1 : PUBSPEC_BUILD ))
+          echo "Building number $BUILD_NUMBER (pubspec $PUBSPEC_BUILD, last uploaded $LATEST_BUILD)"
+
+          # Release builds have no quick sign-in; the server addresses are built in
+          # (lib/app_config.dart), so nothing else needs passing here.
+          flutter build ipa --release \
+            --build-number="$BUILD_NUMBER" \
+            --export-options-plist=/Users/builder/export_options.plist
+    artifacts:
+      - apps/mobile/build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+    publishing:
+      app_store_connect:
+        auth: integration
+        # Internal testers get the build as soon as Apple finishes processing
+        # it. External testers need a beta review, which is requested by hand.
+        submit_to_testflight: false

@@ -32,6 +32,15 @@ Run all of these before pushing; none needs Docker.
 | Crew app (iOS) | GitHub Actions, `.github/workflows/ios.yml`, on every push touching `apps/mobile` | Unsigned iOS build, then the device tests on an iPhone simulator (iOS needs a Mac) |
 | Crew app (on device) | `cd apps/mobile && flutter test integration_test -d <device>` | On-phone database and screens: shift, jobs, scoreboard and tip split, disposal pricing, cash, photos and their upload queue, pre-submit checks, refusals; taps through the real screens |
 
+## iOS release (TestFlight)
+
+Crews use iPhones only. There is no Mac in the team, so the signed iOS build is made by
+**Codemagic** (same setup as the Poubelle du Ski app): [`codemagic.yaml`](codemagic.yaml), started
+by hand from Codemagic, uploads to TestFlight for internal testers. The one-time setup (App ID
+`com.innodigital.gotjunk.crew`, App Store Connect app, signing, `APP_STORE_APP_ID`) is listed at
+the top of that file. Raise `version:` in `apps/mobile/pubspec.yaml` for each new release; build
+numbers are handled automatically.
+
 ## Quick sign-in for development
 
 One-click sign-in buttons for testing as different users. **Local development only**: they are
