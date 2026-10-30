@@ -6,11 +6,12 @@
 #   1. Apple Developer: register the App ID com.innodigital.gotjunk.crew (no extra
 #      capabilities needed), then in App Store Connect create the app "GOT-JUNK Équipe"
 #      with that bundle ID.
-#   2. Codemagic: add this repository (asyncprep/gotjunk) as an app.
-#   3. Codemagic team settings -> Integrations -> Developer Portal: the App Store Connect API
+#   2. Codemagic: connect GitHub (account settings -> Integrations -> GitHub, the Codemagic
+#      GitHub App, for asyncprep/gotjunk only), then add this repository as an app.
+#   3. Codemagic account settings -> Integrations -> Developer Portal: the App Store Connect API
 #      key `PDS App Store` already exists for the Poubelle du Ski app; it covers every app in
 #      the same Apple team, so it is reused here.
-#   4. Codemagic team settings -> Code signing identities: use the existing "Apple
+#   4. Codemagic account settings -> Code signing identities: use the existing "Apple
 #      Distribution" certificate, then fetch the App Store profile for
 #      com.innodigital.gotjunk.crew.
 #   5. App settings -> Environment variables, group `gotjunk_ios`:
