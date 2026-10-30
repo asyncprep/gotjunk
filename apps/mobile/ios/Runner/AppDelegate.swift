@@ -13,7 +13,7 @@ import workmanager_apple
     WorkmanagerPlugin.setPluginRegistrantCallback { registry in
       GeneratedPluginRegistrant.register(with: registry)
     }
-    WorkmanagerPlugin.registerPeriodicTask(withIdentifier: "tto.photoUpload.periodic", earliestBeginInSeconds: 15 * 60)
+    WorkmanagerPlugin.registerPeriodicTask(withIdentifier: "tto.photoUpload.periodic", earliestBeginInSeconds: NSNumber(value: 15 * 60))
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 
