@@ -16,7 +16,7 @@ The product specification (v0.3) is a client document and is not stored in this 
 | `supabase/demo-data.sql` | **Dev only.** Demo employees (“(démo)”), trucks DÉMO-1…3 and shifts in every state; remove with `demo-data-cleanup.sql` |
 | `supabase/tests/` | SQL tests: `_fixture.sql` per test, `*.test.sql` cases |
 | `tools/dbtest/` | Test runner: migrations + tests in PGlite, no Docker needed |
-| `apps/mobile/` | Flutter crew app (Android first): `flutter run` (sync needs `--dart-define=POWERSYNC_URL=…`, see [docs/powersync-setup.md](docs/powersync-setup.md)) |
+| `apps/mobile/` | Flutter crew app (iPhone; also runs on Android for development): `flutter run` (sync needs `--dart-define=POWERSYNC_URL=…`, see [docs/powersync-setup.md](docs/powersync-setup.md)) |
 | `apps/admin/` | React dispatch/admin web app: `npm install && npm run dev` (needs `.env.local`, see `.env.example`) |
 | `supabase/functions/` | Edge Functions (`invite-user`), deployed with the migrations |
 
@@ -29,6 +29,7 @@ Run all of these before pushing; none needs Docker.
 | Database | `cd tools/dbtest && npm install && npm test` | Migrations, rules, RLS, calculations (filter: `node run.mjs "tip split"`) |
 | Admin app | `cd apps/admin && npm test && npm run build` | Component tests (cash panel, photo gallery), type-check and production build |
 | Crew app (unit/widget) | `cd apps/mobile && flutter analyze && flutter test` | Amount parsing, refusal messages, retry rules, sign-in screen fr/en |
+| Crew app (iOS) | GitHub Actions, `.github/workflows/ios.yml`, on every push touching `apps/mobile` | Unsigned iOS build, then the device tests on an iPhone simulator (iOS needs a Mac) |
 | Crew app (on device) | `cd apps/mobile && flutter test integration_test -d <device>` | On-phone database and screens: shift, jobs, scoreboard and tip split, disposal pricing, cash, photos and their upload queue, pre-submit checks, refusals; taps through the real screens |
 
 ## Quick sign-in for development

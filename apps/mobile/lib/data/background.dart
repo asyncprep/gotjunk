@@ -13,6 +13,7 @@ import 'photo_uploader.dart';
 /// Android WorkManager runs this even when the app is closed, once there is a network.
 const photoUploadTask = 'tto.photoUpload';
 const _oneOffName = 'tto.photoUpload.oneoff';
+/// Also the iOS task identifier: keep in sync with Info.plist and AppDelegate.swift.
 const _periodicName = 'tto.photoUpload.periodic';
 
 /// Queue rows that keep failing (e.g. a deleted file) stop counting as "still to do".
@@ -60,9 +61,10 @@ Future<bool> uploadPhotosInBackground({PowerSyncDatabase? db, StorageFileApi? bu
   }
 }
 
-/// Registers the background work. Android only for now; iOS follows with the Apple account.
+/// Registers the background work. On iOS the periodic task is a background app refresh: iOS
+/// decides when it runs (it must also be listed in Info.plist and registered in AppDelegate).
 Future<void> initBackgroundUploads() async {
-  if (!Platform.isAndroid) return;
+  if (!Platform.isAndroid && !Platform.isIOS) return;
   await Workmanager().initialize(backgroundDispatcher);
   await Workmanager().registerPeriodicTask(
     _periodicName,
@@ -75,8 +77,9 @@ Future<void> initBackgroundUploads() async {
 }
 
 /// Asks Android to upload as soon as there is a network, even if the app is closed first.
+/// iOS runs it right away and gives it about 30 seconds if the crew leaves the app.
 Future<void> schedulePhotoUpload() async {
-  if (!Platform.isAndroid) return;
+  if (!Platform.isAndroid && !Platform.isIOS) return;
   await Workmanager().registerOneOffTask(
     _oneOffName,
     photoUploadTask,

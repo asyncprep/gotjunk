@@ -11,7 +11,7 @@ IDs A–G match the spec's §15 open items; R1–R5 came from the spec review; S
 | ID | Question | Blocks | Working default |
 | --- | --- | --- | --- |
 | S1 🔴 | Do you approve the technology stack (Flutter app, React admin, Supabase in Canada)? | All development past the backend | Proceeding as recommended |
-| S2 🔴 | Are the crew phones company-owned iPhones? Any Android? | App build and distribution | iPhone only |
+| S2 ✅ | Are the crew phones company-owned iPhones? Any Android? | App build and distribution | **Answered (Oct 30, 2026): iPhone only** |
 | G 🔴 | How long must the app work without signal before crews are blocked? | Offline design (PowerSync scope, photo handling) | Full shift offline |
 | E 🔴 | Does dispatch create truck/phone/crew assignments in Truck Team OS, or do they come from the Daily Tracker? | Assignment screens, sync | Dispatch creates them in the app |
 | A 🟢 | Profit-share formula (see section A below) | Profit-share engine and scoreboard bonus | Not built; shows "pending plan" |
