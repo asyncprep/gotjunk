@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:powersync/powersync.dart' show SyncStatus;
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../app_config.dart';
 import '../data/database.dart';
@@ -53,7 +52,17 @@ class HomePage extends ConsumerWidget {
                     return const Center(child: CircularProgressIndicator());
                   }
                   final employeeId = snap.data;
-                  if (employeeId == null) return _Message(t.notCrew);
+                  if (employeeId == null) {
+                    // Right after sign-in the link to the employee hasn't arrived yet: wait for the
+                    // first sync before saying this account isn't crew.
+                    return StreamBuilder<SyncStatus>(
+                      stream: repo.db.statusStream,
+                      initialData: repo.db.currentStatus,
+                      builder: (context, sync) => AppConfig.powersyncUrl.isEmpty || (sync.data?.hasSynced ?? false)
+                          ? _Message(t.notCrew)
+                          : const Center(child: CircularProgressIndicator()),
+                    );
+                  }
                   return ShiftView(repo: repo, employeeId: employeeId);
                 },
               ),
@@ -83,7 +92,7 @@ Future<void> _signOut(BuildContext context, Repo repo) async {
     );
     if (go != true) return;
   }
-  await Supabase.instance.client.auth.signOut();
+  await signOutAndClear(repo.db);
 }
 
 /// Connection state and anything still waiting to upload.
@@ -544,7 +553,7 @@ class _Rejections extends StatelessWidget {
             child: ListTile(
               leading: Icon(Icons.error_outline, color: scheme.onErrorContainer),
               title: Text(t.rejected, style: TextStyle(color: scheme.onErrorContainer)),
-              subtitle: Text(explainRejection(t, '${r['message']}'), style: TextStyle(color: scheme.onErrorContainer)),
+              subtitle: Text(explainRejection(t, '${r['message']}', sqlState: r['code'] as String?), style: TextStyle(color: scheme.onErrorContainer)),
               trailing: TextButton(onPressed: () => repo.dismissRejection(r['id'] as String), child: Text(t.dismiss)),
             ),
           ),

@@ -29,6 +29,7 @@ class _JobFormPageState extends State<JobFormPage> {
   late final _discount = TextEditingController(text: _fmt(widget.job?['discount_amount']));
   late bool _completed = (widget.job?['outcome'] as String?) != 'cancelled_pending';
   late String? _method = widget.job?['payment_method_code'] as String?;
+  String? _oppError;
 
   static String _fmt(Object? v) => v == null || v == 0 || v == 0.0 ? '' : (v as num).toStringAsFixed(2);
 
@@ -41,6 +42,10 @@ class _JobFormPageState extends State<JobFormPage> {
 
   Future<void> _save() async {
     if (!_form.currentState!.validate()) return;
+    if (await widget.repo.opportunityTaken(widget.shiftId, _opp.text.trim(), exceptJobId: widget.job?['id'] as String?)) {
+      if (mounted) setState(() => _oppError = L10n.of(context).duplicateOpportunity);
+      return;
+    }
     await widget.repo.saveJob(JobDraft(
       id: widget.job?['id'] as String?,
       shiftId: widget.shiftId,
@@ -85,6 +90,10 @@ class _JobFormPageState extends State<JobFormPage> {
               controller: _opp,
               textCapitalization: TextCapitalization.characters,
               decoration: InputDecoration(labelText: t.opportunityId, border: const OutlineInputBorder()),
+              forceErrorText: _oppError,
+              onChanged: (_) {
+                if (_oppError != null) setState(() => _oppError = null);
+              },
               validator: requiredText,
             ),
             const SizedBox(height: 16),

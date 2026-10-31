@@ -1,8 +1,11 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:path/path.dart' as p;
 import 'package:powersync/powersync.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+import 'database.dart';
 
 /// Sends queued photo files to the private `photos` bucket while the app is open.
 /// The photo's database row syncs separately; the file only needs to arrive eventually.
@@ -36,7 +39,7 @@ class PhotoUploader {
     try {
       final queue = await db.getAll('SELECT * FROM photo_upload_queue ORDER BY id');
       for (final item in queue) {
-        final file = File(item['local_path'] as String);
+        final file = await _localFile(item['local_path'] as String);
         if (!file.existsSync()) {
           await _fail(item['id'] as String, 'local file missing');
           continue;
@@ -63,6 +66,14 @@ class PhotoUploader {
       _running = false;
     }
     return sent;
+  }
+
+  /// iOS moves the app's folder on updates and restores, so a saved full path can go stale:
+  /// the file is then looked up by name in today's photo folder.
+  Future<File> _localFile(String savedPath) async {
+    final file = File(savedPath);
+    if (file.existsSync()) return file;
+    return File(p.join((await photoDirectory()).path, p.basename(savedPath)));
   }
 
   Future<void> _done(String id, File file) async {

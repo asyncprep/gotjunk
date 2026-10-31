@@ -31,6 +31,7 @@ class _VisitPageState extends ConsumerState<VisitPage> {
   String? _material;
   final _kg = TextEditingController();
   String? _kgError;
+  String? _ticketError;
   bool _loaded = false;
 
   @override
@@ -50,15 +51,23 @@ class _VisitPageState extends ConsumerState<VisitPage> {
     }
   }
 
-  Future<void> _saveHeader() async {
+  /// Saves site and ticket; false when the ticket number is already used at this site.
+  /// A submitted shift is read-only: nothing is saved (the server would refuse it).
+  Future<bool> _saveHeader() async {
     final repo = ref.read(repoProvider);
-    if (_siteId == null) return;
+    if (_siteId == null || !widget.editable) return true;
+    if (await repo.ticketTaken(_siteId!, _ticket.text, exceptVisitId: _visitId)) {
+      if (mounted) setState(() => _ticketError = L10n.of(context).duplicateTicket);
+      return false;
+    }
+    if (_ticketError != null) setState(() => _ticketError = null);
     if (_visitId == null) {
       final id = await repo.addVisit(widget.shiftId, _siteId!, _ticket.text);
       setState(() => _visitId = id);
     } else {
       await repo.updateVisit(_visitId!, siteId: _siteId!, ticketNumber: _ticket.text);
     }
+    return true;
   }
 
   Future<void> _addLine() async {
@@ -121,7 +130,8 @@ class _VisitPageState extends ConsumerState<VisitPage> {
                   controller: _ticket,
                   enabled: editable,
                   textCapitalization: TextCapitalization.characters,
-                  decoration: InputDecoration(labelText: t.ticketNumber, border: const OutlineInputBorder()),
+                  decoration: InputDecoration(
+                      labelText: t.ticketNumber, border: const OutlineInputBorder(), errorText: _ticketError),
                   onEditingComplete: () {
                     if (_visitId != null) _saveHeader();
                     FocusScope.of(context).unfocus();
@@ -148,8 +158,7 @@ class _VisitPageState extends ConsumerState<VisitPage> {
                         onPressed: !editable
                             ? null
                             : () async {
-                                await _saveHeader();
-                                if (!context.mounted) return;
+                                if (!await _saveHeader() || !context.mounted) return;
                                 await capturePhoto(context, ref,
                                     shiftId: widget.shiftId,
                                     kind: 'disposal_ticket',
@@ -237,8 +246,7 @@ class _VisitPageState extends ConsumerState<VisitPage> {
                   const SizedBox(height: 24),
                   FilledButton(
                     onPressed: () async {
-                      await _saveHeader();
-                      if (context.mounted) Navigator.pop(context);
+                      if (await _saveHeader() && context.mounted) Navigator.pop(context);
                     },
                     style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
                     child: Text(t.done),

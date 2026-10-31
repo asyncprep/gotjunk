@@ -53,11 +53,24 @@ String outcomeLabel(L10n t, String? outcome) => switch (outcome) {
     };
 
 /// Turns a server refusal like "shift_not_ready: finish_time_missing, job_incomplete" into crew language.
-String explainRejection(L10n t, String message) {
-  final match = RegExp(r'^(\w+):\s*(.*)$').firstMatch(message);
+/// [sqlState] is the database error code, for refusals that carry no message of ours (constraints).
+String explainRejection(L10n t, String message, {String? sqlState}) {
+  switch (sqlState) {
+    case '23505':
+      if (message.contains('disposal_visit_ticket')) return t.duplicateTicket;
+      if (message.contains('opportunity')) return t.duplicateOpportunity;
+      return t.err_duplicate;
+    case '23514' || '22007' || '22P02' || '22003':
+      return t.err_invalid_value;
+    case '23503':
+      return t.err_missing_parent;
+    case '42501':
+      return t.err_not_allowed;
+  }
+  final match = RegExp(r'^(\w+)(?::\s*(.*))?$', dotAll: true).firstMatch(message);
   if (match == null) return message;
   final code = match.group(1)!;
-  final rest = match.group(2)!;
+  final rest = match.group(2) ?? '';
   if (code == 'shift_not_ready') {
     return rest.split(',').map((c) => _problem(t, c.trim())).join(' · ');
   }
@@ -66,6 +79,13 @@ String explainRejection(L10n t, String message) {
     'shift_locked' => t.err_shift_locked,
     'not_allowed' => t.err_not_allowed,
     'hours_type_missing' => t.err_hours_type_missing,
+    'no_rate' => t.err_no_rate,
+    'crew_double_booked' => t.err_crew_double_booked,
+    'photo_entity_missing' => t.err_photo_entity_missing,
+    'photo_shift_mismatch' => t.err_photo_shift_mismatch,
+    'invalid_transition' => t.err_invalid_transition,
+    'reason_required' => t.err_reason_required,
+    'not_found' => t.err_not_found,
     _ => message,
   };
 }
@@ -80,5 +100,11 @@ String _problem(L10n t, String code) => switch (code) {
       'ticket_photo_missing' => t.problem_ticket_photo_missing,
       'visit_no_materials' => t.problem_visit_no_materials,
       'cash_photo_missing' => t.problem_cash_photo_missing,
+      'tip_unassigned' => t.problem_tip_unassigned,
+      'photo_not_uploaded' => t.problem_photo_not_uploaded,
+      'opportunity_repeated' => t.problem_opportunity_repeated,
+      'hours_type_unconfirmed' => t.problem_hours_type_unconfirmed,
+      'cancellation_pending' => t.problem_cancellation_pending,
+      'tax_check' => t.problem_tax_check,
       _ => code,
     };

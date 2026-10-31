@@ -40,32 +40,34 @@ class SupabaseConnector extends PowerSyncBackendConnector {
     final transaction = await database.getNextCrudTransaction();
     if (transaction == null) return;
 
-    CrudEntry? current;
-    try {
-      for (final op in transaction.crud) {
-        current = op;
-        final pk = writablePrimaryKeys[op.table];
-        if (pk == null) continue; // read-only reference data is never uploaded
-        final table = _client.from(op.table);
+    for (final op in transaction.crud) {
+      final pk = writablePrimaryKeys[op.table];
+      if (pk == null) continue; // read-only reference data is never uploaded
+      final table = _client.from(op.table);
+      try {
         switch (op.op) {
           case UpdateType.put:
             await table.upsert({...?op.opData, pk: op.id});
           case UpdateType.patch:
-            await table.update(op.opData!).eq(pk, op.id);
+            // A change that matches no row (gone, or hidden by access rules) is not a success.
+            final rows = await table.update(op.opData!).eq(pk, op.id).select(pk);
+            if (rows.isEmpty) await _reject(database, op, 'PGRST116', 'not_found: ${op.table} ${op.id}');
           case UpdateType.delete:
             await table.delete().eq(pk, op.id);
         }
+      } on PostgrestException catch (e) {
+        if (!isRejection(e)) rethrow; // network/server trouble: PowerSync retries the whole transaction later
+        // Keep going with the rest, so one refusal doesn't take the other changes with it.
+        // The crew is told why; the next sync restores the server's version of this record.
+        await _reject(database, op, e.code, e.message);
       }
-      await transaction.complete();
-    } on PostgrestException catch (e) {
-      if (!isRejection(e)) rethrow; // network/server trouble: PowerSync retries later
-      // Keep the queue moving, but tell the crew why. The next sync restores the server's version.
-      await database.execute(
+    }
+    await transaction.complete();
+  }
+
+  Future<void> _reject(PowerSyncDatabase database, CrudEntry op, String? code, String message) => database.execute(
         'INSERT INTO sync_rejection (id, table_name, record_id, code, message, created_at) '
         'VALUES (?, ?, ?, ?, ?, ?)',
-        [const Uuid().v7(), current?.table, current?.id, e.code, e.message, DateTime.now().toUtc().toIso8601String()],
+        [const Uuid().v7(), op.table, op.id, code, message, DateTime.now().toUtc().toIso8601String()],
       );
-      await transaction.complete();
-    }
-  }
 }

@@ -206,6 +206,27 @@ void main() {
     expect(await repo.pendingPhotoUploads().first, 0);
   });
 
+  testWidgets('a photo is still found after iOS moves the app folder', (_) async {
+    final visit = await repo.addVisit(shiftId, 'eco', 'EJ-10');
+    final picture = File(join(dir.path, 'pic10_${DateTime.now().microsecondsSinceEpoch}.jpg'))..writeAsBytesSync([1]);
+    final photoId = await repo.addPhoto(shiftId: shiftId, kind: 'disposal_ticket', entityType: 'disposal_visit',
+        entityId: visit, picture: picture, photoDir: await photoDirectory());
+    await db.execute('UPDATE photo_upload_queue SET local_path = ? WHERE id = ?',
+        ['/var/mobile/Containers/Data/Application/OLD-ID/Documents/photos/$photoId.jpg', photoId]);
+    final bucket = FakeBucket();
+    expect(await PhotoUploader(db, bucketOverride: bucket).runOnce(), 1);
+    expect(bucket.uploaded, ['$shiftId/$photoId.jpg']);
+  });
+
+  testWidgets('a ticket number already used at the site is caught on the phone', (_) async {
+    final visit = await repo.addVisit(shiftId, 'eco', 'EJ-11');
+    expect(await repo.ticketTaken('eco', 'EJ-11'), isTrue);
+    expect(await repo.ticketTaken('eco', ' EJ-11 '), isTrue);
+    expect(await repo.ticketTaken('eco', 'EJ-11', exceptVisitId: visit), isFalse, reason: 'its own number');
+    expect(await repo.ticketTaken('other-site', 'EJ-11'), isFalse);
+    expect(await repo.ticketTaken('eco', ''), isFalse, reason: 'no ticket is not a duplicate');
+  });
+
   testWidgets('a new visit and line upload with only phone-entered fields', (_) async {
     while (true) {
       final tx = await db.getNextCrudTransaction();

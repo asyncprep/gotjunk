@@ -262,6 +262,73 @@ class L10nFr extends L10n {
   String get err_hours_type_missing => 'Choisissez le type d’heures';
 
   @override
+  String get err_no_rate =>
+      'Aucun tarif actif pour cette matière à ce site : avisez la répartition';
+
+  @override
+  String get err_crew_double_booked =>
+      'Un membre de l’équipe est déjà sur un autre quart actif ce jour-là';
+
+  @override
+  String get err_photo_entity_missing =>
+      'La photo n’a pas été envoyée : sa visite ou son comptant a été refusé';
+
+  @override
+  String get err_photo_shift_mismatch =>
+      'La photo ne correspond pas à ce quart';
+
+  @override
+  String get err_invalid_transition => 'Ce changement d’état n’est pas permis';
+
+  @override
+  String get err_reason_required => 'Une raison est requise';
+
+  @override
+  String get err_not_found =>
+      'Changement non appliqué : l’élément n’existe plus ou n’est plus modifiable';
+
+  @override
+  String get err_duplicate => 'Déjà saisi : ce numéro existe déjà';
+
+  @override
+  String get err_invalid_value =>
+      'Valeur refusée (par exemple, une heure de fin avant l’heure de début)';
+
+  @override
+  String get err_missing_parent =>
+      'Refusé parce que l’élément auquel il est rattaché a été refusé';
+
+  @override
+  String get duplicateTicket =>
+      'Ce numéro de billet est déjà utilisé à ce site';
+
+  @override
+  String get duplicateOpportunity =>
+      'Ce numéro d’opportunité est déjà dans ce quart';
+
+  @override
+  String get problem_tip_unassigned =>
+      'Un pourboire n’a personne à qui aller (heures d’arrivée ou de départ de l’équipe)';
+
+  @override
+  String get problem_photo_not_uploaded => 'Une photo n’est pas encore envoyée';
+
+  @override
+  String get problem_opportunity_repeated =>
+      'Le même numéro d’opportunité apparaît deux fois';
+
+  @override
+  String get problem_hours_type_unconfirmed => 'Type d’heures non confirmé';
+
+  @override
+  String get problem_cancellation_pending =>
+      'Une annulation attend la répartition';
+
+  @override
+  String get problem_tax_check =>
+      'Le total avec taxes ne correspond pas au montant avant taxes';
+
+  @override
   String get language => 'Langue';
 
   @override

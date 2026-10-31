@@ -258,6 +258,72 @@ class L10nEn extends L10n {
   String get err_hours_type_missing => 'Choose the hours type';
 
   @override
+  String get err_no_rate =>
+      'No active rate for this material at this site: tell dispatch';
+
+  @override
+  String get err_crew_double_booked =>
+      'A crew member is already on another active shift that day';
+
+  @override
+  String get err_photo_entity_missing =>
+      'The photo wasn\'t sent: its visit or cash record was refused';
+
+  @override
+  String get err_photo_shift_mismatch => 'The photo doesn\'t match this shift';
+
+  @override
+  String get err_invalid_transition => 'This status change isn\'t allowed';
+
+  @override
+  String get err_reason_required => 'A reason is required';
+
+  @override
+  String get err_not_found =>
+      'Change not applied: the item no longer exists or can\'t be changed';
+
+  @override
+  String get err_duplicate => 'Already entered: this number already exists';
+
+  @override
+  String get err_invalid_value =>
+      'Value refused (for example, a finish time before the start time)';
+
+  @override
+  String get err_missing_parent =>
+      'Refused because the item it belongs to was refused';
+
+  @override
+  String get duplicateTicket =>
+      'This ticket number is already used at this site';
+
+  @override
+  String get duplicateOpportunity =>
+      'This opportunity number is already on this shift';
+
+  @override
+  String get problem_tip_unassigned =>
+      'A tip has nobody to go to (crew arrival or departure times)';
+
+  @override
+  String get problem_photo_not_uploaded => 'A photo hasn\'t been sent yet';
+
+  @override
+  String get problem_opportunity_repeated =>
+      'The same opportunity number appears twice';
+
+  @override
+  String get problem_hours_type_unconfirmed => 'Hours type not confirmed';
+
+  @override
+  String get problem_cancellation_pending =>
+      'A cancellation is waiting for dispatch';
+
+  @override
+  String get problem_tax_check =>
+      'The total with tax doesn\'t match the amount before tax';
+
+  @override
   String get language => 'Language';
 
   @override

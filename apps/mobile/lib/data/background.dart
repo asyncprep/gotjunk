@@ -42,10 +42,21 @@ Future<bool> uploadPhotosInBackground({PowerSyncDatabase? db, StorageFileApi? bu
     if (!_supabaseReady) {
       WidgetsFlutterBinding.ensureInitialized();
       DartPluginRegistrant.ensureInitialized();
-      await Supabase.initialize(url: AppConfig.supabaseUrl, publishableKey: AppConfig.supabasePublishableKey);
+      // Reads the app's saved sign-in but never refreshes, saves or removes it: a refresh here
+      // would use up the refresh token the app itself needs, and sign the crew out.
+      await Supabase.initialize(
+        url: AppConfig.supabaseUrl,
+        publishableKey: AppConfig.supabasePublishableKey,
+        authOptions: FlutterAuthClientOptions(
+          autoRefreshToken: false,
+          localStorage: _ReadOnlySessionStorage(
+              persistSessionKey: 'sb-${Uri.parse(AppConfig.supabaseUrl).host.split('.').first}-auth-token'),
+        ),
+      );
       _supabaseReady = true;
     }
-    if (Supabase.instance.client.auth.currentSession == null) return true; // signed out: nothing to send
+    // Signed out, or the sign-in expired: the app uploads once it is open and signed in again.
+    if (Supabase.instance.client.auth.currentSession == null) return true;
   }
 
   // Inside the running app, reuse its database; in a background isolate, open our own.
@@ -86,4 +97,15 @@ Future<void> schedulePhotoUpload() async {
     constraints: Constraints(networkType: NetworkType.connected),
     existingWorkPolicy: ExistingWorkPolicy.keep,
   );
+}
+
+/// The app's saved sign-in, read-only for the background engine.
+class _ReadOnlySessionStorage extends SharedPreferencesLocalStorage {
+  _ReadOnlySessionStorage({required super.persistSessionKey});
+
+  @override
+  Future<void> persistSession(String persistSessionString) async {}
+
+  @override
+  Future<void> removePersistedSession() async {}
 }

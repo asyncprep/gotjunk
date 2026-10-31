@@ -577,6 +577,114 @@ abstract class L10n {
   /// **'Choisissez le type d’heures'**
   String get err_hours_type_missing;
 
+  /// No description provided for @err_no_rate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun tarif actif pour cette matière à ce site : avisez la répartition'**
+  String get err_no_rate;
+
+  /// No description provided for @err_crew_double_booked.
+  ///
+  /// In fr, this message translates to:
+  /// **'Un membre de l’équipe est déjà sur un autre quart actif ce jour-là'**
+  String get err_crew_double_booked;
+
+  /// No description provided for @err_photo_entity_missing.
+  ///
+  /// In fr, this message translates to:
+  /// **'La photo n’a pas été envoyée : sa visite ou son comptant a été refusé'**
+  String get err_photo_entity_missing;
+
+  /// No description provided for @err_photo_shift_mismatch.
+  ///
+  /// In fr, this message translates to:
+  /// **'La photo ne correspond pas à ce quart'**
+  String get err_photo_shift_mismatch;
+
+  /// No description provided for @err_invalid_transition.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ce changement d’état n’est pas permis'**
+  String get err_invalid_transition;
+
+  /// No description provided for @err_reason_required.
+  ///
+  /// In fr, this message translates to:
+  /// **'Une raison est requise'**
+  String get err_reason_required;
+
+  /// No description provided for @err_not_found.
+  ///
+  /// In fr, this message translates to:
+  /// **'Changement non appliqué : l’élément n’existe plus ou n’est plus modifiable'**
+  String get err_not_found;
+
+  /// No description provided for @err_duplicate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Déjà saisi : ce numéro existe déjà'**
+  String get err_duplicate;
+
+  /// No description provided for @err_invalid_value.
+  ///
+  /// In fr, this message translates to:
+  /// **'Valeur refusée (par exemple, une heure de fin avant l’heure de début)'**
+  String get err_invalid_value;
+
+  /// No description provided for @err_missing_parent.
+  ///
+  /// In fr, this message translates to:
+  /// **'Refusé parce que l’élément auquel il est rattaché a été refusé'**
+  String get err_missing_parent;
+
+  /// No description provided for @duplicateTicket.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ce numéro de billet est déjà utilisé à ce site'**
+  String get duplicateTicket;
+
+  /// No description provided for @duplicateOpportunity.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ce numéro d’opportunité est déjà dans ce quart'**
+  String get duplicateOpportunity;
+
+  /// No description provided for @problem_tip_unassigned.
+  ///
+  /// In fr, this message translates to:
+  /// **'Un pourboire n’a personne à qui aller (heures d’arrivée ou de départ de l’équipe)'**
+  String get problem_tip_unassigned;
+
+  /// No description provided for @problem_photo_not_uploaded.
+  ///
+  /// In fr, this message translates to:
+  /// **'Une photo n’est pas encore envoyée'**
+  String get problem_photo_not_uploaded;
+
+  /// No description provided for @problem_opportunity_repeated.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le même numéro d’opportunité apparaît deux fois'**
+  String get problem_opportunity_repeated;
+
+  /// No description provided for @problem_hours_type_unconfirmed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Type d’heures non confirmé'**
+  String get problem_hours_type_unconfirmed;
+
+  /// No description provided for @problem_cancellation_pending.
+  ///
+  /// In fr, this message translates to:
+  /// **'Une annulation attend la répartition'**
+  String get problem_cancellation_pending;
+
+  /// No description provided for @problem_tax_check.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le total avec taxes ne correspond pas au montant avant taxes'**
+  String get problem_tax_check;
+
   /// No description provided for @language.
   ///
   /// In fr, this message translates to:

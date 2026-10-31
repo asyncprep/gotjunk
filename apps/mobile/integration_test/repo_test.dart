@@ -80,7 +80,43 @@ void main() {
     expect(tx!.crud, hasLength(1));
     expect(tx.crud.single.table, 'shift');
     expect(tx.crud.single.op, UpdateType.patch);
-    expect(tx.crud.single.opData, {'hours_type': 'regular_junk', 'status': 'in_progress'});
+    final sent = tx.crud.single.opData!;
+    expect(sent.keys.toSet(), {'hours_type', 'start_time', 'status'}, reason: 'only columns crew may change');
+    expect(sent['status'], 'in_progress');
+    expect(DateTime.now().toUtc().difference(DateTime.parse(sent['start_time'] as String)).inMinutes, 0,
+        reason: "the phone's start time, not the upload time");
+  });
+
+  testWidgets('a completed job keeps the moment it was completed', (_) async {
+    await repo.startShift(shiftId, 'regular_junk');
+    await repo.saveJob(JobDraft(shiftId: shiftId, opportunityId: 'OPP-9', outcome: 'cancelled_pending'));
+    final job = await db.get("SELECT id, completed_at FROM job WHERE opportunity_id = 'OPP-9'");
+    expect(job['completed_at'], isNull);
+
+    final draft = JobDraft(id: job['id'] as String, shiftId: shiftId, opportunityId: 'OPP-9', outcome: 'completed',
+        paymentMethod: 'card', preTax: 100, total: 114.98);
+    await repo.saveJob(draft);
+    final completedAt = (await db.get('SELECT completed_at FROM job WHERE id = ?', [job['id']]))['completed_at'];
+    expect(completedAt, isNotNull);
+    await repo.saveJob(draft); // edited later: same completion time
+    expect((await db.get('SELECT completed_at FROM job WHERE id = ?', [job['id']]))['completed_at'], completedAt);
+
+    expect(await repo.opportunityTaken(shiftId, 'opp-9'), isTrue, reason: 'same number, any case');
+    expect(await repo.opportunityTaken(shiftId, 'OPP-9', exceptJobId: job['id'] as String), isFalse);
+  });
+
+  testWidgets('a second shift the same day shows instead of the submitted first one', (_) async {
+    await repo.startShift(shiftId, 'regular_junk');
+    await repo.submitShift(shiftId);
+    await db.writeTransaction((tx) async {
+      await tx.execute(
+          "INSERT INTO shift (id, shift_date, status, truck_id, phone_id) VALUES ('s-2', ?, 'open', 't-1', 'p-1')",
+          [todayLocal()]);
+      await tx.execute(
+          "INSERT INTO shift_crew_member (id, shift_id, employee_id, joined_at) VALUES ('m-3', 's-2', ?, ?)",
+          [me, nowUtc()]);
+    });
+    expect((await repo.currentShift(me).first)?['id'], 's-2');
   });
 
   testWidgets('scoreboard counts completed jobs and splits tips', (_) async {

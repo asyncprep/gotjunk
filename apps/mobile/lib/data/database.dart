@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:powersync/powersync.dart';
@@ -39,17 +40,33 @@ Future<PowerSyncDatabase> openDatabase() async {
   auth.onAuthStateChange.listen((change) async {
     switch (change.event) {
       case AuthChangeEvent.signedIn:
+        // The same person back after an expired sign-in keeps their unsent work;
+        // someone else on this phone starts clean.
+        final previous = await db.getOptional('SELECT id FROM app_user LIMIT 1');
+        final userId = change.session?.user.id;
+        if (previous != null && userId != null && previous['id'] != userId) await clearPhone(db);
         await connect();
       case AuthChangeEvent.signedOut:
-        // Shared truck phones: remove the previous crew's data and photos.
-        await db.disconnectAndClear();
-        final photos = await photoDirectory();
-        if (photos.existsSync()) photos.deleteSync(recursive: true);
+        // Not a wipe: this also fires when a sign-in expires or can't be refreshed, and unsent
+        // work must survive that. Only the crew's own sign-out (signOutAndClear) removes data.
+        await db.disconnect();
       default:
         break;
     }
-  });
+  }, onError: (Object e) => debugPrint('Auth state error: $e'));
   return db;
+}
+
+/// The crew's own sign-out (shared truck phones): removes their data and photos from the phone.
+Future<void> signOutAndClear(PowerSyncDatabase db) async {
+  await Supabase.instance.client.auth.signOut();
+  await clearPhone(db);
+}
+
+Future<void> clearPhone(PowerSyncDatabase db) async {
+  await db.disconnectAndClear();
+  final photos = await photoDirectory();
+  if (photos.existsSync()) photos.deleteSync(recursive: true);
 }
 
 /// Changes and photos on this phone that haven't reached the server yet.

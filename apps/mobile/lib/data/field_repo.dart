@@ -76,6 +76,17 @@ extension FieldRepo on Repo {
     return id;
   }
 
+  /// A site's ticket numbers are unique; the server would refuse the visit with its weigh-ins
+  /// and photo. Only this phone's visits can be checked here.
+  Future<bool> ticketTaken(String siteId, String? ticketNumber, {String? exceptVisitId}) async {
+    final ticket = _blankToNull(ticketNumber);
+    if (ticket == null) return false;
+    final row = await db.getOptional(
+        'SELECT 1 FROM disposal_visit WHERE site_id = ? AND ticket_number = ? AND id IS NOT ?',
+        [siteId, ticket, exceptVisitId]);
+    return row != null;
+  }
+
   Future<void> updateVisit(String visitId, {required String siteId, String? ticketNumber}) => db.execute(
       'UPDATE disposal_visit SET site_id = ?, ticket_number = ? WHERE id = ?',
       [siteId, _blankToNull(ticketNumber), visitId]);

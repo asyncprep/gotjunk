@@ -24,6 +24,7 @@ class Repo {
       .map((rows) => rows.isEmpty ? null : rows.first['employee_id'] as String?);
 
   /// Today's shift, or an earlier one still waiting on the crew (returned/reopened/unfinished).
+  /// A truck can run two shifts a day: one the crew can still work on comes before a submitted one.
   Stream<Map<String, dynamic>?> currentShift(String employeeId) => db.watch('''
       SELECT s.*, t.unit_number AS truck, p.label AS phone
       FROM shift s
@@ -33,7 +34,8 @@ class Repo {
       WHERE m.employee_id = ?
         AND (s.shift_date = ? OR s.status IN ('in_progress', 'returned', 'reopened'))
         AND s.status <> 'archived'
-      ORDER BY s.shift_date DESC
+      ORDER BY s.status IN ('open', 'in_progress', 'returned', 'reopened') DESC, s.shift_date DESC,
+        coalesce(s.start_time, '') DESC
       LIMIT 1''', parameters: [employeeId, todayLocal()]).map((rows) => rows.isEmpty ? null : Map.of(rows.first));
 
   Stream<List<Map<String, dynamic>>> crew(String shiftId) => db.watch('''
@@ -88,8 +90,10 @@ class Repo {
 
   // ---- Writes (saved on the phone immediately, uploaded when there is signal) ----
 
+  /// The start time is the phone's: offline, the server would otherwise stamp it at upload.
   Future<void> startShift(String shiftId, String hoursType) => db.execute(
-      "UPDATE shift SET hours_type = ?, status = 'in_progress' WHERE id = ?", [hoursType, shiftId]);
+      "UPDATE shift SET hours_type = ?, start_time = coalesce(start_time, ?), status = 'in_progress' WHERE id = ?",
+      [hoursType, nowUtc(), shiftId]);
 
   Future<void> setHoursType(String shiftId, String hoursType) =>
       db.execute('UPDATE shift SET hours_type = ? WHERE id = ?', [hoursType, shiftId]);
@@ -98,23 +102,35 @@ class Repo {
       "UPDATE shift SET finish_time = coalesce(finish_time, ?), status = 'submitted' WHERE id = ?",
       [nowUtc(), shiftId]);
 
+  /// completed_at is the moment the phone marked the job completed: it decides who shares the tip.
   Future<void> saveJob(JobDraft job) async {
+    final now = nowUtc();
     if (job.id == null) {
       await db.execute('''
           INSERT INTO job (id, shift_id, opportunity_id, outcome, payment_method_code, discount_amount,
-                           revenue_pre_tax, revenue_total_incl_tax, tip_amount, created_at)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', [
+                           revenue_pre_tax, revenue_total_incl_tax, tip_amount, completed_at, created_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', [
         _uuid.v7(), job.shiftId, job.opportunityId, job.outcome, job.paymentMethod, job.discount,
-        job.preTax, job.total, job.tip, nowUtc(),
+        job.preTax, job.total, job.tip, job.outcome == 'completed' ? now : null, now,
       ]);
     } else {
       await db.execute('''
           UPDATE job SET opportunity_id = ?, outcome = ?, payment_method_code = ?, discount_amount = ?,
-                         revenue_pre_tax = ?, revenue_total_incl_tax = ?, tip_amount = ?
+                         revenue_pre_tax = ?, revenue_total_incl_tax = ?, tip_amount = ?,
+                         completed_at = CASE WHEN ? = 'completed' THEN coalesce(completed_at, ?) END
           WHERE id = ?''', [
-        job.opportunityId, job.outcome, job.paymentMethod, job.discount, job.preTax, job.total, job.tip, job.id,
+        job.opportunityId, job.outcome, job.paymentMethod, job.discount, job.preTax, job.total, job.tip,
+        job.outcome, now, job.id,
       ]);
     }
+  }
+
+  /// The server refuses a second job with the same opportunity on one shift; say so before saving.
+  Future<bool> opportunityTaken(String shiftId, String opportunityId, {String? exceptJobId}) async {
+    final row = await db.getOptional(
+        'SELECT 1 FROM job WHERE shift_id = ? AND upper(opportunity_id) = upper(?) AND id IS NOT ?',
+        [shiftId, opportunityId, exceptJobId]);
+    return row != null;
   }
 
   Future<void> deleteJob(String jobId) => db.execute('DELETE FROM job WHERE id = ?', [jobId]);
