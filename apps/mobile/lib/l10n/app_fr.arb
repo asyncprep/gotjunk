@@ -38,7 +38,6 @@
   "revenue": "Revenus avant taxes",
   "jobsDone": "Travaux",
   "tips": "Pourboires",
-  "myTips": "Ma part",
   "perHour": "Par heure",
   "jobs": "Travaux",
   "addJob": "Ajouter un travail",
@@ -175,5 +174,27 @@
     }
   },
   "quickTitle": "Connexion rapide",
-  "quickHint": "Version de développement seulement : absent des versions installées par l’équipe."
+  "quickHint": "Version de développement seulement : absent des versions installées par l’équipe.",
+  "tipShares": "Pourboires par personne",
+  "leadIs": "{name} est le chef d’équipe sur ce téléphone. Vous pouvez consulter le quart, mais seul le chef d’équipe peut le modifier.",
+  "leadLeft": "{name} a quitté le quart. Prenez la relève pour continuer à le saisir.",
+  "noLead": "Ce quart n’a pas de chef d’équipe. Prenez la relève pour le saisir.",
+  "takeOver": "Prendre la relève",
+  "takeOverConfirm": "Vous devenez le chef d’équipe sur ce téléphone : c’est vous qui saisirez les travaux, le dépotoir et le comptant de ce quart.",
+  "err_not_lead": "Seul le chef d’équipe connecté sur le téléphone du camion peut modifier ce quart",
+  "err_lead_not_crew": "Le chef d’équipe doit faire partie de l’équipe de ce quart",
+  "@leadIs": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@leadLeft": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  }
 }

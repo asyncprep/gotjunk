@@ -105,9 +105,6 @@ class L10nEn extends L10n {
   String get tips => 'Tips';
 
   @override
-  String get myTips => 'My share';
-
-  @override
   String get perHour => 'Per hour';
 
   @override
@@ -439,4 +436,34 @@ class L10nEn extends L10n {
   @override
   String get quickHint =>
       'Development build only: not in the builds crews install.';
+
+  @override
+  String get tipShares => 'Tips per person';
+
+  @override
+  String leadIs(String name) {
+    return '$name is the crew lead on this phone. You can view the shift, but only the crew lead can change it.';
+  }
+
+  @override
+  String leadLeft(String name) {
+    return '$name has left the shift. Take over to keep entering it.';
+  }
+
+  @override
+  String get noLead => 'This shift has no crew lead. Take over to enter it.';
+
+  @override
+  String get takeOver => 'Take over';
+
+  @override
+  String get takeOverConfirm =>
+      'You become the crew lead on this phone: you will enter this shift’s jobs, disposal and cash.';
+
+  @override
+  String get err_not_lead =>
+      'Only the crew lead signed in on the truck phone can change this shift';
+
+  @override
+  String get err_lead_not_crew => 'The crew lead must be on this shift’s crew';
 }

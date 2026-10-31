@@ -163,35 +163,62 @@ class ShiftView extends StatelessWidget {
         if (shift == null) return _Message(t.noShift);
         final shiftId = shift['id'] as String;
         final status = shift['status'] as String?;
-        return ListView(
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 120),
-          children: [
-            _Rejections(repo: repo),
-            _ShiftHeader(repo: repo, shift: shift),
-            if (status == 'open') _StartShift(repo: repo, shiftId: shiftId, current: shift['hours_type'] as String?),
-            if (status != 'open') ...[
-              const SizedBox(height: 12),
-              _ScoreboardCard(repo: repo, shiftId: shiftId, employeeId: employeeId),
-              const SizedBox(height: 12),
-              _JobsCard(repo: repo, shiftId: shiftId, editable: crewJobStatuses.contains(status)),
-              const SizedBox(height: 12),
-              _DisposalCard(repo: repo, shiftId: shiftId, editable: crewJobStatuses.contains(status)),
-              const SizedBox(height: 12),
-              _CashCard(repo: repo, shiftId: shiftId, editable: crewJobStatuses.contains(status)),
-              if (crewJobStatuses.contains(status)) ...[
-                const SizedBox(height: 20),
-                FilledButton.icon(
-                  icon: const Icon(Icons.flag_outlined),
-                  style: goButtonStyle(),
-                  onPressed: () => _confirmSubmit(context, shiftId),
-                  label: Text(t.submitShift),
-                ),
+        return StreamBuilder<LeadState>(
+          stream: repo.lead(shiftId, employeeId),
+          builder: (context, leadSnap) {
+            final lead = leadSnap.data ?? const LeadState();
+            // One shared phone per truck: only the lead's login changes the shift.
+            final editable = lead.isMe && crewJobStatuses.contains(status);
+            return ListView(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 120),
+              children: [
+                _Rejections(repo: repo),
+                if (leadSnap.hasData && !lead.isMe && crewEditableStatuses.contains(status))
+                  _LeadBanner(lead: lead, onTakeOver: () => _confirmTakeOver(context, shiftId)),
+                _ShiftHeader(repo: repo, shift: shift),
+                if (status == 'open' && lead.isMe)
+                  _StartShift(repo: repo, shiftId: shiftId, current: shift['hours_type'] as String?),
+                if (status != 'open') ...[
+                  const SizedBox(height: 12),
+                  _ScoreboardCard(repo: repo, shiftId: shiftId),
+                  const SizedBox(height: 12),
+                  _JobsCard(repo: repo, shiftId: shiftId, editable: editable),
+                  const SizedBox(height: 12),
+                  _DisposalCard(repo: repo, shiftId: shiftId, editable: editable),
+                  const SizedBox(height: 12),
+                  _CashCard(repo: repo, shiftId: shiftId, editable: editable),
+                  if (editable) ...[
+                    const SizedBox(height: 20),
+                    FilledButton.icon(
+                      icon: const Icon(Icons.flag_outlined),
+                      style: goButtonStyle(),
+                      onPressed: () => _confirmSubmit(context, shiftId),
+                      label: Text(t.submitShift),
+                    ),
+                  ],
+                ],
               ],
-            ],
-          ],
+            );
+          },
         );
       },
     );
+  }
+
+  Future<void> _confirmTakeOver(BuildContext context, String shiftId) async {
+    final t = L10n.of(context);
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(t.takeOver),
+        content: Text(t.takeOverConfirm),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(t.cancel)),
+          FilledButton(onPressed: () => Navigator.pop(context, true), child: Text(t.takeOver)),
+        ],
+      ),
+    );
+    if (ok == true) await repo.takeOver(shiftId, employeeId);
   }
 
   /// Checks on the phone first (works offline), so the crew fixes problems before leaving the truck.
@@ -234,6 +261,47 @@ class ShiftView extends StatelessWidget {
       ),
     );
     if (ok == true) await repo.submitShift(shiftId);
+  }
+}
+
+/// Shown to a crew member who isn't the lead: the shift is read-only on their login.
+class _LeadBanner extends StatelessWidget {
+  const _LeadBanner({required this.lead, required this.onTakeOver});
+  final LeadState lead;
+  final VoidCallback onTakeOver;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = L10n.of(context);
+    final scheme = Theme.of(context).colorScheme;
+    final name = lead.leadName ?? '…';
+    final text = lead.leadName == null && !lead.leadLeft
+        ? t.noLead
+        : lead.leadLeft
+            ? t.leadLeft(name)
+            : t.leadIs(name);
+    return Card(
+      color: scheme.tertiaryContainer,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Icon(Icons.lock_outline, color: scheme.onTertiaryContainer),
+            const SizedBox(width: 12),
+            Expanded(child: Text(text, style: TextStyle(color: scheme.onTertiaryContainer))),
+          ]),
+          if (lead.canTakeOver) ...[
+            const SizedBox(height: 12),
+            FilledButton.icon(
+              icon: const Icon(Icons.swap_horiz),
+              style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(48)),
+              onPressed: onTakeOver,
+              label: Text(t.takeOver),
+            ),
+          ],
+        ]),
+      ),
+    );
   }
 }
 
@@ -333,18 +401,17 @@ class _StartShiftState extends State<_StartShift> {
 }
 
 class _ScoreboardCard extends StatelessWidget {
-  const _ScoreboardCard({required this.repo, required this.shiftId, required this.employeeId});
+  const _ScoreboardCard({required this.repo, required this.shiftId});
   final Repo repo;
   final String shiftId;
-  final String employeeId;
 
   @override
   Widget build(BuildContext context) {
     final t = L10n.of(context);
     return StreamBuilder<Scoreboard>(
-      stream: repo.scoreboard(shiftId, employeeId),
+      stream: repo.scoreboard(shiftId),
       builder: (context, snap) {
-        final s = snap.data ?? const Scoreboard(jobs: 0, revenue: 0, tips: 0, myTips: 0);
+        final s = snap.data ?? const Scoreboard(jobs: 0, revenue: 0, tips: 0);
         return Card(
           child: Padding(
             padding: const EdgeInsets.all(16),
@@ -355,12 +422,31 @@ class _ScoreboardCard extends StatelessWidget {
                 _Tile(value: money(context, s.revenue), label: t.revenue, big: true),
                 _Tile(value: '${s.jobs}', label: t.jobsDone),
                 _Tile(value: money(context, s.tips), label: t.tips),
-                _Tile(value: money(context, s.myTips), label: t.myTips),
                 StreamBuilder<double>(
                   stream: repo.netDisposal(shiftId),
                   builder: (context, snap) => _Tile(value: money(context, snap.data ?? 0), label: t.netDisposal),
                 ),
               ]),
+              // Shared phone: everyone's share of the tips, not just the signed-in person's.
+              StreamBuilder<List<TipShare>>(
+                stream: repo.tipShares(shiftId),
+                builder: (context, snap) {
+                  final shares = snap.data ?? const <TipShare>[];
+                  if (shares.isEmpty) return const SizedBox.shrink();
+                  return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                    const SizedBox(height: 16),
+                    Text(t.tipShares, style: Theme.of(context).textTheme.labelLarge),
+                    for (final share in shares)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 4),
+                        child: Row(children: [
+                          Expanded(child: Text(share.name ?? '…')),
+                          Text(money(context, share.amount), style: Theme.of(context).textTheme.titleMedium),
+                        ]),
+                      ),
+                  ]);
+                },
+              ),
             ]),
           ),
         );

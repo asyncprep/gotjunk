@@ -106,9 +106,6 @@ class L10nFr extends L10n {
   String get tips => 'Pourboires';
 
   @override
-  String get myTips => 'Ma part';
-
-  @override
   String get perHour => 'Par heure';
 
   @override
@@ -444,4 +441,36 @@ class L10nFr extends L10n {
   @override
   String get quickHint =>
       'Version de développement seulement : absent des versions installées par l’équipe.';
+
+  @override
+  String get tipShares => 'Pourboires par personne';
+
+  @override
+  String leadIs(String name) {
+    return '$name est le chef d’équipe sur ce téléphone. Vous pouvez consulter le quart, mais seul le chef d’équipe peut le modifier.';
+  }
+
+  @override
+  String leadLeft(String name) {
+    return '$name a quitté le quart. Prenez la relève pour continuer à le saisir.';
+  }
+
+  @override
+  String get noLead =>
+      'Ce quart n’a pas de chef d’équipe. Prenez la relève pour le saisir.';
+
+  @override
+  String get takeOver => 'Prendre la relève';
+
+  @override
+  String get takeOverConfirm =>
+      'Vous devenez le chef d’équipe sur ce téléphone : c’est vous qui saisirez les travaux, le dépotoir et le comptant de ce quart.';
+
+  @override
+  String get err_not_lead =>
+      'Seul le chef d’équipe connecté sur le téléphone du camion peut modifier ce quart';
+
+  @override
+  String get err_lead_not_crew =>
+      'Le chef d’équipe doit faire partie de l’équipe de ce quart';
 }

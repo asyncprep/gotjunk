@@ -86,6 +86,8 @@ String explainRejection(L10n t, String message, {String? sqlState}) {
     'invalid_transition' => t.err_invalid_transition,
     'reason_required' => t.err_reason_required,
     'not_found' => t.err_not_found,
+    'not_lead' => t.err_not_lead,
+    'lead_not_crew' => t.err_lead_not_crew,
     _ => message,
   };
 }

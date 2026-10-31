@@ -17,6 +17,10 @@ const schema = Schema([
     Column.text('return_reason'),
     Column.text('reopen_reason'),
     Column.text('submitted_at'),
+    // Only the lead's login can change the shift (one shared phone per truck).
+    Column.text('lead_employee_id'),
+    // Not synced down: sent only when a crew member takes over the phone.
+    Column.text('truck_phone_confirmed_at'),
   ]),
   Table('shift_crew_member', [
     Column.text('shift_id'),
@@ -124,6 +128,12 @@ const schema = Schema([
     Column.text('storage_path'),
     Column.integer('attempts'),
     Column.text('last_error'),
+  ]),
+  // Shifts this login took over (no lead, or the lead left) and the server hasn't confirmed yet.
+  // Never uploaded.
+  Table.localOnly('lead_claim', [
+    Column.text('shift_id'),
+    Column.text('employee_id'),
   ]),
   // Writes the server refused (e.g. a submit that wasn't ready). Never uploaded.
   Table.localOnly('sync_rejection', [

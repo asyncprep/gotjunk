@@ -44,8 +44,8 @@ void main() {
           "('card', 'Carte', 'Card', 0, 1), ('cash', 'Comptant', 'Cash', 1, 1), ('old', 'Vieux', 'Old', 0, 0)");
       await tx.execute("INSERT INTO app_setting (id, value) VALUES ('sales_tax_rate', '0.14975')");
       await tx.execute(
-          "INSERT INTO shift (id, shift_date, status, truck_id, phone_id) VALUES (?, ?, 'open', 't-1', 'p-1')",
-          [shiftId, todayLocal()]);
+          "INSERT INTO shift (id, shift_date, status, truck_id, phone_id, lead_employee_id) VALUES (?, ?, 'open', 't-1', 'p-1', ?)",
+          [shiftId, todayLocal(), me]);
       await tx.execute(
           'INSERT INTO shift_crew_member (id, shift_id, employee_id, joined_at) VALUES (?, ?, ?, ?), (?, ?, ?, ?)',
           ['m-1', shiftId, me, serverTime, 'm-2', shiftId, mate, serverTime]);
@@ -126,26 +126,63 @@ void main() {
     await repo.saveJob(JobDraft(shiftId: shiftId, opportunityId: 'OPP-2', outcome: 'cancelled_pending'));
     await repo.saveJob(JobDraft(shiftId: shiftId, opportunityId: 'OPP-3', outcome: null));
 
-    var s = await repo.scoreboard(shiftId, me).first;
+    var s = await repo.scoreboard(shiftId).first;
     expect(s.jobs, 1);
     expect(s.revenue, 200);
     expect(s.tips, 20);
-    expect(s.myTips, closeTo(10, 0.001));
+    Map<String, double> shares(List<TipShare> l) => {for (final x in l) x.name ?? x.employeeId: x.amount};
+    expect(shares(await repo.tipShares(shiftId).first), {'Crew One': 10, 'Crew Two': 10});
 
-    // Crewmate leaves after OPP-1 (server-format timestamp); later tips are mine alone.
+    // Crewmate leaves after OPP-1 (server-format timestamp); later tips go to whoever is still on the truck.
     await Future<void>.delayed(const Duration(milliseconds: 50));
     final left = DateTime.now().toUtc();
     await db.execute('UPDATE shift_crew_member SET left_at = ? WHERE id = ?',
         ['${left.toIso8601String().replaceFirst('T', ' ').replaceFirst('Z', '')}000Z', 'm-2']);
     await Future<void>.delayed(const Duration(milliseconds: 50));
-    s = await repo.scoreboard(shiftId, me).first;
-    expect(s.myTips, closeTo(10, 0.001), reason: 'OPP-1 still split with the crewmate');
+    expect(shares(await repo.tipShares(shiftId).first), {'Crew One': 10, 'Crew Two': 10},
+        reason: 'OPP-1 still split with the crewmate');
     await repo.saveJob(JobDraft(shiftId: shiftId, opportunityId: 'OPP-4', outcome: 'completed',
         paymentMethod: 'cash', preTax: 100, total: 114.98, tip: 9));
-    s = await repo.scoreboard(shiftId, me).first;
+    s = await repo.scoreboard(shiftId).first;
     expect(s.jobs, 2);
     expect(s.tips, 29);
-    expect(s.myTips, closeTo(19, 0.001));
+    expect(shares(await repo.tipShares(shiftId).first), {'Crew One': 19, 'Crew Two': 10});
+  });
+
+  testWidgets('only the lead changes the shift; a crew member takes over once the lead has left', (_) async {
+    var lead = await repo.lead(shiftId, me).first;
+    expect(lead.isMe, isTrue);
+    expect(lead.canTakeOver, isFalse);
+
+    lead = await repo.lead(shiftId, mate).first;
+    expect(lead.isMe, isFalse, reason: 'a crewmate signed in on the phone only views the shift');
+    expect(lead.leadName, 'Crew One');
+    expect(lead.canTakeOver, isFalse, reason: 'the lead is still on the truck');
+
+    final past = DateTime.now().toUtc().subtract(const Duration(minutes: 1));
+    await db.execute('UPDATE shift_crew_member SET left_at = ? WHERE id = ?',
+        ['${past.toIso8601String().replaceFirst('T', ' ').replaceFirst('Z', '')}000Z', 'm-1']);
+    await _clearQueue(db);
+    lead = await repo.lead(shiftId, mate).first;
+    expect(lead.leadLeft, isTrue);
+    expect(lead.canTakeOver, isTrue);
+
+    await repo.takeOver(shiftId, mate);
+    lead = await repo.lead(shiftId, mate).first;
+    expect(lead.isMe, isTrue);
+    expect(lead.canTakeOver, isFalse);
+    final tx = await db.getNextCrudTransaction();
+    final op = tx!.crud.single;
+    expect(op.table, 'shift', reason: 'the takeover is queued before anything the new lead enters');
+    expect(op.opData!.keys.toSet(), {'truck_phone_confirmed_at'}, reason: 'crew may not send lead_employee_id');
+  });
+
+  testWidgets('a shift with no lead can be taken over', (_) async {
+    await db.execute('UPDATE shift SET lead_employee_id = NULL WHERE id = ?', [shiftId]);
+    final lead = await repo.lead(shiftId, mate).first;
+    expect(lead.isMe, isFalse);
+    expect(lead.leadName, isNull);
+    expect(lead.canTakeOver, isTrue);
   });
 
   testWidgets('a new job uploads as an insert without server-calculated fields', (_) async {

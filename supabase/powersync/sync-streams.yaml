@@ -33,7 +33,7 @@ streams:
       - >-
         SELECT shift.shift_id AS id, shift.shift_date, shift.status, shift.truck_id, shift.phone_id,
                shift.hours_type, shift.hours_type_confirmed_at, shift.start_time, shift.finish_time,
-               shift.total_hours, shift.return_reason, shift.reopen_reason, shift.submitted_at
+               shift.total_hours, shift.return_reason, shift.reopen_reason, shift.submitted_at, shift.lead_employee_id
         FROM shift
         INNER JOIN shift_crew_member m ON m.shift_id = shift.shift_id
         INNER JOIN app_user u ON u.employee_id = m.employee_id

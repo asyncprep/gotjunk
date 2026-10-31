@@ -283,12 +283,6 @@ abstract class L10n {
   /// **'Pourboires'**
   String get tips;
 
-  /// No description provided for @myTips.
-  ///
-  /// In fr, this message translates to:
-  /// **'Ma part'**
-  String get myTips;
-
   /// No description provided for @perHour.
   ///
   /// In fr, this message translates to:
@@ -900,6 +894,54 @@ abstract class L10n {
   /// In fr, this message translates to:
   /// **'Version de développement seulement : absent des versions installées par l’équipe.'**
   String get quickHint;
+
+  /// No description provided for @tipShares.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pourboires par personne'**
+  String get tipShares;
+
+  /// No description provided for @leadIs.
+  ///
+  /// In fr, this message translates to:
+  /// **'{name} est le chef d’équipe sur ce téléphone. Vous pouvez consulter le quart, mais seul le chef d’équipe peut le modifier.'**
+  String leadIs(String name);
+
+  /// No description provided for @leadLeft.
+  ///
+  /// In fr, this message translates to:
+  /// **'{name} a quitté le quart. Prenez la relève pour continuer à le saisir.'**
+  String leadLeft(String name);
+
+  /// No description provided for @noLead.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ce quart n’a pas de chef d’équipe. Prenez la relève pour le saisir.'**
+  String get noLead;
+
+  /// No description provided for @takeOver.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prendre la relève'**
+  String get takeOver;
+
+  /// No description provided for @takeOverConfirm.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous devenez le chef d’équipe sur ce téléphone : c’est vous qui saisirez les travaux, le dépotoir et le comptant de ce quart.'**
+  String get takeOverConfirm;
+
+  /// No description provided for @err_not_lead.
+  ///
+  /// In fr, this message translates to:
+  /// **'Seul le chef d’équipe connecté sur le téléphone du camion peut modifier ce quart'**
+  String get err_not_lead;
+
+  /// No description provided for @err_lead_not_crew.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le chef d’équipe doit faire partie de l’équipe de ce quart'**
+  String get err_lead_not_crew;
 }
 
 class _L10nDelegate extends LocalizationsDelegate<L10n> {

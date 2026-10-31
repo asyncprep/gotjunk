@@ -38,7 +38,6 @@
   "revenue": "Revenue before tax",
   "jobsDone": "Jobs",
   "tips": "Tips",
-  "myTips": "My share",
   "perHour": "Per hour",
   "jobs": "Jobs",
   "addJob": "Add a job",
@@ -147,5 +146,27 @@
   "signOutAnyway": "Sign out anyway",
   "staySignedIn": "Stay signed in",
   "quickTitle": "Quick sign-in",
-  "quickHint": "Development build only: not in the builds crews install."
+  "quickHint": "Development build only: not in the builds crews install.",
+  "tipShares": "Tips per person",
+  "leadIs": "{name} is the crew lead on this phone. You can view the shift, but only the crew lead can change it.",
+  "leadLeft": "{name} has left the shift. Take over to keep entering it.",
+  "noLead": "This shift has no crew lead. Take over to enter it.",
+  "takeOver": "Take over",
+  "takeOverConfirm": "You become the crew lead on this phone: you will enter this shift’s jobs, disposal and cash.",
+  "err_not_lead": "Only the crew lead signed in on the truck phone can change this shift",
+  "err_lead_not_crew": "The crew lead must be on this shift’s crew",
+  "@leadIs": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@leadLeft": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  }
 }

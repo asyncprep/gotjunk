@@ -27,14 +27,14 @@ void main() {
   late String path;
   late Directory dir;
 
-  Future<void> seed({String status = 'in_progress'}) => db.writeTransaction((tx) async {
+  Future<void> seed({String status = 'in_progress', String lead = 'e1'}) => db.writeTransaction((tx) async {
         await tx.execute("INSERT INTO app_user (id, employee_id, role) VALUES (?, 'e1', 'ttm')", [user]);
         await tx.execute("INSERT INTO employee (id, full_name) VALUES ('e1', 'Crew One'), ('e2', 'Crew Two')");
         await tx.execute("INSERT INTO truck (id, unit_number) VALUES ('t1', 'T-01')");
         await tx.execute("INSERT INTO phone (id, label) VALUES ('p1', 'P-01')");
         await tx.execute(
-            "INSERT INTO shift (id, shift_date, status, truck_id, phone_id, hours_type, start_time) VALUES (?, ?, ?, 't1', 'p1', 'regular_junk', ?)",
-            [shiftId, todayLocal(), status, nowUtc()]);
+            "INSERT INTO shift (id, shift_date, status, truck_id, phone_id, hours_type, start_time, lead_employee_id) VALUES (?, ?, ?, 't1', 'p1', 'regular_junk', ?, ?)",
+            [shiftId, todayLocal(), status, nowUtc(), lead]);
         await tx.execute(
             "INSERT INTO shift_crew_member (id, shift_id, employee_id, joined_at) VALUES ('m1', ?, 'e1', '2020-01-01 00:00:00Z'), ('m2', ?, 'e2', '2020-01-01 00:00:00Z')",
             [shiftId, shiftId]);
@@ -231,6 +231,32 @@ void main() {
     await settle(tester);
     expect(find.text('In progress'), findsOneWidget);
     expect(find.text('Scoreboard'), findsOneWidget);
+  });
+
+  testWidgets('a crew member who is not the lead sees the shift read-only', (tester) async {
+    await seed(lead: 'e2');
+    await tester.pumpWidget(app(const Locale('en')));
+    await settle(tester);
+    expect(find.textContaining('Crew Two is the crew lead on this phone'), findsOneWidget);
+    expect(find.text('Take over'), findsNothing, reason: 'the lead is still on the truck');
+    expect(find.text('Add a job'), findsNothing);
+    expect(find.text('Tips per person'), findsOneWidget);
+    await tester.scrollUntilVisible(find.text('Cash'), 300);
+    expect(find.text('Submit shift'), findsNothing);
+  });
+
+  testWidgets('a shift without a lead offers to take over', (tester) async {
+    await seed();
+    await db.execute('UPDATE shift SET lead_employee_id = NULL');
+    await tester.pumpWidget(app(const Locale('en')));
+    await settle(tester);
+    expect(find.text('Add a job'), findsNothing);
+    await tester.tap(find.widgetWithText(FilledButton, 'Take over'));
+    await settle(tester);
+    await tester.tap(find.widgetWithText(FilledButton, 'Take over').last);
+    await settle(tester);
+    expect(find.text('Take over'), findsNothing);
+    expect(find.text('Add a job'), findsOneWidget);
   });
 
   testWidgets('an account not linked to an employee sees a clear message', (tester) async {
