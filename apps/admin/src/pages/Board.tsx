@@ -182,11 +182,14 @@ function NewShift({ date, taken, onCreated, onCancel }: {
 
   if (!options.data) return <div className="card muted">{options.error ?? t('common.loading')}</div>;
   // Only offer what isn't already on a shift that day.
+  // A truck and its phone can run two shifts a day (client answer H2): keep them, marked as used.
+  // People stay hidden only while they're on a shift that is still active.
+  const active = taken.filter((s) => ['open', 'in_progress', 'returned', 'reopened'].includes(s.status));
   const usedTrucks = new Set(taken.map((s) => s.truck_id));
   const usedPhones = new Set(taken.map((s) => s.phone_id));
-  const usedPeople = new Set(taken.flatMap((s) => s.crew.map((c) => c.employee_id)));
-  const trucks = options.data.trucks.filter((x) => !usedTrucks.has(x.truck_id));
-  const phones = options.data.phones.filter((x) => !usedPhones.has(x.phone_id));
+  const usedPeople = new Set(active.flatMap((s) => s.crew.filter((c) => !c.left_at).map((c) => c.employee_id)));
+  const trucks = options.data.trucks;
+  const phones = options.data.phones;
   const employees = options.data.employees.filter((x) => !usedPeople.has(x.employee_id));
 
   return (
@@ -195,11 +198,11 @@ function NewShift({ date, taken, onCreated, onCancel }: {
       <div className="row">
         <select value={truck} onChange={(e) => setTruck(e.target.value)} aria-label={t('board.truck')}>
           <option value="">{t('board.truck')}…</option>
-          {trucks.map((x) => <option key={x.truck_id} value={x.truck_id}>{x.unit_number}</option>)}
+          {trucks.map((x) => <option key={x.truck_id} value={x.truck_id}>{x.unit_number}{usedTrucks.has(x.truck_id) ? ` (${t('board.alreadyToday')})` : ''}</option>)}
         </select>
         <select value={phone} onChange={(e) => setPhone(e.target.value)} aria-label={t('board.phone')}>
           <option value="">{t('board.phone')}…</option>
-          {phones.map((x) => <option key={x.phone_id} value={x.phone_id}>{x.label}</option>)}
+          {phones.map((x) => <option key={x.phone_id} value={x.phone_id}>{x.label}{usedPhones.has(x.phone_id) ? ` (${t('board.alreadyToday')})` : ''}</option>)}
         </select>
       </div>
       <p className="muted small">{t('board.pickCrew')} ({crew.length})</p>

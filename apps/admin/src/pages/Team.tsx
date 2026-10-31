@@ -153,7 +153,7 @@ function Users() {
                 <td>{u.employee?.full_name ?? '—'}</td>
                 <td>{u.role === 'senior_ops' || u.can_edit_config ? t('common.yes') : t('common.no')}</td>
                 <td>{u.active ? t('common.yes') : t('common.no')}</td>
-                <td>{canEdit && u.user_id !== session?.user.id && (
+                <td>{canEdit && u.user_id !== session?.user.id && (u.role !== 'senior_ops' || role === 'senior_ops') && (
                   <button className="link" disabled={action.busy} onClick={() => action.run(() => must(supabase.from('app_user')
                     .update({ active: !u.active }).eq('user_id', u.user_id).select()))}>
                     {u.active ? t('team.deactivate') : t('team.activate')}
@@ -170,7 +170,8 @@ function Users() {
           <div className="row">
             <input type="email" placeholder={t('team.email')} value={invite.email} onChange={(e) => setInvite({ ...invite, email: e.target.value })} />
             <select value={invite.role} onChange={(e) => setInvite({ ...invite, role: e.target.value as Role })}>
-              {(['dispatcher', 'admin', 'ttm', 'senior_ops'] as Role[]).map((r) => <option key={r} value={r}>{t(`role.${r}`)}</option>)}
+              {(['dispatcher', 'admin', 'ttm', ...(role === 'senior_ops' ? ['senior_ops'] : [])] as Role[])
+                .map((r) => <option key={r} value={r}>{t(`role.${r}`)}</option>)}
             </select>
             {invite.role === 'ttm' && (
               <select value={invite.employee_id} onChange={(e) => setInvite({ ...invite, employee_id: e.target.value })}>
@@ -178,7 +179,7 @@ function Users() {
                 {employees.map((e) => <option key={e.employee_id} value={e.employee_id}>{e.full_name}</option>)}
               </select>
             )}
-            {invite.role === 'admin' && (
+            {invite.role === 'admin' && role === 'senior_ops' && (
               <label className="row"><input type="checkbox" checked={invite.can_edit_config}
                 onChange={(e) => setInvite({ ...invite, can_edit_config: e.target.checked })} /> {t('team.configRights')}</label>
             )}

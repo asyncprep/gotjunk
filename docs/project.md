@@ -22,7 +22,7 @@ entered; external systems are matched automatically; admins handle only true exc
 | **Truck Team OS** (this project) | Montréal | Captures local journal data, live scoreboard, end-of-day handoff, reconciliation |
 | HQ "Truck Team App" | Headquarters | Corporate job workflow; starts Stripe payments. Not replaced or imitated |
 | Pipeline (Salesforce) | Headquarters | Job/opportunity record. No API access today |
-| Stripe | Payment processor | Montréal can read its own account; ingestion planned (V1b) |
+| Stripe | Payment processor | Montréal's account is an HQ sub-account; API keys can be created; payments carry Opportunity ID, GST and pre-tax amount. Ingestion planned (V1b) |
 | Scale / weighing system | Montréal | Weigh events per truck, crew and material; ingestion planned (V1b) |
 | Ceridian | Payroll | Authoritative clock-in/out; reconciliation source |
 | Motive | Fleet | Vehicle/GPS/inspection; not duplicated |
@@ -37,11 +37,11 @@ entered; external systems are matched automatically; admins handle only true exc
 | Admin (ops admin) | Resolve reconciliation exceptions, manage config, payroll outputs, reopen with reason |
 | Senior Ops / Owner | Dashboards, business-rule approval, audit history, overrides |
 
-## Technology (decided Oct 27, 2026; pending client sign-off)
+## Technology (decided Oct 27, 2026; approved by the client)
 
 | Layer | Choice |
 | --- | --- |
-| Crew app | Flutter (iPhone first), offline with PowerSync + SQLite, Shorebird over-the-air updates |
+| Crew app | Flutter, **iPhone only** (company phones, MDM; one shared phone per truck), offline with PowerSync + SQLite |
 | Dispatch/admin app | React + TypeScript web app |
 | Backend | Supabase (PostgreSQL), Canada (Central) region; rules, permissions and audit in the database |
 | Integrations | Supabase Edge Functions (TypeScript) + scheduled jobs |
@@ -92,8 +92,8 @@ A separate production project (also ca-central-1, Pro plan) is planned before th
 | Phase | Content | Status |
 | --- | --- | --- |
 | 0 – Setup and decisions | Stack decision doc, repo, data dictionary, open-item defaults | Done, except client sign-off and offline spike |
-| 1 – Backend foundation | Schema, workflow, calculations, RLS, audit, seed, 25 tests, local explorer | **Done**; deployed to `gotjunk-ca` (Canada) on Oct 27, 2026 |
-| 2 – Admin web app (moved first) | Daily board and shift creation, review/accept/return/reopen, cash count, checklist, cancellations, config and rates, roster and ranks, user invites, audit log, CSV export, fr/en | **Built** (`apps/admin`); hosting and first login pending |
+| 1 – Backend foundation | Schema, workflow, calculations, RLS, audit, seed, 49 tests, local explorer | **Done**; deployed to `gotjunk-ca` (Canada) on Oct 27, 2026 |
+| 2 – Admin web app (moved first) | Daily board and shift creation, review/accept/return/reopen, cash count, checklist, cancellations, config and rates, roster and ranks, user invites, audit log, CSV export, fr/en | **Live** on Vercel; includes the Projet page (spec inconsistencies and client questions) |
 | 3 – First crew slice | Flutter (Android first): login, today's shift, start shift, jobs, live scoreboard, submit, offline storage and sync status | **Built** (`apps/mobile`), tested on an Android emulator |
 | 4 – Crew app complete | Disposal visits and weigh-ins with price estimates, ticket and cash photos (queued offline), expected cash, pre-submit checklist, confirmed cancellation reasons, net disposal on the scoreboard | **Built**, tested on an Android emulator; photos also upload in the background on Android (WorkManager) even after the app is closed; sign-out warns about unsent data; live sync waits on the PowerSync database login ([setup](powersync-setup.md)); iOS configured (Oct 30, 2026: crews use iPhone only): icon, name, French permission texts, background upload; built and tested on an iPhone simulator by GitHub Actions; signed TestFlight builds via Codemagic (`codemagic.yaml`, same setup as Poubelle du Ski) once its one-time setup is done |
 | 5 – Pilot | 1–2 trucks alongside the paper journal for 2–4 weeks, then rollout | Planned |

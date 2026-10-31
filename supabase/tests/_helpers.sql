@@ -1,6 +1,6 @@
 -- Assertion helpers for the SQL test cases.
 create schema tests;
-grant usage on schema tests to authenticated;
+grant usage on schema tests to authenticated, anon;
 
 -- Act as a signed-in app user for the rest of the transaction. Use `reset role;` to go back to system.
 create function tests.login(p_user uuid) returns void
@@ -47,7 +47,7 @@ begin
   end if;
 end $$;
 
-grant execute on all functions in schema tests to authenticated;
+grant execute on all functions in schema tests to authenticated, anon;
 
 -- Fills shift S1 so it passes the submit checks: hours, start/finish, one card job,
 -- one Eco-Junk visit with ticket, photo and a garbage line. Runs as system.

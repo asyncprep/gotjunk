@@ -31,7 +31,7 @@ const fr = {
     title: 'Quarts du jour', newShift: 'Nouveau quart', truck: 'Camion', phone: 'Téléphone', crew: 'Équipe',
     status: 'Statut', revenue: 'Revenus', jobs: 'Travaux', issues: 'À régler', create: 'Créer le quart',
     pickCrew: 'Choisir 2 ou 3 membres', empty: 'Aucun quart pour cette date.', open: 'Ouvrir',
-    toReview: 'À réviser', today: 'Aujourd’hui', inProgress: 'En cours', done: 'Acceptés', created: 'Quart créé',
+    toReview: 'À réviser', today: 'Aujourd’hui', alreadyToday: 'déjà un quart aujourd’hui', inProgress: 'En cours', done: 'Acceptés', created: 'Quart créé',
     noMatch: 'Aucun quart dans ce filtre.',
   },
   shift: {
@@ -54,7 +54,9 @@ const fr = {
     returnTitle: 'Retourner le quart à l’équipe', returnHelp: 'L’équipe verra cette raison sur son téléphone.',
     reopenTitle: 'Rouvrir un quart accepté', reopenHelp: 'La raison est conservée dans le journal d’audit.',
     locked: 'Quart accepté et verrouillé', returned: 'Quart retourné à l’équipe', reopened: 'Quart rouvert',
-    finalized: 'Annulation finalisée', countSaved: 'Comptant enregistré', invalidAmount: 'Montant invalide (ex. 227,30)',
+    finalized: 'Annulation finalisée', countSaved: 'Comptant enregistré',
+    cancelShift: 'Annuler le quart', cancelTitle: 'Annuler ce quart', cancelHelp: 'Pour un quart qui n’aura pas lieu (camion en panne…). Le camion et le téléphone redeviennent disponibles.',
+    cancelled: 'Quart annulé', cancelledFor: 'Annulé', joined: 'Arrivé', editTimes: 'Corriger les heures', invalidAmount: 'Montant invalide (ex. 227,30)',
     photoNotUploaded: 'Pas encore reçue du camion', photoTaken: 'prise le', openFull: 'Ouvrir en grand',
     ticketPhoto: 'Photo du billet', cashPhoto: 'Photo du comptant', ticketPhotoMissing: 'Photo du billet manquante',
     cashNotSubmitted: 'L’équipe n’a pas encore déclaré le comptant ni pris la photo.',
@@ -71,8 +73,12 @@ const fr = {
     hours_type_unconfirmed: 'Type d’heures non confirmé', checklist_incomplete: 'Liste de fin de journée incomplète',
     cash_not_counted: 'Comptant non compté', cash_variance_unresolved: 'Écart de comptant non expliqué',
     cancellation_pending: 'Annulation à finaliser',
+    tip_unassigned: 'Pourboire sans équipe présente (corriger les heures de l’équipe)', photo_not_uploaded: 'Photo pas encore reçue du téléphone',
   },
   err: {
+    no_rate: 'Aucun tarif actif pour ce site et cette matière à cette date', shift_not_editable: 'Le quart est en révision par la répartition',
+    hours_type_missing: 'Type d’heures manquant', crew_size: 'Choisissez au moins un membre d’équipe', duplicate: 'Cet élément existe déjà',
+    photo_entity_missing: 'Photo liée à un élément introuvable', photo_shift_mismatch: 'Photo rattachée au mauvais quart',
     shift_not_ready: 'Le quart n’est pas prêt', reason_required: 'Une raison est obligatoire',
     shift_locked: 'Quart verrouillé : rouvrez-le d’abord', invalid_transition: 'Changement de statut non permis',
     not_allowed: 'Action non permise', crew_double_booked: 'Employé déjà assigné ce jour-là',
@@ -145,7 +151,7 @@ const en: Dict = {
     title: 'Shifts', newShift: 'New shift', truck: 'Truck', phone: 'Phone', crew: 'Crew',
     status: 'Status', revenue: 'Revenue', jobs: 'Jobs', issues: 'To fix', create: 'Create shift',
     pickCrew: 'Pick 2 or 3 members', empty: 'No shifts for this date.', open: 'Open',
-    toReview: 'To review', today: 'Today', inProgress: 'In progress', done: 'Accepted', created: 'Shift created',
+    toReview: 'To review', today: 'Today', alreadyToday: 'already has a shift today', inProgress: 'In progress', done: 'Accepted', created: 'Shift created',
     noMatch: 'No shifts match this filter.',
   },
   shift: {
@@ -168,7 +174,9 @@ const en: Dict = {
     returnTitle: 'Return the shift to the crew', returnHelp: 'The crew will see this reason on their phone.',
     reopenTitle: 'Reopen an accepted shift', reopenHelp: 'The reason is kept in the audit log.',
     locked: 'Shift accepted and locked', returned: 'Shift returned to the crew', reopened: 'Shift reopened',
-    finalized: 'Cancellation finalized', countSaved: 'Cash count saved', invalidAmount: 'Invalid amount (e.g. 227.30)',
+    finalized: 'Cancellation finalized', countSaved: 'Cash count saved',
+    cancelShift: 'Cancel shift', cancelTitle: 'Cancel this shift', cancelHelp: 'For a shift that won’t run (truck breakdown…). The truck and phone become available again.',
+    cancelled: 'Shift cancelled', cancelledFor: 'Cancelled', joined: 'Joined', editTimes: 'Fix times', invalidAmount: 'Invalid amount (e.g. 227.30)',
     photoNotUploaded: 'Not received from the truck yet', photoTaken: 'taken', openFull: 'Open full size',
     ticketPhoto: 'Ticket photo', cashPhoto: 'Cash photo', ticketPhotoMissing: 'Ticket photo missing',
     cashNotSubmitted: 'The crew hasn’t declared the cash or taken the photo yet.',
@@ -185,8 +193,12 @@ const en: Dict = {
     hours_type_unconfirmed: 'Hours type not confirmed', checklist_incomplete: 'End-of-day checklist incomplete',
     cash_not_counted: 'Cash not counted', cash_variance_unresolved: 'Cash variance not explained',
     cancellation_pending: 'Cancellation to finalize',
+    tip_unassigned: 'Tip with no crew present (fix the crew times)', photo_not_uploaded: 'Photo not yet received from the phone',
   },
   err: {
+    no_rate: 'No active rate for this site and material on that date', shift_not_editable: 'The shift is under dispatch review',
+    hours_type_missing: 'Hours type missing', crew_size: 'Pick at least one crew member', duplicate: 'This already exists',
+    photo_entity_missing: 'Photo linked to a missing record', photo_shift_mismatch: 'Photo attached to the wrong shift',
     shift_not_ready: 'Shift is not ready', reason_required: 'A reason is required',
     shift_locked: 'Shift is locked: reopen it first', invalid_transition: 'Status change not allowed',
     not_allowed: 'Not allowed', crew_double_booked: 'Employee already assigned that day',
@@ -254,6 +266,7 @@ i18n.use(initReactI18next).init({
 
 // Database errors look like "code: detail"; show the translated code when we know it.
 export function explainError(message: string): string {
+  if (/duplicate key value/i.test(message)) return i18n.t('err.duplicate');
   const code = message.match(/^(\w+):/)?.[1];
   if (code && i18n.exists(`err.${code}`)) {
     const rest = message.slice(code.length + 1).trim();

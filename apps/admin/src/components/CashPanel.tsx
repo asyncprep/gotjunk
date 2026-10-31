@@ -10,11 +10,10 @@ export default function CashPanel({ expected, cash, photos, busy, lang, onChange
   onChange: (patch: CashPatch) => void; onSave: () => void;
 }) {
   const { t } = useTranslation();
-  if (!cash) {
-    return expected > 0
-      ? <p className="problem error">✕ {t('shift.cashNotSubmitted')} ({money(expected, lang)})</p>
-      : <p className="muted">{t('shift.noCash')}</p>;
-  }
+  if (!cash && expected <= 0) return <p className="muted">{t('shift.noCash')}</p>;
+  // No cash record from the crew (phone lost…): dispatch can still record the count.
+  const missing = !cash;
+  cash = cash ?? { counted_cash: null };
   const counted = cash.counted_cash === null ? null : Number(cash.counted_cash);
   const variance = counted === null ? null : Math.round((counted - expected) * 100) / 100;
   const varianceLabel = variance === null ? t('shift.toCount')
@@ -30,6 +29,7 @@ export default function CashPanel({ expected, cash, photos, busy, lang, onChange
           <div className="k">{t('shift.variance')} · {varianceLabel}</div>
         </div>
       </div>
+      {missing && <p className="problem error">✕ {t('shift.cashNotSubmitted')}</p>}
       {photos.length
         ? <PhotoGallery photos={photos} label={t('shift.cashPhoto')} />
         : <p className="problem error small">✕ {t('problem.cash_photo_missing')}</p>}

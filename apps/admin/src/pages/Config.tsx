@@ -247,7 +247,12 @@ function Rates({ readOnly }: { readOnly: boolean }) {
                 <option value="">{t('shift.material')}…</option>
                 {materials.map((m) => <option key={m.material_type_id} value={m.material_type_id}>{mat(m)}</option>)}
               </select>
-              <select value={draft.direction} onChange={(e) => setDraft({ ...draft, direction: e.target.value, ...(e.target.value === 'no_charge' ? { rate_per_ton: 0 } : {}) })}>
+              <select value={draft.direction} onChange={(e) => setDraft({
+                ...draft, direction: e.target.value,
+                ...(e.target.value === 'no_charge' ? { rate_per_ton: 0 } : {}),
+                // Credits never use a minimum billable weight (decision R3c).
+                ...(e.target.value === 'credit' ? { min_billable_kg: 0, min_applies_to: 'never' } : {}),
+              })}>
                 {['cost', 'credit', 'no_charge'].map((d) => <option key={d} value={d}>{t(`config.${d}`)}</option>)}
               </select>
               <input className="narrow" type="number" min={0} placeholder={t('config.ratePerTon')} value={draft.rate_per_ton ?? ''}
@@ -256,14 +261,19 @@ function Rates({ readOnly }: { readOnly: boolean }) {
             </div>
             <div className="row">
               <label>{t('config.minKg')} <input className="narrow" type="number" min={0} value={draft.min_billable_kg}
+                disabled={draft.direction === 'credit'}
                 onChange={(e) => setDraft({ ...draft, min_billable_kg: Number(e.target.value) })} /></label>
-              <select value={draft.min_applies_to} onChange={(e) => setDraft({ ...draft, min_applies_to: e.target.value })}>
+              <select value={draft.min_applies_to} disabled={draft.direction === 'credit'} onChange={(e) => setDraft({ ...draft, min_applies_to: e.target.value })}>
                 {['transaction', 'never'].map((d) => <option key={d} value={d}>{t(`config.${d}`)}</option>)}
               </select>
               <label>{t('config.from')} <input type="date" value={draft.effective_from}
                 onChange={(e) => setDraft({ ...draft, effective_from: e.target.value })} /></label>
               <button className="go" disabled={action.busy || !draft.site_id || !draft.material_type_id || draft.rate_per_ton === undefined}
-                onClick={() => action.run(() => must(supabase.from('site_rate_config').insert(draft).select()), t('config.rateAdded'))}>
+                onClick={() => action.run(() => must(supabase.rpc('add_site_rate', {
+                  p_site_id: draft.site_id, p_material_type_id: draft.material_type_id, p_rate_per_ton: draft.rate_per_ton,
+                  p_direction: draft.direction, p_min_billable_kg: draft.min_billable_kg, p_min_applies_to: draft.min_applies_to,
+                  p_effective_from: draft.effective_from,
+                })), t('config.rateAdded'))}>
                 {t('common.add')}
               </button>
             </div>

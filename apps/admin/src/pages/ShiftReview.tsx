@@ -9,6 +9,12 @@ import PhotoGallery from '../components/PhotoGallery';
 import CashPanel from '../components/CashPanel';
 
 type Named = { name_fr: string; name_en: string } | null;
+
+// ISO timestamp -> value for <input type="datetime-local"> in the browser's time zone.
+const toLocalInput = (iso: string) => {
+  const d = new Date(iso);
+  return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+};
 const named = (n: Named, lang: string) => (n ? (lang === 'en' ? n.name_en : n.name_fr) : '');
 
 async function loadShift(id: string) {
@@ -45,7 +51,8 @@ export default function ShiftReview() {
   const [reasonPick, setReasonPick] = useState<Record<string, string>>({});
   const [cashForm, setCashForm] = useState<{ counted?: string; envelope?: string; resolution?: string }>({});
   const [newMember, setNewMember] = useState('');
-  const [asking, setAsking] = useState<'return' | 'reopen' | null>(null);
+  const [asking, setAsking] = useState<'return' | 'reopen' | 'cancel' | null>(null);
+  const [crewEdit, setCrewEdit] = useState<{ id: string; joined: string; left: string } | null>(null);
 
   if (!view.data) return <p className="muted">{view.error ?? t('common.loading')}</p>;
   const d = view.data;
@@ -63,12 +70,15 @@ export default function ShiftReview() {
   const saveCash = () => action.run(async () => {
     const counted = cashForm.counted === undefined ? undefined : parseAmount(cashForm.counted);
     if (Number.isNaN(counted)) throw new Error(t('shift.invalidAmount'));
-    return must(supabase.from('cash_submission').update({
-    ...(counted !== undefined ? { counted_cash: counted } : {}),
-    ...(cashForm.envelope !== undefined ? { envelope_id: cashForm.envelope || null } : {}),
-    ...(cashForm.resolution !== undefined ? { mismatch_resolution: cashForm.resolution || null } : {}),
-    received_by: session?.user.id,
-  }).eq('shift_id', shiftId).select());
+    // Upsert: dispatch can record the count even if the crew never created the cash record.
+    return must(supabase.from('cash_submission').upsert({
+      shift_id: shiftId,
+      ...(d.cash ? { cash_submission_id: d.cash.cash_submission_id } : {}),
+      ...(counted !== undefined ? { counted_cash: counted } : {}),
+      ...(cashForm.envelope !== undefined ? { envelope_id: cashForm.envelope || null } : {}),
+      ...(cashForm.resolution !== undefined ? { mismatch_resolution: cashForm.resolution || null } : {}),
+      received_by: session?.user.id,
+    }, { onConflict: 'shift_id' }).select());
   }, t('shift.countSaved'));
   const toggleCheck = (itemId: string, value: boolean) => action.run(() => must(
     supabase.from('shift_checklist_check').upsert({ shift_id: shiftId, item_id: itemId, checked: value }, { onConflict: 'shift_id,item_id' }).select()));
@@ -90,6 +100,7 @@ export default function ShiftReview() {
           {s.hours_type_confirmed_at ? ` (${t('shift.confirmed')})` : ''} · {t('shift.start')} {time(s.start_time, lang)} · {t('shift.finish')} {time(s.finish_time, lang)}
           {s.return_reason && <> · {t('shift.returnedFor')}: « {s.return_reason} »</>}
           {s.reopen_reason && <> · {t('shift.reopenedFor')}: « {s.reopen_reason} »</>}
+          {s.cancel_reason && <> · {t('shift.cancelledFor')}: « {s.cancel_reason} »</>}
         </p>
         <div className="row">
           {['submitted', 'reopened', 'returned', 'in_progress'].includes(status) && s.hours_type && !s.hours_type_confirmed_at && (
@@ -101,6 +112,9 @@ export default function ShiftReview() {
           </>}
           {(status === 'locked' || (status === 'reconciled' && isAdminRole(role))) && (
             <button disabled={action.busy} onClick={() => setAsking('reopen')}>{t('shift.reopen')}</button>
+          )}
+          {status === 'open' && (
+            <button className="danger" disabled={action.busy} onClick={() => setAsking('cancel')}>{t('shift.cancelShift')}</button>
           )}
           {status === 'locked' && isAdminRole(role) && (
             <button disabled={action.busy} onClick={() => updateShift({ status: 'reconciled' }, t('ui.saved'))}>{t('shift.reconcile')}</button>
@@ -243,7 +257,34 @@ export default function ShiftReview() {
               <tbody>
                 {d.crew.map((m: any) => (
                   <tr key={m.shift_crew_id}>
-                    <td>{m.employee?.full_name}{m.left_at && <div className="muted small">{t('shift.left')} {dateTime(m.left_at, lang)}</div>}</td>
+                    <td>
+                      {m.employee?.full_name}
+                      {crewEdit && crewEdit.id === m.shift_crew_id ? (
+                        <div className="stack small" style={{ marginTop: 6 }}>
+                          <label>{t('shift.joined')} <input type="datetime-local" value={crewEdit!.joined}
+                            onChange={(e) => setCrewEdit({ ...crewEdit!, joined: e.target.value })} /></label>
+                          <label>{t('shift.left')} <input type="datetime-local" value={crewEdit!.left}
+                            onChange={(e) => setCrewEdit({ ...crewEdit!, left: e.target.value })} /></label>
+                          <div className="row">
+                            <button className="primary" disabled={action.busy || !crewEdit!.joined} onClick={async () => {
+                              const ok = await action.run(() => must(supabase.from('shift_crew_member').update({
+                                joined_at: new Date(crewEdit!.joined).toISOString(),
+                                left_at: crewEdit!.left ? new Date(crewEdit!.left).toISOString() : null,
+                              }).eq('shift_crew_id', m.shift_crew_id).select()), t('ui.saved'));
+                              if (ok) setCrewEdit(null);
+                            }}>{t('common.save')}</button>
+                            <button className="ghost" onClick={() => setCrewEdit(null)}>{t('common.cancel')}</button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="muted small">
+                          {t('shift.joined')} {dateTime(m.joined_at, lang)}{m.left_at && <> · {t('shift.left')} {dateTime(m.left_at, lang)}</>}
+                          {' '}<button className="link" onClick={() => setCrewEdit({
+                            id: m.shift_crew_id, joined: toLocalInput(m.joined_at), left: m.left_at ? toLocalInput(m.left_at) : '',
+                          })}>{t('shift.editTimes')}</button>
+                        </div>
+                      )}
+                    </td>
                     <td>{named(m.frozen, lang) || '—'}</td>
                     <td className="num">{money(tipFor(m.employee_id), lang)}</td>
                     <td>{!m.left_at && (
@@ -271,15 +312,16 @@ export default function ShiftReview() {
       <AskDialog
         open={asking !== null}
         kind="text"
-        title={asking === 'reopen' ? t('shift.reopenTitle') : t('shift.returnTitle')}
-        message={asking === 'reopen' ? t('shift.reopenHelp') : t('shift.returnHelp')}
-        confirmLabel={asking === 'reopen' ? t('shift.reopen') : t('shift.return')}
+        title={asking === 'reopen' ? t('shift.reopenTitle') : asking === 'cancel' ? t('shift.cancelTitle') : t('shift.returnTitle')}
+        message={asking === 'reopen' ? t('shift.reopenHelp') : asking === 'cancel' ? t('shift.cancelHelp') : t('shift.returnHelp')}
+        confirmLabel={asking === 'reopen' ? t('shift.reopen') : asking === 'cancel' ? t('shift.cancelShift') : t('shift.return')}
         danger
         onClose={() => setAsking(null)}
         onConfirm={(reason) => {
           const kind = asking;
           setAsking(null);
           if (kind === 'reopen') updateShift({ status: 'reopened', reopen_reason: reason }, t('shift.reopened'));
+          else if (kind === 'cancel') updateShift({ status: 'archived', cancel_reason: reason }, t('shift.cancelled'));
           else updateShift({ status: 'returned', return_reason: reason }, t('shift.returned'));
         }}
       />
