@@ -53,14 +53,16 @@ class HomePage extends ConsumerWidget {
                   }
                   final employeeId = snap.data;
                   if (employeeId == null) {
-                    // Right after sign-in the link to the employee hasn't arrived yet: wait for the
-                    // first sync before saying this account isn't crew.
+                    // Right after sign-in the link to the employee hasn't arrived yet: while the
+                    // first sync is under way, wait before saying this account isn't crew.
                     return StreamBuilder<SyncStatus>(
                       stream: repo.db.statusStream,
                       initialData: repo.db.currentStatus,
-                      builder: (context, sync) => AppConfig.powersyncUrl.isEmpty || (sync.data?.hasSynced ?? false)
-                          ? _Message(t.notCrew)
-                          : const Center(child: CircularProgressIndicator()),
+                      builder: (context, sync) {
+                        final s = sync.data;
+                        final firstSync = s != null && s.hasSynced != true && (s.connected || s.connecting);
+                        return firstSync ? const Center(child: CircularProgressIndicator()) : _Message(t.notCrew);
+                      },
                     );
                   }
                   return ShiftView(repo: repo, employeeId: employeeId);
