@@ -14,7 +14,7 @@ tracked on the admin app's **Projet** page (table `spec_item`).
 | F1 – Stripe | Montréal's Stripe is a sub-account of HQ; API keys can be created | V1b integration |
 | F2 – Stripe data | Payments carry the Opportunity ID, GST and pre-tax amount | Crew amount entry can be replaced by import later |
 | F3 – HQ export | Headquarters can't provide an export of the HQ app | Reconciliation is Truck Team OS ↔ Stripe |
-| Crew phone | **One shared phone per truck** | Login model under discussion (personal vs per-phone) |
+| Crew phone (S10) | **One shared phone per truck, signed in by the crew lead**; the rest of the crew has no login | `shift.lead_employee_id`: only the lead's login writes; dispatch picks/changes the lead; if the lead leaves, the next crew member who signs in takes over (migration 1100) |
 
 ## Working defaults (until the client answers)
 

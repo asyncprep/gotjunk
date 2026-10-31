@@ -31,7 +31,7 @@ const fr = {
     title: 'Quarts du jour', newShift: 'Nouveau quart', truck: 'Camion', phone: 'Téléphone', crew: 'Équipe',
     status: 'Statut', revenue: 'Revenus', jobs: 'Travaux', issues: 'À régler', create: 'Créer le quart',
     pickCrew: 'Choisir 2 ou 3 membres', empty: 'Aucun quart pour cette date.', open: 'Ouvrir',
-    toReview: 'À réviser', today: 'Aujourd’hui', alreadyToday: 'déjà un quart aujourd’hui', inProgress: 'En cours', done: 'Acceptés', created: 'Quart créé',
+    toReview: 'À réviser', today: 'Aujourd’hui', alreadyToday: 'déjà un quart aujourd’hui', lead: 'Chef d’équipe (connecté au téléphone)', inProgress: 'En cours', done: 'Acceptés', created: 'Quart créé',
     noMatch: 'Aucun quart dans ce filtre.',
   },
   shift: {
@@ -49,7 +49,8 @@ const fr = {
     recordCount: 'Enregistrer le compte', variance: 'Écart', noCash: 'Aucun comptant déclaré.',
     checklist: 'Liste de fin de journée', checkAll: 'Tout cocher',
     crew: 'Équipe et pourboires', rankToday: 'Rang', rankFrozen: 'Rang figé', tipShare: 'Part des pourboires',
-    addMember: 'Ajouter un membre', markLeft: 'A quitté', left: 'Parti à',
+    addMember: 'Ajouter un membre', markLeft: 'A quitté', left: 'Parti à', lead: 'Chef d’équipe', makeLead: 'Nommer chef',
+    leadHint: 'Le chef d’équipe se connecte sur le téléphone du camion; lui seul peut saisir le quart.',
     returnedFor: 'Retourné', reopenedFor: 'Rouvert',
     returnTitle: 'Retourner le quart à l’équipe', returnHelp: 'L’équipe verra cette raison sur son téléphone.',
     reopenTitle: 'Rouvrir un quart accepté', reopenHelp: 'La raison est conservée dans le journal d’audit.',
@@ -82,6 +83,7 @@ const fr = {
     shift_not_ready: 'Le quart n’est pas prêt', reason_required: 'Une raison est obligatoire',
     shift_locked: 'Quart verrouillé : rouvrez-le d’abord', invalid_transition: 'Changement de statut non permis',
     not_allowed: 'Action non permise', crew_double_booked: 'Employé déjà assigné ce jour-là',
+    lead_not_crew: 'Le chef d’équipe doit faire partie de l’équipe', not_lead: 'Seul le chef d’équipe peut modifier ce quart',
     rate_overlap: 'Un autre tarif actif couvre ces dates', rank_overlap: 'Ce rang chevauche un autre',
   },
   config: {
@@ -151,7 +153,7 @@ const en: Dict = {
     title: 'Shifts', newShift: 'New shift', truck: 'Truck', phone: 'Phone', crew: 'Crew',
     status: 'Status', revenue: 'Revenue', jobs: 'Jobs', issues: 'To fix', create: 'Create shift',
     pickCrew: 'Pick 2 or 3 members', empty: 'No shifts for this date.', open: 'Open',
-    toReview: 'To review', today: 'Today', alreadyToday: 'already has a shift today', inProgress: 'In progress', done: 'Accepted', created: 'Shift created',
+    toReview: 'To review', today: 'Today', alreadyToday: 'already has a shift today', lead: 'Crew lead (signs in on the phone)', inProgress: 'In progress', done: 'Accepted', created: 'Shift created',
     noMatch: 'No shifts match this filter.',
   },
   shift: {
@@ -169,7 +171,8 @@ const en: Dict = {
     recordCount: 'Record count', variance: 'Variance', noCash: 'No cash reported.',
     checklist: 'End-of-day checklist', checkAll: 'Check all',
     crew: 'Crew and tips', rankToday: 'Rank', rankFrozen: 'Rank frozen', tipShare: 'Tip share',
-    addMember: 'Add member', markLeft: 'Left', left: 'Left at',
+    addMember: 'Add member', markLeft: 'Left', left: 'Left at', lead: 'Crew lead', makeLead: 'Make lead',
+    leadHint: 'The crew lead signs in on the truck phone; only they can enter the shift.',
     returnedFor: 'Returned', reopenedFor: 'Reopened',
     returnTitle: 'Return the shift to the crew', returnHelp: 'The crew will see this reason on their phone.',
     reopenTitle: 'Reopen an accepted shift', reopenHelp: 'The reason is kept in the audit log.',
@@ -202,6 +205,7 @@ const en: Dict = {
     shift_not_ready: 'Shift is not ready', reason_required: 'A reason is required',
     shift_locked: 'Shift is locked: reopen it first', invalid_transition: 'Status change not allowed',
     not_allowed: 'Not allowed', crew_double_booked: 'Employee already assigned that day',
+    lead_not_crew: 'The crew lead must be on the crew', not_lead: 'Only the crew lead can change this shift',
     rate_overlap: 'Another active rate covers these dates', rank_overlap: 'This rank overlaps another',
   },
   config: {

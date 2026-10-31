@@ -41,7 +41,7 @@ entered; external systems are matched automatically; admins handle only true exc
 
 | Layer | Choice |
 | --- | --- |
-| Crew app | Flutter, **iPhone only** (company phones, MDM; one shared phone per truck), offline with PowerSync + SQLite |
+| Crew app | Flutter, **iPhone only** (company phones, MDM; one shared phone per truck, signed in by the crew lead), offline with PowerSync + SQLite |
 | Dispatch/admin app | React + TypeScript web app |
 | Backend | Supabase (PostgreSQL), Canada (Central) region; rules, permissions and audit in the database |
 | Integrations | Supabase Edge Functions (TypeScript) + scheduled jobs |

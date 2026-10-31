@@ -1,7 +1,7 @@
 -- test: spec tracker is loaded with inconsistencies and questions
 select tests.eq((select count(*) from spec_item where kind = 'inconsistency'), 17::bigint, 'inconsistencies');
 select tests.ok((select count(*) from spec_item where kind = 'question') >= 50, 'questions');
-select tests.eq((select count(*) from spec_item where status <> 'open'), 0::bigint, 'all open at start');
+select tests.eq((select string_agg(ref, ',') from spec_item where status <> 'open'), 'S10', 'only the shared-phone decision is answered at start');
 
 -- test: dispatch can read the tracker, crew cannot
 select tests.login('a0000000-0000-0000-0000-000000000010');

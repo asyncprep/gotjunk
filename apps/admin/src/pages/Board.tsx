@@ -11,6 +11,7 @@ type BoardShift = {
   phone_id: string;
   truck: { unit_number: string } | null;
   phone: { label: string } | null;
+  lead_employee_id: string | null;
   crew: { employee_id: string; left_at: string | null; employee: { full_name: string } | null }[];
   revenue: number;
   jobs: number;
@@ -32,7 +33,7 @@ async function loadBoard(date: string): Promise<BoardShift[]> {
   const shifts = await must(
     supabase
       .from('shift')
-      .select('shift_id, status, truck_id, phone_id, truck:truck_id(unit_number), phone:phone_id(label), crew:shift_crew_member(employee_id, left_at, employee:employee_id(full_name))')
+      .select('shift_id, status, truck_id, phone_id, lead_employee_id, truck:truck_id(unit_number), phone:phone_id(label), crew:shift_crew_member(employee_id, left_at, employee:employee_id(full_name))')
       .eq('shift_date', date)
       .neq('status', 'archived'),
   ) as unknown as Omit<BoardShift, 'revenue' | 'jobs' | 'errors'>[];
@@ -150,7 +151,8 @@ export default function Board() {
                       onKeyDown={(e) => e.key === 'Enter' && navigate(`/shift/${s.shift_id}`)}>
                       <td><strong>{s.truck?.unit_number}</strong></td>
                       <td>{s.phone?.label}</td>
-                      <td>{s.crew.filter((c) => !c.left_at).map((c) => c.employee?.full_name).join(', ')}</td>
+                      <td>{s.crew.filter((c) => !c.left_at)
+                        .map((c) => `${c.employee?.full_name ?? ''}${c.employee_id === s.lead_employee_id ? ' ★' : ''}`).join(', ')}</td>
                       <td><span className={`pill ${s.status}`}>{t(`status.${s.status}`)}</span></td>
                       <td className="num">{s.jobs}</td>
                       <td className="num">{money(s.revenue, i18n.language)}</td>
@@ -178,6 +180,7 @@ function NewShift({ date, taken, onCreated, onCancel }: {
   const [truck, setTruck] = useState('');
   const [phone, setPhone] = useState('');
   const [crew, setCrew] = useState<string[]>([]);
+  const [lead, setLead] = useState('');
   const action = useAction(onCreated);
 
   if (!options.data) return <div className="card muted">{options.error ?? t('common.loading')}</div>;
@@ -218,12 +221,22 @@ function NewShift({ date, taken, onCreated, onCancel }: {
           </label>
         ))}
       </div>
+      {crew.length > 0 && (
+        <div className="row">
+          <label className="small">{t('board.lead')}{' '}
+            <select value={crew.includes(lead) ? lead : crew[0]} onChange={(e) => setLead(e.target.value)}>
+              {crew.map((id) => <option key={id} value={id}>{employees.find((e) => e.employee_id === id)?.full_name}</option>)}
+            </select>
+          </label>
+        </div>
+      )}
       <div className="row" style={{ marginTop: 12 }}>
         <button
           className="go"
           disabled={action.busy || !truck || !phone || crew.length === 0}
           onClick={() => action.run(() => must(supabase.rpc('create_shift', {
             p_shift_date: date, p_truck_id: truck, p_phone_id: phone, p_crew: crew,
+            p_lead: crew.includes(lead) ? lead : crew[0],
           })), t('board.created'))}
         >
           {t('board.create')}

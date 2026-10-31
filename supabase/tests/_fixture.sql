@@ -1,6 +1,6 @@
 -- Per-test fixture (runs as system inside each test's transaction).
 -- Users:  a…01 ttm1 (e1), a…02 ttm2 (e2), a…03 ttm3 (e3, other shift), a…10 dispatcher, a…20 admin
--- Shifts: c…01 = T-01 / P-01 with e1 + e2;  c…02 = T-02 / P-02 with e3
+-- Shifts: c…01 = T-01 / P-01 with e1 (lead) + e2;  c…02 = T-02 / P-02 with e3 (lead)
 reset role;
 
 insert into auth.users (id) values
@@ -38,3 +38,8 @@ insert into public.shift_crew_member (shift_id, employee_id, joined_at) values
   ('c0000000-0000-0000-0000-000000000001', 'b0000000-0000-0000-0000-000000000001', now() - interval '9 hours'),
   ('c0000000-0000-0000-0000-000000000001', 'b0000000-0000-0000-0000-000000000002', now() - interval '9 hours'),
   ('c0000000-0000-0000-0000-000000000002', 'b0000000-0000-0000-0000-000000000003', now() - interval '9 hours');
+
+update public.shift set lead_employee_id = 'b0000000-0000-0000-0000-000000000001'
+ where shift_id = 'c0000000-0000-0000-0000-000000000001';
+update public.shift set lead_employee_id = 'b0000000-0000-0000-0000-000000000003'
+ where shift_id = 'c0000000-0000-0000-0000-000000000002';

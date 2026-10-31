@@ -23,6 +23,6 @@ This file only records the answers received so far, so they are also in the repo
 | F2 | What do Stripe payments carry? | Opportunity ID, GST (TPS) and the pre-tax amount |
 | F3 | Export of what crews enter in the HQ app? | No |
 | P4 | US region for the offline-sync service during the pilot? | Accepted for the pilot |
+| S10 | How does the crew sign in on the shared truck phone? | The crew lead signs in; the rest of the crew has no login |
 
-Also from the client: **each crew has one shared phone per truck.** How crews sign in on it is
-still to be decided.
+Also from the client: **each crew has one shared phone per truck.**

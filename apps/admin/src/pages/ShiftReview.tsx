@@ -251,6 +251,7 @@ export default function ShiftReview() {
 
         <div className="card">
           <h2>{t('shift.crew')}</h2>
+          <p className="muted small">{t('shift.leadHint')}</p>
           <div className="table-wrap">
             <table>
               <thead><tr><th>{t('common.name')}</th><th>{t('shift.rankFrozen')}</th><th className="num">{t('shift.tipShare')}</th><th /></tr></thead>
@@ -259,6 +260,12 @@ export default function ShiftReview() {
                   <tr key={m.shift_crew_id}>
                     <td>
                       {m.employee?.full_name}
+                      {m.employee_id === d.shift.lead_employee_id
+                        ? <> <span className="chip">★ {t('shift.lead')}</span></>
+                        : !m.left_at && (
+                          <> <button className="link" disabled={action.busy} onClick={() => action.run(() => must(supabase.from('shift')
+                            .update({ lead_employee_id: m.employee_id }).eq('shift_id', shiftId).select()), t('ui.saved'))}>{t('shift.makeLead')}</button></>
+                        )}
                       {crewEdit && crewEdit.id === m.shift_crew_id ? (
                         <div className="stack small" style={{ marginTop: 6 }}>
                           <label>{t('shift.joined')} <input type="datetime-local" value={crewEdit!.joined}
