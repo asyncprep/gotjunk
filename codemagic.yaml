@@ -55,7 +55,8 @@ workflows:
             --build-number="$BUILD_NUMBER" \
             --export-options-plist=/Users/builder/export_options.plist
     artifacts:
-      - apps/mobile/build/ios/ipa/*.ipa
+      # Relative to working_directory (apps/mobile).
+      - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
     publishing:
       app_store_connect:
