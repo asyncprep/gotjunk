@@ -154,13 +154,13 @@ abstract class L10n {
   /// No description provided for @todayShift.
   ///
   /// In fr, this message translates to:
-  /// **'Quart du jour'**
+  /// **'Route du jour'**
   String get todayShift;
 
   /// No description provided for @noShift.
   ///
   /// In fr, this message translates to:
-  /// **'Aucun quart assigné aujourd’hui. Contactez la répartition.'**
+  /// **'Aucune route assignée aujourd’hui. Contactez la répartition.'**
   String get noShift;
 
   /// No description provided for @truck.
@@ -208,13 +208,13 @@ abstract class L10n {
   /// No description provided for @startShift.
   ///
   /// In fr, this message translates to:
-  /// **'Commencer le quart'**
+  /// **'Commencer la route'**
   String get startShift;
 
   /// No description provided for @statusOpen.
   ///
   /// In fr, this message translates to:
-  /// **'Pas commencé'**
+  /// **'Pas commencée'**
   String get statusOpen;
 
   /// No description provided for @statusInProgress.
@@ -226,37 +226,37 @@ abstract class L10n {
   /// No description provided for @statusSubmitted.
   ///
   /// In fr, this message translates to:
-  /// **'Soumis — en révision'**
+  /// **'Soumise — en révision'**
   String get statusSubmitted;
 
   /// No description provided for @statusReturned.
   ///
   /// In fr, this message translates to:
-  /// **'Retourné pour correction'**
+  /// **'Retournée pour correction'**
   String get statusReturned;
 
   /// No description provided for @statusLocked.
   ///
   /// In fr, this message translates to:
-  /// **'Accepté'**
+  /// **'Acceptée'**
   String get statusLocked;
 
   /// No description provided for @statusReopened.
   ///
   /// In fr, this message translates to:
-  /// **'Rouvert'**
+  /// **'Rouverte'**
   String get statusReopened;
 
   /// No description provided for @statusReconciled.
   ///
   /// In fr, this message translates to:
-  /// **'Rapproché'**
+  /// **'Rapprochée'**
   String get statusReconciled;
 
   /// No description provided for @returnedBecause.
   ///
   /// In fr, this message translates to:
-  /// **'Retourné : {reason}'**
+  /// **'Retournée : {reason}'**
   String returnedBecause(String reason);
 
   /// No description provided for @scoreboard.
@@ -430,19 +430,19 @@ abstract class L10n {
   /// No description provided for @finishShift.
   ///
   /// In fr, this message translates to:
-  /// **'Terminer le quart'**
+  /// **'Terminer la route'**
   String get finishShift;
 
   /// No description provided for @submitShift.
   ///
   /// In fr, this message translates to:
-  /// **'Soumettre le quart'**
+  /// **'Soumettre la route'**
   String get submitShift;
 
   /// No description provided for @submitConfirm.
   ///
   /// In fr, this message translates to:
-  /// **'Soumettre le quart? Vous ne pourrez plus le modifier sauf si la répartition le retourne.'**
+  /// **'Soumettre la route? Vous ne pourrez plus la modifier sauf si la répartition la retourne.'**
   String get submitConfirm;
 
   /// No description provided for @finishTime.
@@ -550,13 +550,13 @@ abstract class L10n {
   /// No description provided for @err_shift_not_editable.
   ///
   /// In fr, this message translates to:
-  /// **'Le quart est en révision par la répartition'**
+  /// **'La route est en révision par la répartition'**
   String get err_shift_not_editable;
 
   /// No description provided for @err_shift_locked.
   ///
   /// In fr, this message translates to:
-  /// **'Le quart est verrouillé'**
+  /// **'La route est verrouillée'**
   String get err_shift_locked;
 
   /// No description provided for @err_not_allowed.
@@ -580,7 +580,7 @@ abstract class L10n {
   /// No description provided for @err_crew_double_booked.
   ///
   /// In fr, this message translates to:
-  /// **'Un membre de l’équipe est déjà sur un autre quart actif ce jour-là'**
+  /// **'Un membre de l’équipe est déjà sur une autre route active ce jour-là'**
   String get err_crew_double_booked;
 
   /// No description provided for @err_photo_entity_missing.
@@ -592,7 +592,7 @@ abstract class L10n {
   /// No description provided for @err_photo_shift_mismatch.
   ///
   /// In fr, this message translates to:
-  /// **'La photo ne correspond pas à ce quart'**
+  /// **'La photo ne correspond pas à cette route'**
   String get err_photo_shift_mismatch;
 
   /// No description provided for @err_invalid_transition.
@@ -640,7 +640,7 @@ abstract class L10n {
   /// No description provided for @duplicateOpportunity.
   ///
   /// In fr, this message translates to:
-  /// **'Ce numéro d’opportunité est déjà dans ce quart'**
+  /// **'Ce numéro d’opportunité est déjà sur cette route'**
   String get duplicateOpportunity;
 
   /// No description provided for @problem_tip_unassigned.
@@ -904,19 +904,19 @@ abstract class L10n {
   /// No description provided for @leadIs.
   ///
   /// In fr, this message translates to:
-  /// **'{name} est le chef d’équipe sur ce téléphone. Vous pouvez consulter le quart, mais seul le chef d’équipe peut le modifier.'**
+  /// **'{name} est le chef d’équipe sur ce téléphone. Vous pouvez consulter la route, mais seul le chef d’équipe peut la modifier.'**
   String leadIs(String name);
 
   /// No description provided for @leadLeft.
   ///
   /// In fr, this message translates to:
-  /// **'{name} a quitté le quart. Prenez la relève pour continuer à le saisir.'**
+  /// **'{name} a quitté la route. Prenez la relève pour continuer à la saisir.'**
   String leadLeft(String name);
 
   /// No description provided for @noLead.
   ///
   /// In fr, this message translates to:
-  /// **'Ce quart n’a pas de chef d’équipe. Prenez la relève pour le saisir.'**
+  /// **'Cette route n’a pas de chef d’équipe. Prenez la relève pour la saisir.'**
   String get noLead;
 
   /// No description provided for @takeOver.
@@ -928,20 +928,32 @@ abstract class L10n {
   /// No description provided for @takeOverConfirm.
   ///
   /// In fr, this message translates to:
-  /// **'Vous devenez le chef d’équipe sur ce téléphone : c’est vous qui saisirez les travaux, le dépotoir et le comptant de ce quart.'**
+  /// **'Vous devenez le chef d’équipe sur ce téléphone : c’est vous qui saisirez les travaux, le dépotoir et le comptant de cette route.'**
   String get takeOverConfirm;
 
   /// No description provided for @err_not_lead.
   ///
   /// In fr, this message translates to:
-  /// **'Seul le chef d’équipe connecté sur le téléphone du camion peut modifier ce quart'**
+  /// **'Seul le chef d’équipe connecté sur le téléphone du camion peut modifier cette route'**
   String get err_not_lead;
 
   /// No description provided for @err_lead_not_crew.
   ///
   /// In fr, this message translates to:
-  /// **'Le chef d’équipe doit faire partie de l’équipe de ce quart'**
+  /// **'Le chef d’équipe doit faire partie de l’équipe de cette route'**
   String get err_lead_not_crew;
+
+  /// No description provided for @positionDriver.
+  ///
+  /// In fr, this message translates to:
+  /// **'Chauffeur'**
+  String get positionDriver;
+
+  /// No description provided for @positionNavigator.
+  ///
+  /// In fr, this message translates to:
+  /// **'Navigateur'**
+  String get positionNavigator;
 }
 
 class _L10nDelegate extends LocalizationsDelegate<L10n> {

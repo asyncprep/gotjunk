@@ -39,7 +39,7 @@ class Repo {
       LIMIT 1''', parameters: [employeeId, todayLocal()]).map((rows) => rows.isEmpty ? null : Map.of(rows.first));
 
   Stream<List<Map<String, dynamic>>> crew(String shiftId) => db.watch('''
-      SELECT m.employee_id, e.full_name, m.joined_at, m.left_at
+      SELECT m.employee_id, e.full_name, m.joined_at, m.left_at, m.position
       FROM shift_crew_member m LEFT JOIN employee e ON e.id = m.employee_id
       WHERE m.shift_id = ? ORDER BY m.joined_at, e.full_name''', parameters: [shiftId]).map(_list);
 

@@ -30,7 +30,7 @@ void main() {
       );
     });
     test('known single codes and passthrough', () {
-      expect(explainRejection(L10nEn(), 'shift_locked: reopen the shift before editing'), 'The shift is locked');
+      expect(explainRejection(L10nEn(), 'shift_locked: reopen the shift before editing'), 'The route is locked');
       expect(explainRejection(L10nEn(), 'something unexpected'), 'something unexpected');
       expect(explainRejection(L10nEn(), 'not_allowed: crew cannot change locked_by'), 'Not allowed');
       expect(explainRejection(L10nFr(), 'no_rate: no active rate for this site and material on 2026-10-30'),

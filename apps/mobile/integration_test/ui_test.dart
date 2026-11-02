@@ -36,7 +36,7 @@ void main() {
             "INSERT INTO shift (id, shift_date, status, truck_id, phone_id, hours_type, start_time, lead_employee_id) VALUES (?, ?, ?, 't1', 'p1', 'regular_junk', ?, ?)",
             [shiftId, todayLocal(), status, nowUtc(), lead]);
         await tx.execute(
-            "INSERT INTO shift_crew_member (id, shift_id, employee_id, joined_at) VALUES ('m1', ?, 'e1', '2020-01-01 00:00:00Z'), ('m2', ?, 'e2', '2020-01-01 00:00:00Z')",
+            "INSERT INTO shift_crew_member (id, shift_id, employee_id, joined_at, position) VALUES ('m1', ?, 'e1', '2020-01-01 00:00:00Z', 'driver'), ('m2', ?, 'e2', '2020-01-01 00:00:00Z', 'navigator')",
             [shiftId, shiftId]);
         await tx.execute(
             "INSERT INTO payment_method (id, name_fr, name_en, is_cash, active) VALUES ('cash', 'Comptant', 'Cash', 1, 1), ('card', 'Carte', 'Card', 0, 1)");
@@ -103,11 +103,11 @@ void main() {
 
     expect(find.textContaining('T-01'), findsOneWidget);
     expect(find.text('En cours'), findsOneWidget);
-    expect(find.textContaining('Crew One'), findsOneWidget);
+    expect(find.textContaining('Crew One (Chauffeur), Crew Two (Navigateur)'), findsOneWidget);
     expect(find.text('Tableau de bord'), findsOneWidget);
     expect(find.textContaining('Hors ligne'), findsOneWidget, reason: 'no sync configured in tests');
 
-    await tester.scrollUntilVisible(find.text('Soumettre le quart'), 300);
+    await tester.scrollUntilVisible(find.text('Soumettre la route'), 300);
     expect(find.text('Dépotoir'), findsOneWidget);
     expect(find.text('Comptant'), findsOneWidget);
   });
@@ -135,7 +135,7 @@ void main() {
 
     expect(find.text('OPP-77'), findsOneWidget);
     expect(find.text('\$200.00'), findsWidgets);
-    expect(find.text('\$10.00'), findsOneWidget, reason: 'my half of the tip');
+    expect(find.text('\$10.00'), findsNWidgets(2), reason: "each crew member's half of the tip");
   });
 
   testWidgets('job form rejects a total below the pre-tax amount', (tester) async {
@@ -159,7 +159,7 @@ void main() {
     await tester.pumpWidget(app(const Locale('en')));
     await settle(tester);
 
-    await tester.scrollUntilVisible(find.text('Add a visit'), 300);
+    await reveal(tester, find.text('Add a visit'));
     await tester.tap(find.text('Add a visit'));
     await settle(tester);
     await tester.tap(find.widgetWithText(DropdownButtonFormField<String>, 'Site'));
@@ -193,8 +193,8 @@ void main() {
     await tester.pumpWidget(app(const Locale('en')));
     await settle(tester);
 
-    await tester.scrollUntilVisible(find.text('Submit shift'), 300);
-    await tester.tap(find.text('Submit shift'));
+    await tester.scrollUntilVisible(find.text('Submit route'), 300);
+    await tester.tap(find.text('Submit route'));
     await settle(tester);
     expect(find.text('Fix before submitting:'), findsOneWidget);
     expect(find.text('Cash photo missing'), findsOneWidget);
@@ -207,11 +207,11 @@ void main() {
     await seed();
     await tester.pumpWidget(app(const Locale('en')));
     await settle(tester);
-    await tester.scrollUntilVisible(find.text('Submit shift'), 300);
-    await tester.tap(find.text('Submit shift'));
+    await tester.scrollUntilVisible(find.text('Submit route'), 300);
+    await tester.tap(find.text('Submit route'));
     await settle(tester);
     expect(find.textContaining("won't be able to change it"), findsOneWidget);
-    await tester.tap(find.widgetWithText(FilledButton, 'Submit shift').last);
+    await tester.tap(find.widgetWithText(FilledButton, 'Submit route').last);
     await settle(tester);
     expect((await db.get('SELECT status FROM shift WHERE id = ?', [shiftId]))['status'], 'submitted');
     await reveal(tester, find.text('Submitted — under review'), step: -300);
@@ -227,7 +227,7 @@ void main() {
     expect(find.text('Not started'), findsOneWidget);
     await tester.tap(find.text('Warehouse hours'));
     await settle(tester);
-    await tester.tap(find.text('Start shift'));
+    await tester.tap(find.text('Start route'));
     await settle(tester);
     expect(find.text('In progress'), findsOneWidget);
     expect(find.text('Scoreboard'), findsOneWidget);
@@ -242,7 +242,7 @@ void main() {
     expect(find.text('Add a job'), findsNothing);
     expect(find.text('Tips per person'), findsOneWidget);
     await tester.scrollUntilVisible(find.text('Cash'), 300);
-    expect(find.text('Submit shift'), findsNothing);
+    expect(find.text('Submit route'), findsNothing);
   });
 
   testWidgets('a shift without a lead offers to take over', (tester) async {

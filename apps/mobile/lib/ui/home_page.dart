@@ -345,7 +345,14 @@ class _ShiftHeader extends StatelessWidget {
             StreamBuilder<List<Map<String, dynamic>>>(
               stream: repo.crew(shift['id'] as String),
               builder: (context, snap) => Text(
-                labelled(context, t.crew, (snap.data ?? []).where((m) => m['left_at'] == null).map((m) => m['full_name'] ?? '…').join(', ')),
+                labelled(context, t.crew, (snap.data ?? []).where((m) => m['left_at'] == null).map((m) {
+                  final position = switch (m['position']) {
+                    'driver' => t.positionDriver,
+                    'navigator' => t.positionNavigator,
+                    _ => null,
+                  };
+                  return position == null ? '${m['full_name'] ?? '…'}' : '${m['full_name'] ?? '…'} ($position)';
+                }).join(', ')),
               ),
             ),
           ],

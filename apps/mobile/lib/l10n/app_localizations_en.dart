@@ -37,10 +37,10 @@ class L10nEn extends L10n {
       'This account isn\'t linked to a crew member. Contact dispatch.';
 
   @override
-  String get todayShift => 'Today\'s shift';
+  String get todayShift => 'Today\'s route';
 
   @override
-  String get noShift => 'No shift assigned today. Contact dispatch.';
+  String get noShift => 'No route assigned today. Contact dispatch.';
 
   @override
   String get truck => 'Truck';
@@ -64,7 +64,7 @@ class L10nEn extends L10n {
   String get hoursNonJunk => 'Non-junk hours';
 
   @override
-  String get startShift => 'Start shift';
+  String get startShift => 'Start route';
 
   @override
   String get statusOpen => 'Not started';
@@ -179,14 +179,14 @@ class L10nEn extends L10n {
       'Call dispatch before leaving a job that didn\'t convert.';
 
   @override
-  String get finishShift => 'Finish shift';
+  String get finishShift => 'Finish route';
 
   @override
-  String get submitShift => 'Submit shift';
+  String get submitShift => 'Submit route';
 
   @override
   String get submitConfirm =>
-      'Submit the shift? You won\'t be able to change it unless dispatch returns it.';
+      'Submit the route? You won\'t be able to change it unless dispatch returns it.';
 
   @override
   String get finishTime => 'Finish time';
@@ -243,10 +243,10 @@ class L10nEn extends L10n {
 
   @override
   String get err_shift_not_editable =>
-      'The shift is being reviewed by dispatch';
+      'The route is being reviewed by dispatch';
 
   @override
-  String get err_shift_locked => 'The shift is locked';
+  String get err_shift_locked => 'The route is locked';
 
   @override
   String get err_not_allowed => 'Not allowed';
@@ -260,14 +260,14 @@ class L10nEn extends L10n {
 
   @override
   String get err_crew_double_booked =>
-      'A crew member is already on another active shift that day';
+      'A crew member is already on another active route that day';
 
   @override
   String get err_photo_entity_missing =>
       'The photo wasn\'t sent: its visit or cash record was refused';
 
   @override
-  String get err_photo_shift_mismatch => 'The photo doesn\'t match this shift';
+  String get err_photo_shift_mismatch => 'The photo doesn\'t match this route';
 
   @override
   String get err_invalid_transition => 'This status change isn\'t allowed';
@@ -296,7 +296,7 @@ class L10nEn extends L10n {
 
   @override
   String get duplicateOpportunity =>
-      'This opportunity number is already on this shift';
+      'This opportunity number is already on this route';
 
   @override
   String get problem_tip_unassigned =>
@@ -442,28 +442,34 @@ class L10nEn extends L10n {
 
   @override
   String leadIs(String name) {
-    return '$name is the crew lead on this phone. You can view the shift, but only the crew lead can change it.';
+    return '$name is the crew lead on this phone. You can view the route, but only the crew lead can change it.';
   }
 
   @override
   String leadLeft(String name) {
-    return '$name has left the shift. Take over to keep entering it.';
+    return '$name has left the route. Take over to keep entering it.';
   }
 
   @override
-  String get noLead => 'This shift has no crew lead. Take over to enter it.';
+  String get noLead => 'This route has no crew lead. Take over to enter it.';
 
   @override
   String get takeOver => 'Take over';
 
   @override
   String get takeOverConfirm =>
-      'You become the crew lead on this phone: you will enter this shift’s jobs, disposal and cash.';
+      'You become the crew lead on this phone: you will enter this route’s jobs, disposal and cash.';
 
   @override
   String get err_not_lead =>
-      'Only the crew lead signed in on the truck phone can change this shift';
+      'Only the crew lead signed in on the truck phone can change this route';
 
   @override
-  String get err_lead_not_crew => 'The crew lead must be on this shift’s crew';
+  String get err_lead_not_crew => 'The crew lead must be on this route’s crew';
+
+  @override
+  String get positionDriver => 'Driver';
+
+  @override
+  String get positionNavigator => 'Navigator';
 }

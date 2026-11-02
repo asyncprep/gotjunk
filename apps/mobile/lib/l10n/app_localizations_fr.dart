@@ -37,11 +37,11 @@ class L10nFr extends L10n {
       'Ce compte n’est pas lié à un membre d’équipe. Contactez la répartition.';
 
   @override
-  String get todayShift => 'Quart du jour';
+  String get todayShift => 'Route du jour';
 
   @override
   String get noShift =>
-      'Aucun quart assigné aujourd’hui. Contactez la répartition.';
+      'Aucune route assignée aujourd’hui. Contactez la répartition.';
 
   @override
   String get truck => 'Camion';
@@ -65,32 +65,32 @@ class L10nFr extends L10n {
   String get hoursNonJunk => 'Heures non-junk';
 
   @override
-  String get startShift => 'Commencer le quart';
+  String get startShift => 'Commencer la route';
 
   @override
-  String get statusOpen => 'Pas commencé';
+  String get statusOpen => 'Pas commencée';
 
   @override
   String get statusInProgress => 'En cours';
 
   @override
-  String get statusSubmitted => 'Soumis — en révision';
+  String get statusSubmitted => 'Soumise — en révision';
 
   @override
-  String get statusReturned => 'Retourné pour correction';
+  String get statusReturned => 'Retournée pour correction';
 
   @override
-  String get statusLocked => 'Accepté';
+  String get statusLocked => 'Acceptée';
 
   @override
-  String get statusReopened => 'Rouvert';
+  String get statusReopened => 'Rouverte';
 
   @override
-  String get statusReconciled => 'Rapproché';
+  String get statusReconciled => 'Rapprochée';
 
   @override
   String returnedBecause(String reason) {
-    return 'Retourné : $reason';
+    return 'Retournée : $reason';
   }
 
   @override
@@ -180,14 +180,14 @@ class L10nFr extends L10n {
       'Appelez la répartition avant de quitter un travail non converti.';
 
   @override
-  String get finishShift => 'Terminer le quart';
+  String get finishShift => 'Terminer la route';
 
   @override
-  String get submitShift => 'Soumettre le quart';
+  String get submitShift => 'Soumettre la route';
 
   @override
   String get submitConfirm =>
-      'Soumettre le quart? Vous ne pourrez plus le modifier sauf si la répartition le retourne.';
+      'Soumettre la route? Vous ne pourrez plus la modifier sauf si la répartition la retourne.';
 
   @override
   String get finishTime => 'Heure de fin';
@@ -247,10 +247,10 @@ class L10nFr extends L10n {
 
   @override
   String get err_shift_not_editable =>
-      'Le quart est en révision par la répartition';
+      'La route est en révision par la répartition';
 
   @override
-  String get err_shift_locked => 'Le quart est verrouillé';
+  String get err_shift_locked => 'La route est verrouillée';
 
   @override
   String get err_not_allowed => 'Action non permise';
@@ -264,7 +264,7 @@ class L10nFr extends L10n {
 
   @override
   String get err_crew_double_booked =>
-      'Un membre de l’équipe est déjà sur un autre quart actif ce jour-là';
+      'Un membre de l’équipe est déjà sur une autre route active ce jour-là';
 
   @override
   String get err_photo_entity_missing =>
@@ -272,7 +272,7 @@ class L10nFr extends L10n {
 
   @override
   String get err_photo_shift_mismatch =>
-      'La photo ne correspond pas à ce quart';
+      'La photo ne correspond pas à cette route';
 
   @override
   String get err_invalid_transition => 'Ce changement d’état n’est pas permis';
@@ -301,7 +301,7 @@ class L10nFr extends L10n {
 
   @override
   String get duplicateOpportunity =>
-      'Ce numéro d’opportunité est déjà dans ce quart';
+      'Ce numéro d’opportunité est déjà sur cette route';
 
   @override
   String get problem_tip_unassigned =>
@@ -447,30 +447,36 @@ class L10nFr extends L10n {
 
   @override
   String leadIs(String name) {
-    return '$name est le chef d’équipe sur ce téléphone. Vous pouvez consulter le quart, mais seul le chef d’équipe peut le modifier.';
+    return '$name est le chef d’équipe sur ce téléphone. Vous pouvez consulter la route, mais seul le chef d’équipe peut la modifier.';
   }
 
   @override
   String leadLeft(String name) {
-    return '$name a quitté le quart. Prenez la relève pour continuer à le saisir.';
+    return '$name a quitté la route. Prenez la relève pour continuer à la saisir.';
   }
 
   @override
   String get noLead =>
-      'Ce quart n’a pas de chef d’équipe. Prenez la relève pour le saisir.';
+      'Cette route n’a pas de chef d’équipe. Prenez la relève pour la saisir.';
 
   @override
   String get takeOver => 'Prendre la relève';
 
   @override
   String get takeOverConfirm =>
-      'Vous devenez le chef d’équipe sur ce téléphone : c’est vous qui saisirez les travaux, le dépotoir et le comptant de ce quart.';
+      'Vous devenez le chef d’équipe sur ce téléphone : c’est vous qui saisirez les travaux, le dépotoir et le comptant de cette route.';
 
   @override
   String get err_not_lead =>
-      'Seul le chef d’équipe connecté sur le téléphone du camion peut modifier ce quart';
+      'Seul le chef d’équipe connecté sur le téléphone du camion peut modifier cette route';
 
   @override
   String get err_lead_not_crew =>
-      'Le chef d’équipe doit faire partie de l’équipe de ce quart';
+      'Le chef d’équipe doit faire partie de l’équipe de cette route';
+
+  @override
+  String get positionDriver => 'Chauffeur';
+
+  @override
+  String get positionNavigator => 'Navigateur';
 }

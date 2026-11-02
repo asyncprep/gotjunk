@@ -27,6 +27,7 @@ const schema = Schema([
     Column.text('employee_id'),
     Column.text('joined_at'),
     Column.text('left_at'),
+    Column.text('position'), // driver | navigator, set by dispatch
   ], indexes: [
     Index('by_shift', [IndexedColumn('shift_id')]),
     Index('by_employee', [IndexedColumn('employee_id')]),
