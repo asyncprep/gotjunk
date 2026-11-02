@@ -1,11 +1,17 @@
 # Questions for the client
 
 The live list is on the admin app's **Projet** page (Projet → Questions pour le client). It has
-the 53 questions and the 17 spec inconsistencies, with their status, priority, what each blocks,
+the questions and the 17 spec inconsistencies, with their status, priority, what each blocks,
 what the app does meanwhile, and the client's answers. Use **Imprimer** for a meeting handout and
 **Exporter (CSV)** for a spreadsheet.
 
 This file only records the answers received so far, so they are also in the repository history.
+
+## Questions added since
+
+| Ref | Question |
+| --- | --- |
+| F8 | How can a Stripe payment be linked to the crew who did the job, without anyone typing anything? (Payments carry the Opportunity ID, but the crew types it today. Does HQ know which truck did each job? Is the card reader or payment link tied to a truck or phone? Does the payment carry anything identifying the truck or crew?) |
 
 ## Answers received (as of Oct 30, 2026)
 
