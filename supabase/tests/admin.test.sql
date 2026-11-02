@@ -4,7 +4,7 @@ select tests.ok((select create_shift(
   public.business_date(now()),
   (select truck_id from truck where unit_number = 'T-03'),
   (select phone_id from phone where label = 'P-03'),
-  array['b0000000-0000-0000-0000-000000000004'::uuid]) is not null), 'shift created');
+  array['b0000000-0000-0000-0000-000000000004'::uuid], array['driver']::crew_position[]) is not null), 'shift created');
 select tests.eq((select count(*) from shift_crew_member m join shift s using (shift_id)
                  join truck t using (truck_id) where t.unit_number = 'T-03'), 1::bigint, 'crew attached');
 select tests.eq((select dispatcher_id from shift s join truck t using (truck_id) where t.unit_number = 'T-03'),
@@ -16,7 +16,7 @@ select tests.throws($q$
   select create_shift(public.business_date(now()),
     (select truck_id from truck where unit_number = 'T-03'),
     (select phone_id from phone where label = 'P-03'),
-    array['b0000000-0000-0000-0000-000000000001'::uuid])
+    array['b0000000-0000-0000-0000-000000000001'::uuid], array['driver']::crew_position[])
 $q$, 'crew_double_booked%');
 select tests.eq((select count(*) from shift s join truck t using (truck_id) where t.unit_number = 'T-03'),
                 0::bigint, 'no half-created shift');
@@ -27,7 +27,7 @@ select tests.throws($q$
   select create_shift(public.business_date(now()),
     (select truck_id from truck where unit_number = 'T-03'),
     (select phone_id from phone where label = 'P-03'),
-    array['b0000000-0000-0000-0000-000000000004'::uuid])
+    array['b0000000-0000-0000-0000-000000000004'::uuid], array['driver']::crew_position[])
 $q$, 'not_allowed%');
 
 -- test: promotion closes the previous rank and keeps history

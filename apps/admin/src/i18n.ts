@@ -26,6 +26,7 @@ const fr = {
     open: 'Ouvert', in_progress: 'En cours', submitted: 'Soumis', returned: 'Retourné', locked: 'Accepté',
     reopened: 'Rouvert', reconciled: 'Rapproché', archived: 'Archivé',
   },
+  position: { label: 'Poste', pick: 'Poste…', driver: 'Chauffeur', navigator: 'Navigateur', oneDriver: 'Choisissez un poste pour chaque membre, avec un seul chauffeur.' },
   hours: { regular_junk: 'Heures junk régulières', warehouse: 'Heures entrepôt', non_junk: 'Heures non-junk' },
   board: {
     title: 'Routes du jour', newShift: 'Nouvelle route', truck: 'Camion', phone: 'Téléphone', crew: 'Équipe',
@@ -84,6 +85,7 @@ const fr = {
     shift_locked: 'Route verrouillée : rouvrez-la d’abord', invalid_transition: 'Changement de statut non permis',
     not_allowed: 'Action non permise', crew_double_booked: 'Employé déjà assigné ce jour-là',
     lead_not_crew: 'Le chef d’équipe doit faire partie de l’équipe', not_lead: 'Seul le chef d’équipe peut modifier cette route',
+    position_missing: 'Choisissez chauffeur ou navigateur pour chaque membre', one_driver: 'Une route a exactement un chauffeur',
     rate_overlap: 'Un autre tarif actif couvre ces dates', rank_overlap: 'Ce rang chevauche un autre',
   },
   config: {
@@ -148,6 +150,7 @@ const en: Dict = {
     open: 'Open', in_progress: 'In progress', submitted: 'Submitted', returned: 'Returned', locked: 'Accepted',
     reopened: 'Reopened', reconciled: 'Reconciled', archived: 'Archived',
   },
+  position: { label: 'Position', pick: 'Position…', driver: 'Driver', navigator: 'Navigator', oneDriver: 'Pick a position for each member, with exactly one driver.' },
   hours: { regular_junk: 'Regular junk hours', warehouse: 'Warehouse hours', non_junk: 'Non-junk hours' },
   board: {
     title: 'Routes', newShift: 'New route', truck: 'Truck', phone: 'Phone', crew: 'Crew',
@@ -206,6 +209,7 @@ const en: Dict = {
     shift_locked: 'Route is locked: reopen it first', invalid_transition: 'Status change not allowed',
     not_allowed: 'Not allowed', crew_double_booked: 'Employee already assigned that day',
     lead_not_crew: 'The crew lead must be on the crew', not_lead: 'Only the crew lead can change this route',
+    position_missing: 'Pick driver or navigator for each crew member', one_driver: 'A route needs exactly one driver',
     rate_overlap: 'Another active rate covers these dates', rank_overlap: 'This rank overlaps another',
   },
   config: {

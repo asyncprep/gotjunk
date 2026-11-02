@@ -34,10 +34,10 @@ insert into public.shift (shift_id, truck_id, phone_id, dispatcher_id)
 select 'c0000000-0000-0000-0000-000000000002', t.truck_id, p.phone_id, 'a0000000-0000-0000-0000-000000000010'
 from public.truck t, public.phone p where t.unit_number = 'T-02' and p.label = 'P-02';
 
-insert into public.shift_crew_member (shift_id, employee_id, joined_at) values
-  ('c0000000-0000-0000-0000-000000000001', 'b0000000-0000-0000-0000-000000000001', now() - interval '9 hours'),
-  ('c0000000-0000-0000-0000-000000000001', 'b0000000-0000-0000-0000-000000000002', now() - interval '9 hours'),
-  ('c0000000-0000-0000-0000-000000000002', 'b0000000-0000-0000-0000-000000000003', now() - interval '9 hours');
+insert into public.shift_crew_member (shift_id, employee_id, joined_at, position) values
+  ('c0000000-0000-0000-0000-000000000001', 'b0000000-0000-0000-0000-000000000001', now() - interval '9 hours', 'driver'),
+  ('c0000000-0000-0000-0000-000000000001', 'b0000000-0000-0000-0000-000000000002', now() - interval '9 hours', 'navigator'),
+  ('c0000000-0000-0000-0000-000000000002', 'b0000000-0000-0000-0000-000000000003', now() - interval '9 hours', 'driver');
 
 update public.shift set lead_employee_id = 'b0000000-0000-0000-0000-000000000001'
  where shift_id = 'c0000000-0000-0000-0000-000000000001';

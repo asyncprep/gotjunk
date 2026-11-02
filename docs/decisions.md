@@ -15,6 +15,7 @@ tracked on the admin app's **Projet** page (table `spec_item`).
 | F2 – Stripe data | Payments carry the Opportunity ID, GST and pre-tax amount | Crew amount entry can be replaced by import later |
 | F3 – HQ export | Headquarters can't provide an export of the HQ app | Reconciliation is Truck Team OS ↔ Stripe |
 | Wording | **"Route", not "shift"** (Nov 2): a truck's day is a route, as in the Daily Route Journal | Admin and crew app labels, Projet items (migration 1200). Tables, columns and error codes keep `shift` |
+| Crew positions (S11) | **Each member is the driver or a navigator**; exactly one driver per route | Picked per member when creating the route; dispatch can change it on the route page. `shift_crew_member.position` (migration 1300) |
 | Crew phone (S10) | **One shared phone per truck, signed in by the crew lead**; the rest of the crew has no login | `shift.lead_employee_id`: only the lead's login writes; dispatch picks/changes the lead; if the lead leaves, the next crew member who signs in takes over (migration 1100) |
 
 ## Working defaults (until the client answers)

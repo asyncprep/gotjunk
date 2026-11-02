@@ -3,7 +3,7 @@ select tests.login('a0000000-0000-0000-0000-000000000010');
 select tests.ok((select create_shift(public.business_date(now()),
   (select truck_id from truck where unit_number = 'T-01'),
   (select phone_id from phone where label = 'P-01'),
-  array['b0000000-0000-0000-0000-000000000004'::uuid]) is not null), 'second T-01 shift');
+  array['b0000000-0000-0000-0000-000000000004'::uuid], array['driver']::crew_position[]) is not null), 'second T-01 shift');
 select tests.eq((select count(*) from shift s join truck t using (truck_id) where t.unit_number = 'T-01'),
                 2::bigint, 'two shifts on T-01');
 
@@ -14,7 +14,7 @@ select tests.login('a0000000-0000-0000-0000-000000000010');
 select tests.ok((select create_shift(public.business_date(now()),
   (select truck_id from truck where unit_number = 'T-03'),
   (select phone_id from phone where label = 'P-03'),
-  array['b0000000-0000-0000-0000-000000000001'::uuid]) is not null), 'afternoon shift');
+  array['b0000000-0000-0000-0000-000000000001'::uuid], array['driver']::crew_position[]) is not null), 'afternoon shift');
 
 -- test: dispatch cancels an open shift with a reason; crew cannot
 select tests.login('a0000000-0000-0000-0000-000000000001');

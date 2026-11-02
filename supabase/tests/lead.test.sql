@@ -43,13 +43,13 @@ $q$, 'lead_not_crew%');
 select tests.login('a0000000-0000-0000-0000-000000000010');
 select create_shift(public.business_date(now()),
   (select truck_id from truck where unit_number = 'T-03'), (select phone_id from phone where label = 'P-03'),
-  array['b0000000-0000-0000-0000-000000000004'::uuid]);
+  array['b0000000-0000-0000-0000-000000000004'::uuid], array['driver']::crew_position[]);
 select tests.eq((select lead_employee_id from shift s join truck t using (truck_id) where t.unit_number = 'T-03'),
                 'b0000000-0000-0000-0000-000000000004'::uuid, 'default lead');
 select tests.throws($q$
   select create_shift(public.business_date(now()),
     (select truck_id from truck where unit_number = 'T-03'), (select phone_id from phone where label = 'P-03'),
-    array['b0000000-0000-0000-0000-000000000004'::uuid], 'b0000000-0000-0000-0000-000000000001'::uuid)
+    array['b0000000-0000-0000-0000-000000000004'::uuid], array['driver']::crew_position[], 'b0000000-0000-0000-0000-000000000001'::uuid)
 $q$, 'lead_not_crew%');
 
 -- test: removing the lead from the crew leaves the shift without a lead

@@ -33,8 +33,8 @@ select tests.throws($q$
   where shift_id = 'c0000000-0000-0000-0000-000000000001'
 $q$, 'not_allowed%');
 select tests.throws($q$
-  insert into shift_crew_member (shift_id, employee_id)
-  values ('c0000000-0000-0000-0000-000000000001', 'b0000000-0000-0000-0000-000000000004')
+  insert into shift_crew_member (shift_id, employee_id, position)
+  values ('c0000000-0000-0000-0000-000000000001', 'b0000000-0000-0000-0000-000000000004', 'navigator')
 $q$, 'not_allowed: only dispatch can change shift_crew_member');
 
 -- test: crew cannot edit configuration or read the audit log
@@ -60,8 +60,8 @@ select tests.eq((select special_rule_code from site_rate_config
 -- test: employee cannot be double-booked on one date
 select tests.login('a0000000-0000-0000-0000-000000000010');
 select tests.throws($q$
-  insert into shift_crew_member (shift_id, employee_id)
-  values ('c0000000-0000-0000-0000-000000000002', 'b0000000-0000-0000-0000-000000000001')
+  insert into shift_crew_member (shift_id, employee_id, position)
+  values ('c0000000-0000-0000-0000-000000000002', 'b0000000-0000-0000-0000-000000000001', 'navigator')
 $q$, 'crew_double_booked%');
 
 -- test: other crew cannot read readiness checks for a shift

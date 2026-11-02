@@ -70,8 +70,8 @@ select tests.throws($q$
 $q$, 'no_rate%');
 
 -- test: three-way tip split sums to the tip
-insert into shift_crew_member (shift_id, employee_id, joined_at)
-values ('c0000000-0000-0000-0000-000000000001', 'b0000000-0000-0000-0000-000000000004', now() - interval '9 hours');
+insert into shift_crew_member (shift_id, employee_id, joined_at, position)
+values ('c0000000-0000-0000-0000-000000000001', 'b0000000-0000-0000-0000-000000000004', now() - interval '9 hours', 'navigator');
 select tests.login('a0000000-0000-0000-0000-000000000001');
 insert into job (job_id, shift_id, opportunity_id, outcome, payment_method_code, revenue_pre_tax, revenue_total_incl_tax, tip_amount)
 values ('e0000000-0000-0000-0000-000000000001', 'c0000000-0000-0000-0000-000000000001', 'OPP-1', 'completed', 'card', 100, 114.98, 10.00);

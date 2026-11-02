@@ -32,7 +32,7 @@ async function loadShift(id: string) {
       must(supabase.from('checklist_item').select('item_id, label_fr, label_en, required').eq('active', true).order('sort_order')),
       must(supabase.from('shift_checklist_check').select('item_id, checked').eq('shift_id', id)),
       must(supabase.from('shift_crew_member')
-        .select('shift_crew_id, employee_id, joined_at, left_at, employee:employee_id(full_name), frozen:rank_id_snapshot(name_fr, name_en)')
+        .select('shift_crew_id, employee_id, position, joined_at, left_at, employee:employee_id(full_name), frozen:rank_id_snapshot(name_fr, name_en)')
         .eq('shift_id', id).order('joined_at')),
       must(supabase.from('v_shift_tips_by_employee').select('employee_id, tips').eq('shift_id', id)),
       must(supabase.from('cancellation_reason').select('reason_id, name_fr, name_en').eq('active', true).order('sort_order')),
@@ -51,6 +51,7 @@ export default function ShiftReview() {
   const [reasonPick, setReasonPick] = useState<Record<string, string>>({});
   const [cashForm, setCashForm] = useState<{ counted?: string; envelope?: string; resolution?: string }>({});
   const [newMember, setNewMember] = useState('');
+  const [newPosition, setNewPosition] = useState('');
   const [asking, setAsking] = useState<'return' | 'reopen' | 'cancel' | null>(null);
   const [crewEdit, setCrewEdit] = useState<{ id: string; joined: string; left: string } | null>(null);
 
@@ -254,7 +255,7 @@ export default function ShiftReview() {
           <p className="muted small">{t('shift.leadHint')}</p>
           <div className="table-wrap">
             <table>
-              <thead><tr><th>{t('common.name')}</th><th>{t('shift.rankFrozen')}</th><th className="num">{t('shift.tipShare')}</th><th /></tr></thead>
+              <thead><tr><th>{t('common.name')}</th><th>{t('position.label')}</th><th>{t('shift.rankFrozen')}</th><th className="num">{t('shift.tipShare')}</th><th /></tr></thead>
               <tbody>
                 {d.crew.map((m: any) => (
                   <tr key={m.shift_crew_id}>
@@ -292,6 +293,14 @@ export default function ShiftReview() {
                         </div>
                       )}
                     </td>
+                    <td>
+                      <select value={m.position} disabled={action.busy} aria-label={t('position.label')}
+                        onChange={(e) => action.run(() => must(supabase.from('shift_crew_member')
+                          .update({ position: e.target.value }).eq('shift_crew_id', m.shift_crew_id).select()), t('ui.saved'))}>
+                        <option value="driver">{t('position.driver')}</option>
+                        <option value="navigator">{t('position.navigator')}</option>
+                      </select>
+                    </td>
                     <td>{named(m.frozen, lang) || '—'}</td>
                     <td className="num">{money(tipFor(m.employee_id), lang)}</td>
                     <td>{!m.left_at && (
@@ -309,9 +318,15 @@ export default function ShiftReview() {
               {d.employees.filter((e: any) => !d.crew.some((m: any) => m.employee_id === e.employee_id))
                 .map((e: any) => <option key={e.employee_id} value={e.employee_id}>{e.full_name}</option>)}
             </select>
-            <button disabled={!newMember || action.busy} onClick={() => action.run(async () => {
-              await must(supabase.from('shift_crew_member').insert({ shift_id: shiftId, employee_id: newMember }).select());
+            <select value={newPosition} onChange={(e) => setNewPosition(e.target.value)} aria-label={t('position.label')}>
+              <option value="">{t('position.pick')}</option>
+              <option value="driver">{t('position.driver')}</option>
+              <option value="navigator">{t('position.navigator')}</option>
+            </select>
+            <button disabled={!newMember || !newPosition || action.busy} onClick={() => action.run(async () => {
+              await must(supabase.from('shift_crew_member').insert({ shift_id: shiftId, employee_id: newMember, position: newPosition }).select());
               setNewMember('');
+              setNewPosition('');
             })}>{t('common.add')}</button>
           </div>
         </div>
