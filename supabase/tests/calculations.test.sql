@@ -104,7 +104,7 @@ select tests.eq((select jobs_cancelled from v_shift_totals where shift_id = 'c00
 select tests.eq((select jobs_draft from v_shift_totals where shift_id = 'c0000000-0000-0000-0000-000000000001'), 1::bigint, 'drafts');
 select tests.eq((select revenue_pre_tax from v_shift_totals where shift_id = 'c0000000-0000-0000-0000-000000000001'), 300.00::numeric, 'revenue');
 select tests.eq((select tips from v_shift_totals where shift_id = 'c0000000-0000-0000-0000-000000000001'), 10.00::numeric, 'tips');
-select tests.eq((select expected_cash from v_shift_totals where shift_id = 'c0000000-0000-0000-0000-000000000001'), 124.98::numeric, 'cash incl. tip');
+select tests.eq((select expected_cash from v_shift_totals where shift_id = 'c0000000-0000-0000-0000-000000000001'), 114.98::numeric, 'cash tips stay with the crew (B4)');
 
 -- test: completed job needs its financial fields
 select tests.login('a0000000-0000-0000-0000-000000000001');

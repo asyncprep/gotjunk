@@ -32,7 +32,7 @@ async function loadShift(id: string) {
       must(supabase.from('checklist_item').select('item_id, label_fr, label_en, required').eq('active', true).order('sort_order')),
       must(supabase.from('shift_checklist_check').select('item_id, checked').eq('shift_id', id)),
       must(supabase.from('shift_crew_member')
-        .select('shift_crew_id, employee_id, position, joined_at, left_at, employee:employee_id(full_name), frozen:rank_id_snapshot(name_fr, name_en)')
+        .select('shift_crew_id, employee_id, position, joined_at, left_at, tip_override, employee:employee_id(full_name), frozen:rank_id_snapshot(name_fr, name_en)')
         .eq('shift_id', id).order('joined_at')),
       must(supabase.from('v_shift_tips_by_employee').select('employee_id, tips').eq('shift_id', id)),
       must(supabase.from('cancellation_reason').select('reason_id, name_fr, name_en').eq('active', true).order('sort_order')),
@@ -54,6 +54,8 @@ export default function ShiftReview() {
   const [newPosition, setNewPosition] = useState('');
   const [asking, setAsking] = useState<'return' | 'reopen' | 'cancel' | null>(null);
   const [crewEdit, setCrewEdit] = useState<{ id: string; joined: string; left: string } | null>(null);
+  // Dispatch's own tip split (client answer B2): amount per crew row, as typed.
+  const [tipEdit, setTipEdit] = useState<Record<string, string> | null>(null);
 
   if (!view.data) return <p className="muted">{view.error ?? t('common.loading')}</p>;
   const d = view.data;
@@ -65,18 +67,32 @@ export default function ShiftReview() {
   const checked = new Set(d.checks.filter((c: any) => c.checked).map((c: any) => c.item_id));
   const photosFor = (entityId: string) => d.photos.filter((p: any) => p.entity_id === entityId);
   const tipFor = (employeeId: string) => d.tips.find((x: any) => x.employee_id === employeeId)?.tips ?? 0;
+  const tipsByHand = d.crew.some((m: any) => m.tip_override !== null);
+  const leadName = d.crew.find((m: any) => m.employee_id === s.lead_employee_id)?.employee?.full_name ?? '';
+  // Envelope label (client answer C1): date, crew lead and amount; dispatch's count is the sign-off.
+  const envelopeFor = (amount: number) => [s.shift_date, leadName, money(amount, lang)].filter(Boolean).join(' · ');
+  const saveTips = (split: Record<string, string> | null) => action.run(async () => {
+    for (const m of d.crew) {
+      const v = split === null ? null : parseAmount(split[m.shift_crew_id] || '0');
+      if (Number.isNaN(v)) throw new Error(t('shift.invalidAmount'));
+      await must(supabase.from('shift_crew_member').update({ tip_override: v }).eq('shift_crew_id', m.shift_crew_id).select());
+    }
+    setTipEdit(null);
+  }, t('ui.saved'));
 
   const updateShift = (patch: Record<string, unknown>, okText?: string) =>
     action.run(() => must(supabase.from('shift').update(patch).eq('shift_id', shiftId).select()), okText);
   const saveCash = () => action.run(async () => {
     const counted = cashForm.counted === undefined ? undefined : parseAmount(cashForm.counted);
     if (Number.isNaN(counted)) throw new Error(t('shift.invalidAmount'));
+    const envelope = cashForm.envelope !== undefined ? cashForm.envelope || null
+      : !d.cash?.envelope_id && counted != null ? envelopeFor(counted) : undefined;
     // Upsert: dispatch can record the count even if the crew never created the cash record.
     return must(supabase.from('cash_submission').upsert({
       shift_id: shiftId,
       ...(d.cash ? { cash_submission_id: d.cash.cash_submission_id } : {}),
       ...(counted !== undefined ? { counted_cash: counted } : {}),
-      ...(cashForm.envelope !== undefined ? { envelope_id: cashForm.envelope || null } : {}),
+      ...(envelope !== undefined ? { envelope_id: envelope } : {}),
       ...(cashForm.resolution !== undefined ? { mismatch_resolution: cashForm.resolution || null } : {}),
       received_by: session?.user.id,
     }, { onConflict: 'shift_id' }).select());
@@ -231,6 +247,7 @@ export default function ShiftReview() {
             photos={d.cash ? photosFor(d.cash.cash_submission_id) : []}
             busy={action.busy}
             lang={lang}
+            envelopeHint={envelopeFor(Number(tot.expected_cash ?? 0))}
             onChange={(patch) => setCashForm({ ...cashForm, ...patch })}
             onSave={saveCash}
           />
@@ -302,7 +319,10 @@ export default function ShiftReview() {
                       </select>
                     </td>
                     <td>{named(m.frozen, lang) || '—'}</td>
-                    <td className="num">{money(tipFor(m.employee_id), lang)}</td>
+                    <td className="num">{tipEdit
+                      ? <input inputMode="decimal" style={{ width: 90 }} aria-label={t('shift.tipShare')} value={tipEdit[m.shift_crew_id] ?? ''}
+                          onChange={(e) => setTipEdit({ ...tipEdit, [m.shift_crew_id]: e.target.value })} />
+                      : money(tipFor(m.employee_id), lang)}</td>
                     <td>{!m.left_at && (
                       <button className="link" disabled={action.busy} onClick={() => action.run(() => must(supabase.from('shift_crew_member')
                         .update({ left_at: new Date().toISOString() }).eq('shift_crew_id', m.shift_crew_id).select()))}>{t('shift.markLeft')}</button>
@@ -311,6 +331,23 @@ export default function ShiftReview() {
                 ))}
               </tbody>
             </table>
+          </div>
+          <div className="row">
+            <span className="muted small">
+              {tipsByHand ? t('shift.tipsByHand') : t('shift.tipsEqual')} · {t('shift.tips')} {money(Number(tot.tips ?? 0), lang)}
+            </span>
+            {tipEdit ? (
+              <>
+                <button className="primary" disabled={action.busy} onClick={() => saveTips(tipEdit)}>{t('common.save')}</button>
+                <button className="ghost" onClick={() => setTipEdit(null)}>{t('common.cancel')}</button>
+              </>
+            ) : (
+              <>
+                <button className="link" onClick={() => setTipEdit(Object.fromEntries(d.crew.map((m: any) =>
+                  [m.shift_crew_id, Number(tipFor(m.employee_id)).toFixed(2)])))}>{t('shift.setTips')}</button>
+                {tipsByHand && <button className="link" disabled={action.busy} onClick={() => saveTips(null)}>{t('shift.equalTips')}</button>}
+              </>
+            )}
           </div>
           <div className="row">
             <select value={newMember} onChange={(e) => setNewMember(e.target.value)}>

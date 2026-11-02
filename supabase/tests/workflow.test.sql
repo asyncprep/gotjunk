@@ -144,7 +144,7 @@ select tests.throws($q$
   update job set opportunity_id = 'OPP-X' where job_id = 'e0000000-0000-0000-0000-000000000009'
 $q$, 'not_allowed%');
 
--- test: cash count is dispatch-only and a variance needs a note
+-- test: cash count is dispatch-only; a difference is a warning, not a blocker (client answer C3)
 select tests.prepare_ready_shift();
 insert into job (shift_id, opportunity_id, outcome, payment_method_code, revenue_pre_tax, revenue_total_incl_tax)
 values ('c0000000-0000-0000-0000-000000000001', 'OPP-CASH', 'completed', 'cash', 100, 114.98);
@@ -164,11 +164,8 @@ update shift set hours_type_confirmed_at = now() where shift_id = 'c0000000-0000
 insert into shift_checklist_check (shift_id, item_id, checked)
 select 'c0000000-0000-0000-0000-000000000001', item_id, true from checklist_item;
 update cash_submission set counted_cash = 110.00 where shift_id = 'c0000000-0000-0000-0000-000000000001';
-select tests.throws($q$
-  update shift set status = 'locked' where shift_id = 'c0000000-0000-0000-0000-000000000001'
-$q$, 'shift_not_ready: cash_variance_unresolved');
-update cash_submission set mismatch_resolution = 'Customer paid $110; balance on card'
-where shift_id = 'c0000000-0000-0000-0000-000000000001';
+select tests.eq((select severity from shift_problems('c0000000-0000-0000-0000-000000000001', 'lock') where code = 'cash_variance'),
+                'warning', 'difference shown as a warning');
 update shift set status = 'locked' where shift_id = 'c0000000-0000-0000-0000-000000000001';
 select tests.eq((select expected_cash_snapshot from cash_submission where shift_id = 'c0000000-0000-0000-0000-000000000001'),
                 114.98::numeric, 'expected cash frozen at lock');

@@ -5,8 +5,7 @@
 insert into public.rank (code, name_fr, name_en, sort_order) values
   ('recruit',   'Recrue',                'Recruit',            10),
   ('wingman',   'Coéquipier',            'Wingman',            20),
-  ('sales_pro', 'Professionnel de vente', 'Sales Professional', 30),
-  ('trainer',   'Formateur',             'Trainer',            40);  -- TO CONFIRM: rank or role (open item A)
+  ('sales_pro', 'Professionnel',         'Professional',       30);  -- expert and jr_coach come from migration 1600
 
 insert into public.site (code, name, site_type, issues_tickets, requires_ticket_photo) values
   ('eco_junk',     'Eco-Junk',             'eco_junk',     true, true),
@@ -27,7 +26,7 @@ select s.site_id, m.material_type_id, v.rate, v.direction::public.disposal_direc
        v.min_applies::public.min_applies_to, date '2026-01-01'
 from (values
   ('eco_junk',     'donation',           75, 'credit',      0, 'never'),
-  ('eco_junk',     'metal_electronics',  50, 'cost',        0, 'transaction'),
+  ('eco_junk',     'metal_electronics',  50, 'credit',      0, 'never'),
   ('eco_junk',     'mattress_clean',      0, 'no_charge',   0, 'never'),
   ('eco_junk',     'garbage',           150, 'cost',        0, 'transaction'),
   ('eco_junk',     'wood',              100, 'cost',        0, 'transaction'),
@@ -39,7 +38,7 @@ join public.material_type m on m.code = v.material;
 
 insert into public.payment_method (code, name_fr, name_en, is_cash, stripe_method_type) values
   ('cash', 'Comptant', 'Cash',          true,  null),
-  ('card', 'Carte',    'Card (Stripe)', false, 'card');   -- TO CONFIRM: full list (open item F)
+  ('card', 'Carte de crédit', 'Credit card', false, 'card');  -- debit, invoice, e-transfer: migration 1600
 
 -- TO CONFIRM: placeholder reasons; dispatch owns the real list.
 insert into public.cancellation_reason (code, name_fr, name_en, sort_order) values

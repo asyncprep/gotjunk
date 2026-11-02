@@ -14,6 +14,14 @@ tracked on the admin app's **Projet** page (table `spec_item`).
 | F1 – Stripe | Montréal's Stripe is a sub-account of HQ; API keys can be created | V1b integration |
 | F2 – Stripe data | Payments carry the Opportunity ID, GST and pre-tax amount | Crew amount entry can be replaced by import later |
 | F3 – HQ export | Headquarters can't provide an export of the HQ app | Reconciliation is Truck Team OS ↔ Stripe |
+| Payment methods (J2) | **Cash, credit card, debit card, invoice, e-transfer** | Payment methods list (migration 1600); Configuration → Payment methods |
+| Cash tips (B4) | **Cash tips stay with the crew**: not in the cash envelope | Setting cash_includes_tips = false (admin and phone) |
+| Cash difference (C3) | **Nothing happens in the system**: the difference is shown, it doesn't block acceptance and needs no note | Readiness warning cash_variance |
+| Cash envelope (C1, C2) | **Label: date, name and amount; dispatcher signs off** | Envelope label prefilled with date · crew lead · amount; dispatch's count stores who and when |
+| Tip split (B1, B2) | **Equal split; dispatch can change it** | Route page → Split by hand; amounts must add up to the route's tips (tip_override_mismatch blocks acceptance) |
+| Disposal (R3a–d, sheet) | **Metric tonnes; no minimum at Eco-Junk; each outside dump has its own $/ton and minimum; metal is a 0 credit** | Sites have an address; Waste Management, EBI, Dépôt du Nord, Waste Connections at 60/t, min 1,000 kg |
+| Ranks (A5) | **Recruit, Wingman, Professional, Expert, JR Coach**; Trainer is a role | Rank list (migration 1600) |
+| Profit share (R1, A1–A9) | **Rank % × route revenue, by COGS band** | Not built yet (V1b); formula and worked examples in profit-share.md |
 | Wording | **"Route", not "shift"** (Nov 2): a truck's day is a route, as in the Daily Route Journal | Admin and crew app labels, Projet items (migration 1200). Tables, columns and error codes keep `shift` |
 | Crew positions (S11) | **Each member is the driver or a navigator**; exactly one driver per route | Picked per member when creating the route; dispatch can change it on the route page. `shift_crew_member.position` (migration 1300) |
 | Crew phone (S10) | **One shared phone per truck, signed in by the crew lead**; the rest of the crew has no login | `shift.lead_employee_id`: only the lead's login writes; dispatch picks/changes the lead; if the lead leaves, the next crew member who signs in takes over (migration 1100) |

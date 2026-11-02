@@ -64,3 +64,44 @@ Above 50% COGS, nobody gets a profit share. Tips are separate and are not part o
 - The dev seed ranks (Recruit, Wingman, Sales Professional, Trainer) don't match the sheet
   (Wingman, Professional, Expert, JR Coach; Trainer is a role, not a rank). Production ranks are
   entered on the Configuration page; see A12.
+
+## Worked examples: three routes of Oct 25, 2026
+
+From the client's filled route sheets. Crew names are left out. These are the expected results
+for the profit-share engine's tests.
+
+| | Route 1 | Route 2 | Route 3 |
+| --- | --- | --- | --- |
+| Trucks | 1 | 2 | 2 |
+| Crew hours | 10.75 + 10.75 = 21.5 | 10.25 + 10.5 = 20.75 | 8.75 + 8.75 = 17.5 |
+| Jobs | 9 | 5 | 7 (one paid cash) |
+| R, revenue before tax | 3,522.00 | 4,196.00 | 2,935.40 |
+| RPH | 163.81 | 202.22 | 167.74 |
+| AJS | 391.33 | 839.20 | 419.34 |
+| Wages | 481.00 (18.5 h: 3 h removed, training) | 539.50 | 455.00 |
+| Dumps D − C | 222.00 − 3.10 = 218.90 | 346.70 − 80.00 = 266.70 | 189.00 − 12.00 = 177.00 |
+| Franchise 16% | 563.52 | 671.36 | 469.66 |
+| Fuel | 4% = 140.88 | 7% = 293.72 | 7% = 205.48 |
+| Total COGS | 1,404.30 | 1,771.28 | 1,307.14 |
+| COGS % | 39.9% (under 43%) | 42.2% (under 43%) | 44.5% (43.01–47%) |
+| Profit share | Crew A 5% = 176.10; crew B none | Crew A 3% = 125.88; crew B 4% = 167.84 | Crew A 2% = 58.71; crew B 3% = 88.06 |
+| Ranks implied | A: Expert or JR Coach | A: Wingman; B: Professional | A: Wingman; B: Professional |
+| Tips (equal split) | 357.50 → 178.75 each | 155.80 → 77.90 each | 137.75 → 68.88 / 68.87 |
+
+What the examples confirm:
+- R is the sum of "revenue before taxes" (after discount). Every person's share uses the
+  whole route's R, whatever their own hours.
+- Disposal: garbage $150, wood $100 and bedload $50 per 1,000 kg are costs; metal and
+  electronics is a $50 per 1,000 kg credit (the app had it as a cost; fixed in migration 1600).
+- "2 trucks" means the route used two trucks during the day: fuel 7%, no swing truck fee.
+- Cash tips aren't counted. Route 3's cash job only counts its own payment.
+
+Things on the sheets that don't add up (asked on the Projet page):
+- Route 1: the two donation credits are $1.20 for 120 kg and $1.40 for 190 kg, about $10 per
+  1,000 kg instead of $75 (A14).
+- Route 1: wages drop 3 hours for the training day, but RPH still uses all 21.5 hours, and the
+  second crew member gets no share (A13).
+- Route 2: one garbage ticket of 520 kg is charged $83.20, which is $160 per 1,000 kg, the
+  outside-dump rate.
+- Route 3: the credits total is written as 17, but the lines add up to 12 (the dumps line
+  correctly uses 12). The tip per person is written 63.88; half of 137.75 is 68.88.

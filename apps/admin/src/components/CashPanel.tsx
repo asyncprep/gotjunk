@@ -5,8 +5,8 @@ import PhotoGallery, { type Photo } from './PhotoGallery';
 export type CashPatch = { counted?: string; envelope?: string; resolution?: string };
 
 // Expected vs counted cash, the crew's photo of it, and the dispatcher's count.
-export default function CashPanel({ expected, cash, photos, busy, lang, onChange, onSave }: {
-  expected: number; cash: any; photos: Photo[]; busy: boolean; lang: string;
+export default function CashPanel({ expected, cash, photos, busy, lang, envelopeHint, onChange, onSave }: {
+  expected: number; cash: any; photos: Photo[]; busy: boolean; lang: string; envelopeHint?: string;
   onChange: (patch: CashPatch) => void; onSave: () => void;
 }) {
   const { t } = useTranslation();
@@ -44,7 +44,7 @@ export default function CashPanel({ expected, cash, photos, busy, lang, onChange
           <input inputMode="decimal" defaultValue={cash.counted_cash ?? ''} onChange={(e) => onChange({ counted: e.target.value })} />
         </label>
         <label>{t('shift.envelope')}
-          <input defaultValue={cash.envelope_id ?? ''} onChange={(e) => onChange({ envelope: e.target.value })} />
+          <input defaultValue={cash.envelope_id ?? ''} placeholder={envelopeHint} onChange={(e) => onChange({ envelope: e.target.value })} />
         </label>
         <label className="wide">{t('shift.resolution')}
           <input defaultValue={cash.mismatch_resolution ?? ''} onChange={(e) => onChange({ resolution: e.target.value })} />

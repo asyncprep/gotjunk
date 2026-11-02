@@ -15,6 +15,9 @@ This file only records the answers received so far, so they are also in the repo
 | A11 | What is a "split day" and "2 trucks" for fuel, and when is the $60 swing truck fee charged? |
 | A12 | Which ranks exist? Do Recruits get profit share? Are Expert and JR Coach one rank or two? |
 | A13 | How are the trainer's 3 hours removed, and who records damages? |
+| A14 | Donation credit: $75 per 1,000 kg, or what the Oct 25 sheet shows (about $10)? |
+| F9 | Are card payments taken with Helcim, Stripe, or both? |
+| S12 | Which GOT-JUNK address sends invitations, and can we get its SMTP settings? |
 | F8 | How can a Stripe payment be linked to the crew who did the job, without anyone typing anything? (Payments carry the Opportunity ID, but the crew types it today. Does HQ know which truck did each job? Is the card reader or payment link tied to a truck or phone? Does the payment carry anything identifying the truck or crew?) |
 
 ## Answers received (as of Nov 2, 2026)
@@ -41,6 +44,29 @@ This file only records the answers received so far, so they are also in the repo
 | A5 | Ranks and %? | Wingman 1–3%, Professional 2–4%, Expert & JR Coach 3–5% of revenue by COGS band; Trainer is a role (−3 hours) |
 | A8 | Do disposal costs/credits count? | Yes: dumps − credits; donations credit $75 per 1,000 kg |
 | A9 | Other criteria? | Paperwork complete, no damages, policies respected, donations never dumped |
+| E | Where do route assignments come from? | Dispatch enters them by hand |
+| G | How long can the phone work without signal? | No limit |
+| S4 | Does HQ need to approve the app or brand use? | No |
+| S9 | Which email sends invitations? | GOT-JUNK addresses (see S12) |
+| A6 | Which hours types count for profit share? | Regular Junk |
+| A7 | Worked examples? | Daily tracker Excel to come; three filled route sheets of Oct 25 received |
+| B1 | Tips split equally? | Yes |
+| B2 | Can the tip split be overridden? | Yes, by the dispatcher |
+| B3 | Payroll format for tips? | Not needed |
+| B4 | Cash tips in the envelope? | No: the crew keeps cash tips |
+| C1 | Envelope identifier? | Date, name and amount, signed off by the dispatcher |
+| C2 | Who receives the envelope? | Dispatch, with a sign-off |
+| C3 | Cash doesn't match? | Nothing in the system |
+| D1 | End-of-day checklist? | Kept in the admin; admin sets which items are required |
+| R2 | Ticket number on scale records? | Yes, at Eco-Junk (internal) |
+| R3a | Metric or short tons? | Metric |
+| R3b | Minimum billable weights? | None at Eco-Junk; 500 or 1,000 kg at outside dumps |
+| R3c | Minimum on donation credits? | No |
+| R3d | Which outside dumps? | A list kept in the admin: name, address, $ per ton, minimum |
+| J2 | Payment methods? | Cash, invoice, credit card, debit card, e-transfer |
+| J3 | Cancellation reasons? | On the sheet; to be shared |
+| J4 | Revenue before tax after the discount? | Yes |
+| J5 | Tax-exempt jobs or other rates? | No |
 | S10 | How does the crew sign in on the shared truck phone? | The crew lead signs in; the rest of the crew has no login |
 
 Also from the client: **each crew has one shared phone per truck.**

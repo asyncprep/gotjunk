@@ -43,6 +43,7 @@ export default function Config() {
       { key: 'label', label: t('config.label'), type: 'text' }, active] },
     sites: { table: 'site', pk: 'site_id', order: 'name', fields: [
       { key: 'name', label: t('common.name'), type: 'text' },
+      { key: 'address', label: t('config.address'), type: 'text' },
       { key: 'site_type', label: t('config.siteType'), type: 'select', options: ['eco_junk', 'eco_depot', 'outside_dump', 'other'] },
       { key: 'issues_tickets', label: t('config.issuesTickets'), type: 'bool' },
       { key: 'requires_ticket_photo', label: t('config.needsPhoto'), type: 'bool' }, code, active] },
