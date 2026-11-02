@@ -229,7 +229,7 @@ function NewShift({ date, taken, onCreated, onCancel }: {
         <>
           <div className="stack" style={{ marginTop: 8 }}>
             {crew.map((id) => (
-              <label key={id} className="small">{employees.find((e) => e.employee_id === id)?.full_name}{' '}
+              <label key={id} className="small" style={{ display: 'block' }}>{employees.find((e) => e.employee_id === id)?.full_name}{' '}
                 <select value={positions[id] ?? ''} aria-label={t('position.label')}
                   onChange={(e) => setPositions({ ...positions, [id]: e.target.value as Position })}>
                   <option value="">{t('position.pick')}</option>
