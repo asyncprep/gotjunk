@@ -40,8 +40,7 @@ streams:
         WHERE u.user_id = auth.user_id()
       - >-
         SELECT shift_crew_member.shift_crew_id AS id, shift_crew_member.shift_id,
-               shift_crew_member.employee_id, shift_crew_member.joined_at, shift_crew_member.left_at,
-               shift_crew_member.position
+               shift_crew_member.employee_id, shift_crew_member.joined_at, shift_crew_member.left_at, shift_crew_member.position
         FROM shift_crew_member
         INNER JOIN shift_crew_member m ON m.shift_id = shift_crew_member.shift_id
         INNER JOIN app_user u ON u.employee_id = m.employee_id
