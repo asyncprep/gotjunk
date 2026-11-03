@@ -187,6 +187,7 @@ export default function PasteRoutes({ date, existing, onDone, onCancel }: {
                             <option value="">{t('position.pick')}</option>
                             <option value="driver">{t('position.driver')}</option>
                             <option value="navigator">{t('position.navigator')}</option>
+                            <option value="onboarding">{t('position.onboarding')}</option>
                           </select>
                         )})
                         {' '}<span className="muted">{m.start ?? '…'} – {m.end ?? '…'}</span>

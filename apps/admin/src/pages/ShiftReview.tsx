@@ -316,6 +316,7 @@ export default function ShiftReview() {
                           .update({ position: e.target.value }).eq('shift_crew_id', m.shift_crew_id).select()), t('ui.saved'))}>
                         <option value="driver">{t('position.driver')}</option>
                         <option value="navigator">{t('position.navigator')}</option>
+                        <option value="onboarding">{t('position.onboarding')}</option>
                       </select>
                     </td>
                     <td>{named(m.frozen, lang) || '—'}</td>
@@ -359,6 +360,7 @@ export default function ShiftReview() {
               <option value="">{t('position.pick')}</option>
               <option value="driver">{t('position.driver')}</option>
               <option value="navigator">{t('position.navigator')}</option>
+              <option value="onboarding">{t('position.onboarding')}</option>
             </select>
             <button disabled={!newMember || !newPosition || action.busy} onClick={() => action.run(async () => {
               await must(supabase.from('shift_crew_member').insert({ shift_id: shiftId, employee_id: newMember, position: newPosition }).select());

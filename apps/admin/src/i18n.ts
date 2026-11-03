@@ -26,7 +26,7 @@ const fr = {
     open: 'Ouvert', in_progress: 'En cours', submitted: 'Soumis', returned: 'Retourné', locked: 'Accepté',
     reopened: 'Rouvert', reconciled: 'Rapproché', archived: 'Archivé',
   },
-  position: { label: 'Poste', pick: 'Poste…', driver: 'Chauffeur', navigator: 'Navigateur', oneDriver: 'Choisissez un poste pour chaque membre, avec un seul chauffeur.' },
+  position: { label: 'Poste', pick: 'Poste…', driver: 'Chauffeur', navigator: 'Navigateur', onboarding: 'Intégration', oneDriver: 'Choisissez un poste pour chaque membre, avec un seul chauffeur.' },
   hours: { regular_junk: 'Heures junk régulières', warehouse: 'Heures entrepôt', non_junk: 'Heures non-junk' },
   paste: {
     open: 'Coller depuis le tableau', title: 'Coller les routes du tableau',
@@ -196,7 +196,7 @@ const en: Dict = {
     open: 'Open', in_progress: 'In progress', submitted: 'Submitted', returned: 'Returned', locked: 'Accepted',
     reopened: 'Reopened', reconciled: 'Reconciled', archived: 'Archived',
   },
-  position: { label: 'Position', pick: 'Position…', driver: 'Driver', navigator: 'Navigator', oneDriver: 'Pick a position for each member, with exactly one driver.' },
+  position: { label: 'Position', pick: 'Position…', driver: 'Driver', navigator: 'Navigator', onboarding: 'Onboarding', oneDriver: 'Pick a position for each member, with exactly one driver.' },
   hours: { regular_junk: 'Regular junk hours', warehouse: 'Warehouse hours', non_junk: 'Non-junk hours' },
   paste: {
     open: 'Paste from tracker', title: 'Paste routes from the tracker',

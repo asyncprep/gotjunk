@@ -14,7 +14,7 @@ The crew app replaces the paper route sheet. You enter your route on the truck's
 
 1. Open **GOT-JUNK Équipe** on the truck's phone.
 2. Sign in with the email and password you set from your invitation.
-3. **Route du jour (Today's route)** shows your truck, phone, crew with each person's position (Driver or Navigator) and status.
+3. **Route du jour (Today's route)** shows your truck, phone, crew with each person's position (Driver, Navigator or Onboarding) and status.
 
 If you see **No route assigned today**, dispatch hasn't put you on a route for today: call them. If it says another person is the crew lead, you can look but not change anything. If the crew lead has left, or there is none, tap **Prendre la relève (Take over)** to become crew lead on this phone.
 

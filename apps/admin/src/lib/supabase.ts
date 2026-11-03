@@ -10,7 +10,7 @@ export const supabase = createClient(url, key);
 
 export type Role = 'ttm' | 'dispatcher' | 'admin' | 'senior_ops';
 /** A crew member's position on a route (exactly one driver). */
-export type Position = 'driver' | 'navigator';
+export type Position = 'driver' | 'navigator' | 'onboarding';
 
 export type ShiftStatus =
   | 'open' | 'in_progress' | 'submitted' | 'returned' | 'locked' | 'reopened' | 'reconciled' | 'archived';

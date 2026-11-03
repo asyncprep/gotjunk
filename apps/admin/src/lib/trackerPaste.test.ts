@@ -61,9 +61,10 @@ describe('parseTracker', () => {
     ]);
   });
 
-  it('reads French position names', () => {
-    const fr = [row('C1', '4029', 'Pink', 'Chauffeur', 'Alex Tremblay', '7:30'), row('', '', '', 'Navigateur', 'Sam Côté', '7:30')];
-    expect(parseTracker(fr.join('\n'))[0].members.map((m) => m.position)).toEqual(['driver', 'navigator']);
+  it('reads French position names and Onboarding', () => {
+    const fr = [row('C1', '4029', 'Pink', 'Chauffeur', 'Alex Tremblay', '7:30'), row('', '', '', 'Navigateur', 'Sam Côté', '7:30'),
+      row('', '', '', 'Onboarding', 'Kim Pham', '7:30'), row('', '', '', 'Intégration', 'Lee Dubé', '7:30')];
+    expect(parseTracker(fr.join('\n'))[0].members.map((m) => m.position)).toEqual(['driver', 'navigator', 'onboarding', 'onboarding']);
   });
 });
 

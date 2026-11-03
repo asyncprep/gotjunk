@@ -99,7 +99,7 @@ Use **Imprimer (Print)** for a meeting handout and **Exporter (CSV)** for a spre
 
 These rules hold for everyone, in both apps:
 
-- A route has exactly one driver; every crew member is the driver or a navigator.
+- A route has exactly one driver; every crew member is the driver, a navigator or onboarding.
 - A person can't be on two active routes the same day.
 - The crew edits a route only until they submit it. After that only dispatch changes it, and an accepted route must be reopened, with a reason, before anyone edits it.
 - Returning, reopening or cancelling a route always needs a reason, and every change is in the audit log.

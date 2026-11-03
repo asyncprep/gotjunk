@@ -11,6 +11,7 @@ export type PastedRoute = {
 
 const POSITIONS: Record<string, Position> = {
   driver: 'driver', chauffeur: 'driver', navigator: 'navigator', navigateur: 'navigator',
+  onboarding: 'onboarding', integration: 'onboarding',
 };
 
 export const normalize = (s: string) =>

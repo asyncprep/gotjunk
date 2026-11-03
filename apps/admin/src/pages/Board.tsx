@@ -243,6 +243,7 @@ function NewShift({ date, taken, onCreated, onCancel }: {
                   <option value="">{t('position.pick')}</option>
                   <option value="driver">{t('position.driver')}</option>
                   <option value="navigator">{t('position.navigator')}</option>
+                  <option value="onboarding">{t('position.onboarding')}</option>
                 </select>
               </label>
             ))}
