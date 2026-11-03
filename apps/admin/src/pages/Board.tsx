@@ -181,10 +181,12 @@ function NewShift({ date, taken, onCreated, onCancel }: {
 }) {
   const { t } = useTranslation();
   const options = useLoad(async () => ({
+    routes: await must(supabase.from('route_name').select('name').eq('active', true).order('sort_order')),
     trucks: await must(supabase.from('truck').select('truck_id, unit_number').eq('active', true).order('unit_number')),
     phones: await must(supabase.from('phone').select('phone_id, label').eq('active', true).order('label')),
     employees: await must(supabase.from('employee').select('employee_id, full_name').eq('active', true).order('full_name')),
   }), []);
+  const [routeName, setRouteName] = useState('');
   const [truck, setTruck] = useState('');
   const [phone, setPhone] = useState('');
   const [crew, setCrew] = useState<string[]>([]);
@@ -211,6 +213,12 @@ function NewShift({ date, taken, onCreated, onCancel }: {
     <div className="card">
       <h2>{t('board.newShift')} · {date}</h2>
       <div className="row">
+        <select value={routeName} onChange={(e) => setRouteName(e.target.value)} aria-label={t('paste.route')}>
+          <option value="">{t('paste.route')}…</option>
+          {(options.data.routes as { name: string }[]).map((x) => (
+            <option key={x.name} value={x.name}>{x.name}{taken.some((s) => s.route_code === x.name) ? ` (${t('board.alreadyToday')})` : ''}</option>
+          ))}
+        </select>
         <select value={truck} onChange={(e) => setTruck(e.target.value)} aria-label={t('board.truck')}>
           <option value="">{t('board.truck')}…</option>
           {trucks.map((x) => <option key={x.truck_id} value={x.truck_id}>{x.unit_number}{usedTrucks.has(x.truck_id) ? ` (${t('board.alreadyToday')})` : ''}</option>)}
@@ -262,11 +270,14 @@ function NewShift({ date, taken, onCreated, onCancel }: {
         <button
           className="go"
           disabled={action.busy || !truck || !phone || crew.length === 0 || !positionsOk}
-          onClick={() => action.run(() => must(supabase.rpc('create_shift', {
-            p_shift_date: date, p_truck_id: truck, p_phone_id: phone, p_crew: crew,
-            p_positions: crew.map((id) => positions[id]),
-            p_lead: crew.includes(lead) ? lead : crew[0],
-          })), t('board.created'))}
+          onClick={() => action.run(async () => {
+            const shiftId = await must(supabase.rpc('create_shift', {
+              p_shift_date: date, p_truck_id: truck, p_phone_id: phone, p_crew: crew,
+              p_positions: crew.map((id) => positions[id]),
+              p_lead: crew.includes(lead) ? lead : crew[0],
+            }));
+            if (routeName) await must(supabase.from('shift').update({ route_code: routeName }).eq('shift_id', shiftId).select('shift_id'));
+          }, t('board.created'))}
         >
           {t('board.create')}
         </button>

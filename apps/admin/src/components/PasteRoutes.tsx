@@ -14,7 +14,7 @@ type Existing = {
 };
 type Option = { id: string; label: string };
 type Plan = {
-  key: string; route: PastedRoute; truckId: string | null; phoneId: string | null;
+  key: string; route: PastedRoute; routeName: string | null; truckId: string | null; phoneId: string | null;
   members: { employeeId: string | null; position: Position | null; name: string; start: string | null; end: string | null }[];
   existing: Existing | null; problems: string[];
 };
@@ -39,12 +39,14 @@ export default function PasteRoutes({ date, existing, onDone, onCancel }: {
 }) {
   const { t } = useTranslation();
   const options = useLoad(async () => {
-    const [trucks, phones, employees] = await Promise.all([
+    const [routes, trucks, phones, employees] = await Promise.all([
+      must(supabase.from('route_name').select('route_name_id, name').eq('active', true).order('sort_order')),
       must(supabase.from('truck').select('truck_id, unit_number').eq('active', true).order('unit_number')),
       must(supabase.from('phone').select('phone_id, label').eq('active', true).order('label')),
       must(supabase.from('employee').select('employee_id, full_name').eq('active', true).order('full_name')),
     ]);
     return {
+      routes: (routes as any[]).map((x) => ({ id: x.name, label: x.name })) as Option[],
       trucks: (trucks as any[]).map((x) => ({ id: x.truck_id, label: x.unit_number })) as Option[],
       phones: (phones as any[]).map((x) => ({ id: x.phone_id, label: x.label })) as Option[],
       employees: (employees as any[]).map((x) => ({ id: x.employee_id, label: x.full_name })) as Option[],
@@ -61,6 +63,8 @@ export default function PasteRoutes({ date, existing, onDone, onCancel }: {
     const o = options.data;
     return parseTracker(text).map((route, i) => {
       const key = route.route || String(i + 1);
+      // The route's name from Configuration → Routes (ids are the names themselves).
+      const routeName = picks[`route:${key}`] || (route.route ? find(o.routes, route.route) : null);
       const truckId = picks[`truck:${key}`] || find(o.trucks, route.truck);
       const phoneId = picks[`phone:${key}`] || find(o.phones, route.phone);
       const members = route.members.map((m, j) => ({
@@ -68,10 +72,11 @@ export default function PasteRoutes({ date, existing, onDone, onCancel }: {
         position: (picks[`position:${key}:${j}`] as Position) || m.position,
       }));
       const driverId = members.find((m) => m.position === 'driver')?.employeeId;
-      const match = existing.find((s) => route.route && s.route_code && normalize(s.route_code) === normalize(route.route))
+      const match = existing.find((s) => routeName && s.route_code && normalize(s.route_code) === normalize(routeName))
         ?? existing.find((s) => !s.route_code && s.truck_id === truckId && s.crew.some((c) => c.employee_id === driverId))
         ?? null;
       const problems: string[] = [];
+      if (route.route && !routeName) problems.push(t('paste.unknownRoute', { name: route.route }));
       if (!truckId) problems.push(t('paste.unknownTruck', { name: route.truck || '—' }));
       if (!phoneId) problems.push(t('paste.unknownPhone', { name: route.phone || '—' }));
       members.forEach((m) => { if (!m.employeeId) problems.push(t('paste.unknownPerson', { name: m.name })); });
@@ -79,7 +84,7 @@ export default function PasteRoutes({ date, existing, onDone, onCancel }: {
         problems.push(t('position.oneDriver'));
       }
       if (match && FROZEN.includes(match.status)) problems.push(t('paste.frozen'));
-      return { key, route, truckId, phoneId, members, existing: match, problems };
+      return { key, route, routeName, truckId, phoneId, members, existing: match, problems };
     });
   }, [text, picks, options.data, existing, t]);
 
@@ -101,7 +106,7 @@ export default function PasteRoutes({ date, existing, onDone, onCancel }: {
     }
 
     const shift: Record<string, unknown> = { truck_id: p.truckId, phone_id: p.phoneId };
-    if (p.route.route) shift.route_code = p.route.route;
+    if (p.routeName) shift.route_code = p.routeName;
     if (routeStart) shift.start_time = montrealIso(date, routeStart);
     if (routeEnd && (!routeStart || routeEnd > routeStart)) shift.finish_time = montrealIso(date, routeEnd);
     if (p.route.secondTruck) shift.fuel_mode = 'two_trucks';
@@ -172,7 +177,7 @@ export default function PasteRoutes({ date, existing, onDone, onCancel }: {
             <tbody>
               {plans.map((p) => (
                 <tr key={p.key}>
-                  <td><strong>{p.route.route || '—'}</strong></td>
+                  <td><strong>{p.routeName ?? (p.route.route ? pick(`route:${p.key}`, o.routes, null) : '—')}</strong></td>
                   <td>
                     {p.truckId ? o.trucks.find((x) => x.id === p.truckId)?.label : pick(`truck:${p.key}`, o.trucks, null)}
                     {p.route.secondTruck && <div className="small muted">+ {p.route.secondTruck} ({t('paste.twoTrucks')})</div>}

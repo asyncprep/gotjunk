@@ -37,7 +37,7 @@ What the paste takes from each block:
 
 Empty blocks at the bottom of the tracker are skipped. Routes are created for the date shown on the Board, so check it before applying.
 
-**By hand.** Click **+ Nouvelle route (New route)**, pick the truck and phone, tick 2 or 3 crew members, give each a position (exactly one driver), choose the crew lead, then **Créer la route (Create route)**. A truck and phone can run two routes the same day; a person can't be on two routes at once.
+**By hand.** Click **+ Nouvelle route (New route)**, pick the route name, the truck and the phone, tick 2 or 3 crew members, give each a position (exactly one driver), choose the crew lead, then **Créer la route (Create route)**. A truck and phone can run two routes the same day; a person can't be on two routes at once.
 
 ## Following routes on the Board
 
@@ -82,7 +82,7 @@ Return, reopen and cancel each ask for a reason, and every action is recorded wi
 
 | Problem | What to do |
 | --- | --- |
-| "Camion inconnu", "Téléphone inconnu" or "Personne inconnue" in the preview | Pick the right one from the list next to it, or ask the admin to add it with the tracker's spelling |
+| "Route inconnue", "Camion inconnu", "Téléphone inconnu" or "Personne inconnue" in the preview | Pick the right one from the list next to it, or ask the admin to add it with the tracker's spelling |
 | "Choisissez un poste… un seul chauffeur" | Each crew member needs Driver, Navigator or Onboarding, and the route exactly one driver |
 | A person is already on another route that day | Take them off the other route first (mark them as left), or check the tracker |
 | The crew can't see their route on the phone | The crew lead must sign in on that route's phone, and be on that route |

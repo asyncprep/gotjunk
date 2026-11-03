@@ -50,6 +50,7 @@ The **Configuration** page holds every list and rate the apps calculate from. Wi
 | Raisons d'annulation | Cancellation reasons | Reasons dispatch picks when a job is cancelled | A new reason is needed |
 | Liste de fin de journée | End-of-day checklist | What dispatch ticks before accepting a route; "required" items block acceptance | The closing routine changes |
 | Rangs | Ranks | Wingman, Professional, Expert, JR Coach… | A rank is added or renamed |
+| Routes | Routes | The route names on the daily tracker (C1, E1, RN W1, LAUR2…) | A route is added or renamed |
 | Camions | Trucks | Each truck's name (Pink, Bleu, Titan…) | A truck is added or retired |
 | Téléphones | Phones | Each truck phone's label (4026, 4027…) | A phone is added or replaced |
 | Sites | Sites | Dumps and depots, their type, whether they issue tickets and need a ticket photo, address | A new dump is used |
@@ -61,7 +62,7 @@ The **Configuration** page holds every list and rate the apps calculate from. Wi
 
 **Turning something off.** Untick **Actif (Active)** instead of deleting. It disappears from new routes but stays on past ones.
 
-**Names must match the tracker.** Dispatch pastes routes from the daily tracker, and trucks, phones and people are matched by name. Enter trucks and phones exactly as they appear in the tracker (Pink, 4029).
+**Names must match the tracker.** Dispatch pastes routes from the daily tracker, and trucks, phones and people are matched by name. Enter routes, trucks and phones exactly as they appear in the tracker (RN W1, Pink, 4029).
 
 ## Team: employees and ranks
 

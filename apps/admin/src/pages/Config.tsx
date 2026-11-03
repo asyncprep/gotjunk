@@ -12,7 +12,7 @@ type Field = { key: string; label: string; type: 'text' | 'number' | 'bool' | 's
 /** orderKey: the table is ordered by dragging rows; the order column itself is hidden. */
 type TableDef = { table: string; pk: string; order: string; orderKey?: string; fields: Field[] };
 
-const TABS = ['rates', 'profitShare', 'reasons', 'checklist', 'ranks', 'trucks', 'phones', 'sites', 'materials', 'payments', 'settings'] as const;
+const TABS = ['rates', 'profitShare', 'reasons', 'checklist', 'ranks', 'routes', 'trucks', 'phones', 'sites', 'materials', 'payments', 'settings'] as const;
 type Tab = typeof TABS[number];
 
 // "Prix refusé" -> "prix_refuse": codes are stable identifiers, generated when left empty.
@@ -37,6 +37,8 @@ export default function Config() {
     ranks: { table: 'rank', pk: 'rank_id', order: 'sort_order', orderKey: 'sort_order', fields: [
       { key: 'name_fr', label: t('common.nameFr'), type: 'text' },
       { key: 'name_en', label: t('common.nameEn'), type: 'text' }, code, active] },
+    routes: { table: 'route_name', pk: 'route_name_id', order: 'sort_order', orderKey: 'sort_order', fields: [
+      { key: 'name', label: t('paste.route'), type: 'text' }, active] },
     trucks: { table: 'truck', pk: 'truck_id', order: 'unit_number', fields: [
       { key: 'unit_number', label: t('config.unit'), type: 'text' }, active] },
     phones: { table: 'phone', pk: 'phone_id', order: 'label', fields: [
