@@ -19,6 +19,7 @@ This file only records the answers received so far, so they are also in the repo
 | F9 | Are card payments taken with Helcim, Stripe, or both? |
 | S12 | Which GOT-JUNK address sends invitations, and can we get its SMTP settings? |
 | F8 | How can a Stripe payment be linked to the crew who did the job, without anyone typing anything? (Payments carry the Opportunity ID, but the crew types it today. Does HQ know which truck did each job? Is the card reader or payment link tied to a truck or phone? Does the payment carry anything identifying the truck or crew?) |
+| F10 | Can dispatch get today's jobs per truck out of Pipeline without typing? (A Salesforce report with Opportunity ID, truck or crew, address and time, exported to CSV or emailed each morning. Can we get a sample? Failing that, read-only API access to those fields from HQ?) |
 
 ## Answers received (as of Nov 2, 2026)
 
