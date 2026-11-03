@@ -21,7 +21,7 @@ Set up with PowerSync's guided Supabase setup on the **Development** instance:
   **JWT Audience must include `authenticated`** (Supabase user tokens carry `aud: authenticated`).
   The guided setup did not add it; without it every client gets
   `401 PSYNC_S2105: Unexpected "aud" claim value: "authenticated"`.
-- Sync streams: `supabase/powersync/sync-streams.yaml`, validated and deployed (v3 on Nov 2, 2026: adds the route's crew lead and each member's position). Source tables are
+- Sync streams: `supabase/powersync/sync-streams.yaml`, validated and deployed (v4 on Nov 3, 2026: adds the ranks with their profit-share %, the route questions, each member's rank and dispatch's tip split). Source tables are
   not aliased (an alias renames the table on the phone) and only the columns the app uses are sent.
 - Instance URL (public endpoint, the app's default):
   `https://6ae136d7fb9e144e4ed9a04e.powersync.journeyapps.com`
