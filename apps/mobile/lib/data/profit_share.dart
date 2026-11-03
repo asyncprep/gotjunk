@@ -12,6 +12,7 @@ class ProfitSharePlan {
     this.minRevenue = 2000,
     this.minRevenuePerHour = 135,
     this.smallTeamHours = 18,
+    this.smallTeamMinCrew = 2,
     this.smallTeamMinRevenue = 1500,
     this.trainingMinRevenue = 1500,
     this.trainingMinRevenuePerHour = 125,
@@ -44,6 +45,7 @@ class ProfitSharePlan {
       minRevenue: n('min_revenue', d.minRevenue),
       minRevenuePerHour: n('min_revenue_per_hour', d.minRevenuePerHour),
       smallTeamHours: n('small_team_hours', d.smallTeamHours),
+      smallTeamMinCrew: n('small_team_min_crew', d.smallTeamMinCrew),
       smallTeamMinRevenue: n('small_team_min_revenue', d.smallTeamMinRevenue),
       trainingMinRevenue: n('training_min_revenue', d.trainingMinRevenue),
       trainingMinRevenuePerHour: n('training_min_revenue_per_hour', d.trainingMinRevenuePerHour),
@@ -64,6 +66,8 @@ class ProfitSharePlan {
   final double minRevenue;
   final double minRevenuePerHour;
   final double smallTeamHours;
+  /// The short-day minimum applies to a team of at least this many people.
+  final double smallTeamMinCrew;
   final double smallTeamMinRevenue;
   final double trainingMinRevenue;
   final double trainingMinRevenuePerHour;
@@ -210,7 +214,7 @@ ProfitShareResult computeProfitShare(ProfitSharePlan plan, RouteShareInput r) {
               ? CogsBand.high
               : CogsBand.over;
 
-  final smallTeam = r.crew.length >= 2 && teamHours < plan.smallTeamHours;
+  final smallTeam = r.crew.length >= plan.smallTeamMinCrew && teamHours < plan.smallTeamHours;
   final minRevenue = r.trainingDay
       ? plan.trainingMinRevenue
       : smallTeam

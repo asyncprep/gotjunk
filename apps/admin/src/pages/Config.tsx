@@ -12,7 +12,7 @@ type Field = { key: string; label: string; type: 'text' | 'number' | 'bool' | 's
 /** orderKey: the table is ordered by dragging rows; the order column itself is hidden. */
 type TableDef = { table: string; pk: string; order: string; orderKey?: string; fields: Field[] };
 
-const TABS = ['rates', 'reasons', 'checklist', 'ranks', 'trucks', 'phones', 'sites', 'materials', 'payments', 'settings'] as const;
+const TABS = ['rates', 'profitShare', 'reasons', 'checklist', 'ranks', 'trucks', 'phones', 'sites', 'materials', 'payments', 'settings'] as const;
 type Tab = typeof TABS[number];
 
 // "Prix refusé" -> "prix_refuse": codes are stable identifiers, generated when left empty.
@@ -26,7 +26,7 @@ export default function Config() {
   const code: Field = { key: 'code', label: t('common.code'), type: 'text', hint: t('ui.codeAuto') };
   const active: Field = { key: 'active', label: t('common.active'), type: 'bool' };
 
-  const defs: Record<Exclude<Tab, 'rates' | 'settings'>, TableDef> = {
+  const defs: Record<Exclude<Tab, 'rates' | 'settings' | 'profitShare'>, TableDef> = {
     reasons: { table: 'cancellation_reason', pk: 'reason_id', order: 'sort_order', orderKey: 'sort_order', fields: [
       { key: 'name_fr', label: t('common.nameFr'), type: 'text' },
       { key: 'name_en', label: t('common.nameEn'), type: 'text' }, code, active] },
@@ -68,6 +68,7 @@ export default function Config() {
         ))}
       </div>
       {tab === 'rates' ? <Rates readOnly={!canEditConfig} />
+        : tab === 'profitShare' ? <ProfitShare readOnly={!canEditConfig} />
         : tab === 'settings' ? <Settings readOnly={!canEditConfig} />
         : <EditableTable key={tab} def={defs[tab]} readOnly={!canEditConfig} />}
     </>
@@ -308,7 +309,9 @@ function Rates({ readOnly }: { readOnly: boolean }) {
 
 function Settings({ readOnly }: { readOnly: boolean }) {
   const { t } = useTranslation();
-  const rows = useLoad(() => must(supabase.from('app_setting').select('key, value, description').order('key')) as Promise<any[]>, []);
+  // The profit-share plan has its own tab with one field per value.
+  const rows = useLoad(() => must(supabase.from('app_setting').select('key, value, description')
+    .neq('key', PLAN_KEY).order('key')) as Promise<any[]>, []);
   const action = useAction(rows.reload);
   const [edits, setEdits] = useState<Record<string, string>>({});
 
@@ -338,3 +341,166 @@ function Settings({ readOnly }: { readOnly: boolean }) {
   );
 }
 
+
+const PLAN_KEY = 'profit_share_plan';
+
+/** Defaults are the paper sheet's (Aug 2024); the crew app falls back to the same values. */
+const PLAN_DEFAULTS = {
+  wage_per_hour: 26, franchise_pct: 16, fuel_pct: { one_truck: 4, split_day: 5.5, two_trucks: 7 }, swing_truck_fee: 60,
+  min_revenue: 2000, min_revenue_per_hour: 135,
+  small_team_hours: 18, small_team_min_crew: 2, small_team_min_revenue: 1500,
+  training_min_revenue: 1500, training_min_revenue_per_hour: 125, training_hours_max: 3,
+  training_hours_off_revenue_per_hour: false,
+  low_cogs_max_pct: 43, mid_cogs_max_pct: 47, max_cogs_pct: 50,
+  hours_types: ['regular_junk'] as string[],
+};
+type Plan = typeof PLAN_DEFAULTS;
+type NumberKey = { [K in keyof Plan]: Plan[K] extends number ? K : never }[keyof Plan];
+const HOURS_TYPES = ['regular_junk', 'warehouse', 'non_junk'];
+const FUEL_MODES = ['one_truck', 'split_day', 'two_trucks'] as const;
+const PCT_KEYS = ['share_pct_low_cogs', 'share_pct_mid_cogs', 'share_pct_high_cogs'];
+
+/** Every number the profit share uses: the plan (one setting) and the % per rank and COGS band. */
+function ProfitShare({ readOnly }: { readOnly: boolean }) {
+  const { t, i18n } = useTranslation();
+  const data = useLoad(async () => ({
+    setting: await must(supabase.from('app_setting').select('value').eq('key', PLAN_KEY).maybeSingle()) as any,
+    ranks: await must(supabase.from('rank')
+      .select('rank_id, name_fr, name_en, active, share_pct_low_cogs, share_pct_mid_cogs, share_pct_high_cogs')
+      .order('sort_order')) as any[],
+  }), []);
+  const action = useAction(data.reload);
+  const [plan, setPlan] = useState<Plan | null>(null);
+  const [rankEdits, setRankEdits] = useState<Record<string, Record<string, number | null>>>({});
+
+  if (!data.data) return <div className="card muted">{data.error ?? t('common.loading')}</div>;
+  const stored = data.data.setting?.value ?? {};
+  const saved: Plan = { ...PLAN_DEFAULTS, ...stored, fuel_pct: { ...PLAN_DEFAULTS.fuel_pct, ...(stored.fuel_pct ?? {}) } };
+  const p = plan ?? saved;
+  const set = (patch: Partial<Plan>) => setPlan({ ...p, ...patch });
+  const bandsOk = p.low_cogs_max_pct < p.mid_cogs_max_pct && p.mid_cogs_max_pct < p.max_cogs_pct;
+
+  const num = (key: NumberKey, unit: string) => (
+    <label key={key}>{t(`ps.${key}`)} ({unit})
+      <input type="number" min={0} step="any" value={p[key]} disabled={readOnly}
+        onChange={(e) => set({ [key]: e.target.value === '' ? 0 : Number(e.target.value) } as Partial<Plan>)} />
+    </label>
+  );
+
+  const rankName = (r: any) => (i18n.language === 'en' ? r.name_en : r.name_fr);
+  const pctCell = (r: any, key: string) => {
+    const changed = rankEdits[r.rank_id];
+    const value = changed && key in changed ? changed[key] : r[key];
+    return (
+      <td key={key} className="num">
+        <input className="narrow" type="number" min={0} max={100} step="any" value={value ?? ''} disabled={readOnly}
+          placeholder="—" onChange={(e) => setRankEdits({
+            ...rankEdits, [r.rank_id]: { ...changed, [key]: e.target.value === '' ? null : Number(e.target.value) },
+          })} />
+      </td>
+    );
+  };
+  const dropRankEdit = (id: string) => { const { [id]: _x, ...rest } = rankEdits; setRankEdits(rest); };
+
+  return (
+    <>
+      <div className="card">
+        <p className="muted small">{t('ps.intro')}</p>
+        <h2>{t('ps.costs')}</h2>
+        <div className="cash-form">
+          {num('wage_per_hour', '$/h')}
+          {num('franchise_pct', '%')}
+          {FUEL_MODES.map((m) => (
+            <label key={m}>{t(`ps.fuel_${m}`)} (%)
+              <input type="number" min={0} step="any" value={p.fuel_pct[m]} disabled={readOnly}
+                onChange={(e) => set({ fuel_pct: { ...p.fuel_pct, [m]: e.target.value === '' ? 0 : Number(e.target.value) } })} />
+            </label>
+          ))}
+          {num('swing_truck_fee', '$')}
+        </div>
+        <h2 style={{ marginTop: 20 }}>{t('ps.minimums')}</h2>
+        <div className="cash-form">
+          {num('min_revenue', '$')}
+          {num('min_revenue_per_hour', '$/h')}
+          {num('small_team_hours', 'h')}
+          {num('small_team_min_crew', t('ps.people'))}
+          {num('small_team_min_revenue', '$')}
+        </div>
+        <h2 style={{ marginTop: 20 }}>{t('ps.training')}</h2>
+        <div className="cash-form">
+          {num('training_min_revenue', '$')}
+          {num('training_min_revenue_per_hour', '$/h')}
+          {num('training_hours_max', 'h')}
+        </div>
+        <div className="checks">
+          <label>
+            <input type="checkbox" checked={p.training_hours_off_revenue_per_hour} disabled={readOnly}
+              onChange={(e) => set({ training_hours_off_revenue_per_hour: e.target.checked })} />
+            {t('ps.training_hours_off_revenue_per_hour')}
+          </label>
+        </div>
+        <h2 style={{ marginTop: 20 }}>{t('ps.bands')}</h2>
+        <div className="cash-form">
+          {num('low_cogs_max_pct', '%')}
+          {num('mid_cogs_max_pct', '%')}
+          {num('max_cogs_pct', '%')}
+        </div>
+        {!bandsOk && <div className="notice err">{t('ps.bandsOrder')}</div>}
+        <h2 style={{ marginTop: 20 }}>{t('ps.hoursTypes')}</h2>
+        <div className="checks">
+          {HOURS_TYPES.map((h) => (
+            <label key={h}>
+              <input type="checkbox" checked={p.hours_types.includes(h)} disabled={readOnly}
+                onChange={(e) => set({ hours_types: e.target.checked ? [...p.hours_types, h] : p.hours_types.filter((x) => x !== h) })} />
+              {t(`hours.${h}`)}
+            </label>
+          ))}
+        </div>
+        {plan !== null && !readOnly && (
+          <div className="row" style={{ marginTop: 16 }}>
+            <button className="primary" disabled={action.busy || !bandsOk} onClick={() => action.run(async () => {
+              await must(supabase.from('app_setting').update({ value: p }).eq('key', PLAN_KEY).select());
+              setPlan(null);
+            }, t('ui.saved'))}>{t('common.save')}</button>
+            <button className="ghost" onClick={() => setPlan(null)}>{t('common.cancel')}</button>
+          </div>
+        )}
+      </div>
+      <div className="card">
+        <h2>{t('ps.rankPct')}</h2>
+        <p className="muted small">{t('ps.rankPctHint')}</p>
+        <div className="table-wrap">
+          <table>
+            <thead><tr>
+              <th>{t('config.ranks')}</th>
+              <th className="num">{t('ps.bandLow', { max: p.low_cogs_max_pct })}</th>
+              <th className="num">{t('ps.bandMid', { min: p.low_cogs_max_pct, max: p.mid_cogs_max_pct })}</th>
+              <th className="num">{t('ps.bandHigh', { min: p.mid_cogs_max_pct, max: p.max_cogs_pct })}</th>
+              <th />
+            </tr></thead>
+            <tbody>
+              {data.data.ranks.filter((r) => r.active).map((r) => {
+                const changed = rankEdits[r.rank_id];
+                return (
+                  <tr key={r.rank_id} className={changed ? 'dirty' : ''}>
+                    <td>{rankName(r)}</td>
+                    {PCT_KEYS.map((k) => pctCell(r, k))}
+                    <td>{changed && !readOnly && (
+                      <div className="row">
+                        <button className="primary" disabled={action.busy} onClick={() => action.run(async () => {
+                          await must(supabase.from('rank').update(changed).eq('rank_id', r.rank_id).select());
+                          dropRankEdit(r.rank_id);
+                        }, t('ui.saved'))}>{t('common.save')}</button>
+                        <button className="ghost" onClick={() => dropRankEdit(r.rank_id)}>{t('common.cancel')}</button>
+                      </div>
+                    )}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </>
+  );
+}

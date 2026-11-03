@@ -64,9 +64,9 @@ visits and hours come in, so nobody fills in the bottom of the sheet at the end 
 
 Where the numbers come from:
 - Plan: `app_setting` `profit_share_plan` (JSON with every amount and threshold on the sheet,
-  editable on the Configuration page). `training_hours_off_revenue_per_hour` is false, as on the
+  editable on Configuration → Profit share, one field per value). `training_hours_off_revenue_per_hour` is false, as on the
   sheets (A13).
-- % per rank: `rank.share_pct_low_cogs` / `mid` / `high`. No % (Recruit, A12 default) = no share.
+- % per rank: `rank.share_pct_low_cogs` / `mid` / `high`, on the same tab. No % (Recruit, A12 default) = no share.
 - Rank: `shift_crew_member.rank_id_snapshot`, now kept current from the rank history until the
   route is accepted, then frozen as before.
 - Route inputs on `shift`: `fuel_mode` (one truck / split day / 2 trucks), `swing_truck`,

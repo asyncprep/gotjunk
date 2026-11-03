@@ -93,6 +93,13 @@ void main() {
     expect(ProfitSharePlan.fromSetting('not json').wagePerHour, 26);
   });
 
+  test('the short-day minimum follows the team size set by the admin', () {
+    final route = RouteShareInput(revenue: 1800, jobs: 4, dumps: 0, crew: [wingman(8), professional(8)], hoursType: 'regular_junk');
+    expect(computeProfitShare(plan, route).minRevenue, 1500, reason: 'team of 2 under 18 hours');
+    final threeOrMore = ProfitSharePlan.fromSetting('{"small_team_min_crew": 3}');
+    expect(computeProfitShare(threeOrMore, route).minRevenue, 2000);
+  });
+
   test('crew hours count from the route start to finish, leaving, or now', () {
     final start = DateTime.utc(2026, 10, 25, 12);
     final now = DateTime.utc(2026, 10, 25, 15, 30);

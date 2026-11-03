@@ -34,3 +34,22 @@ $q$, '%check%');
 select tests.login('a0000000-0000-0000-0000-000000000010');
 update shift set damages = true where shift_id = 'c0000000-0000-0000-0000-000000000001';
 select tests.ok((select damages from shift where shift_id = 'c0000000-0000-0000-0000-000000000001'), 'dispatch records damages');
+
+-- test: every plan value is in the setting, including the short-day team size
+select tests.eq((select (value ->> 'small_team_min_crew')::numeric from app_setting where key = 'profit_share_plan'), 2::numeric, 'team size');
+select tests.ok((select value ?& array['wage_per_hour', 'franchise_pct', 'fuel_pct', 'swing_truck_fee', 'min_revenue',
+  'min_revenue_per_hour', 'small_team_hours', 'small_team_min_revenue', 'training_min_revenue',
+  'training_min_revenue_per_hour', 'training_hours_max', 'training_hours_off_revenue_per_hour', 'low_cogs_max_pct',
+  'mid_cogs_max_pct', 'max_cogs_pct', 'hours_types'] from app_setting where key = 'profit_share_plan'), 'all keys present');
+
+-- test: only configuration rights change the plan and the % per rank
+select tests.login('a0000000-0000-0000-0000-000000000010');
+update app_setting set value = value || '{"wage_per_hour": 99}'::jsonb where key = 'profit_share_plan';
+update rank set share_pct_low_cogs = 99 where code = 'wingman';
+select tests.login('a0000000-0000-0000-0000-000000000020');
+select tests.eq((select (value ->> 'wage_per_hour')::numeric from app_setting where key = 'profit_share_plan'), 26::numeric, 'dispatcher cannot');
+select tests.eq((select share_pct_low_cogs from rank where code = 'wingman'), 3.00::numeric, 'dispatcher cannot');
+update app_setting set value = value || '{"wage_per_hour": 27}'::jsonb where key = 'profit_share_plan';
+update rank set share_pct_low_cogs = 3.5 where code = 'wingman';
+select tests.eq((select (value ->> 'wage_per_hour')::numeric from app_setting where key = 'profit_share_plan'), 27::numeric, 'admin with config rights');
+select tests.eq((select share_pct_low_cogs from rank where code = 'wingman'), 3.50::numeric, 'admin with config rights');
