@@ -57,60 +57,77 @@ class _ProfitShareCardState extends State<ProfitShareCard> {
         return Card(
           child: Padding(
             padding: const EdgeInsets.all(16),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-              Row(children: [
-                Expanded(child: Text(t.profitShare, style: text.titleSmall)),
-                Chip(label: Text(status), backgroundColor: statusColor, side: BorderSide.none),
-              ]),
-              for (final s in r.shares)
-                Padding(
-                  padding: const EdgeInsets.only(top: 6),
-                  child: Row(children: [
-                    Expanded(child: Text(s.name ?? '…', style: text.bodyLarge)),
-                    Text(s.pct == null ? t.psNoRank : pct(s.pct!), style: text.bodySmall),
-                    const SizedBox(width: 12),
-                    Text(money(context, s.amount), style: text.titleLarge?.copyWith(fontWeight: FontWeight.w600)),
-                  ]),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  children: [
+                    Expanded(child: Text(t.profitShare, style: text.titleSmall)),
+                    Chip(label: Text(status), backgroundColor: statusColor, side: BorderSide.none),
+                  ],
                 ),
-              if (r.blocks.isNotEmpty) ...[
-                const SizedBox(height: 8),
-                for (final b in r.blocks)
+                for (final s in r.shares)
                   Padding(
-                    padding: const EdgeInsets.only(top: 2),
-                    child: Row(children: [
-                      Icon(Icons.info_outline, size: 18, color: scheme.error),
-                      const SizedBox(width: 8),
-                      Expanded(child: Text(_block(context, t, r, b, data.plan))),
-                    ]),
+                    padding: const EdgeInsets.only(top: 6),
+                    child: Row(
+                      children: [
+                        Expanded(child: Text(s.name ?? '…', style: text.bodyLarge)),
+                        Text(s.pct == null ? t.psNoRank : pct(s.pct!), style: text.bodySmall),
+                        const SizedBox(width: 12),
+                        Text(money(context, s.amount), style: text.titleLarge?.copyWith(fontWeight: FontWeight.w600)),
+                      ],
+                    ),
                   ),
-              ],
-              const SizedBox(height: 12),
-              Wrap(spacing: 12, runSpacing: 8, children: [
-                _Figure(label: t.psRevenuePerHour, value: money(context, r.revenuePerHour)),
-                _Figure(label: t.psCogs, value: r.revenue > 0 ? pct(r.cogsPct) : '—'),
-                _Figure(label: t.psTeamHours, value: _hours(context, r.teamHours)),
-                _Figure(label: t.psAverageJob, value: money(context, r.averageJobSize)),
-              ]),
-              if (data.live) Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: Text(t.psLive, style: text.bodySmall),
-              ),
-              ExpansionTile(
-                tilePadding: EdgeInsets.zero,
-                title: Text(t.psDetails, style: text.labelLarge),
-                children: [
-                  _Line(t.revenue, money(context, r.revenue)),
-                  _Line(t.psWages(_hours(context, r.wageHours), money(context, data.plan.wagePerHour)), money(context, r.wages)),
-                  _Line(t.psDumps, money(context, r.dumps)),
-                  _Line(t.psFranchise(pct(data.plan.franchisePct)), money(context, r.franchise)),
-                  _Line(t.psFuel(pct(r.fuelPct)), money(context, r.fuel)),
-                  if (r.swingTruck > 0) _Line(t.psSwing, money(context, r.swingTruck)),
-                  _Line(t.psTotalCogs, money(context, r.cogs), bold: true),
-                  _Line(t.psCogs, r.revenue > 0 ? pct(r.cogsPct) : '—', bold: true),
+                if (r.blocks.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  for (final b in r.blocks)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 2),
+                      child: Row(
+                        children: [
+                          Icon(Icons.info_outline, size: 18, color: scheme.error),
+                          const SizedBox(width: 8),
+                          Expanded(child: Text(_block(context, t, r, b, data.plan))),
+                        ],
+                      ),
+                    ),
                 ],
-              ),
-              _RouteQuestions(repo: widget.repo, shiftId: widget.shiftId, data: data, editable: widget.editable),
-            ]),
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 8,
+                  children: [
+                    _Figure(label: t.psRevenuePerHour, value: money(context, r.revenuePerHour)),
+                    _Figure(label: t.psCogs, value: r.revenue > 0 ? pct(r.cogsPct) : '—'),
+                    _Figure(label: t.psTeamHours, value: _hours(context, r.teamHours)),
+                    _Figure(label: t.psAverageJob, value: money(context, r.averageJobSize)),
+                  ],
+                ),
+                if (data.live)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Text(t.psLive, style: text.bodySmall),
+                  ),
+                ExpansionTile(
+                  tilePadding: EdgeInsets.zero,
+                  title: Text(t.psDetails, style: text.labelLarge),
+                  children: [
+                    _Line(t.revenue, money(context, r.revenue)),
+                    _Line(
+                      t.psWages(_hours(context, r.wageHours), money(context, data.plan.wagePerHour)),
+                      money(context, r.wages),
+                    ),
+                    _Line(t.psDumps, money(context, r.dumps)),
+                    _Line(t.psFranchise(pct(data.plan.franchisePct)), money(context, r.franchise)),
+                    _Line(t.psFuel(pct(r.fuelPct)), money(context, r.fuel)),
+                    if (r.swingTruck > 0) _Line(t.psSwing, money(context, r.swingTruck)),
+                    _Line(t.psTotalCogs, money(context, r.cogs), bold: true),
+                    _Line(t.psCogs, r.revenue > 0 ? pct(r.cogsPct) : '—', bold: true),
+                  ],
+                ),
+                _RouteQuestions(repo: widget.repo, shiftId: widget.shiftId, data: data, editable: widget.editable),
+              ],
+            ),
           ),
         );
       },
@@ -118,13 +135,12 @@ class _ProfitShareCardState extends State<ProfitShareCard> {
   }
 
   String _block(BuildContext context, L10n t, ProfitShareResult r, ShareBlock b, ProfitSharePlan plan) => switch (b) {
-        ShareBlock.revenue => t.psBlockRevenue(money(context, r.revenue), money(context, r.minRevenue)),
-        ShareBlock.revenuePerHour =>
-          t.psBlockRph(money(context, r.revenuePerHour), money(context, r.minRevenuePerHour)),
-        ShareBlock.cogs => t.psBlockCogs(_percent(context)(plan.maxCogsPct)),
-        ShareBlock.damages => t.psBlockDamages,
-        ShareBlock.hoursType => t.psBlockHours,
-      };
+    ShareBlock.revenue => t.psBlockRevenue(money(context, r.revenue), money(context, r.minRevenue)),
+    ShareBlock.revenuePerHour => t.psBlockRph(money(context, r.revenuePerHour), money(context, r.minRevenuePerHour)),
+    ShareBlock.cogs => t.psBlockCogs(_percent(context)(plan.maxCogsPct)),
+    ShareBlock.damages => t.psBlockDamages,
+    ShareBlock.hoursType => t.psBlockHours,
+  };
 }
 
 /// "39,87 %" in French, "39.87%" in English.
@@ -147,10 +163,13 @@ class _Figure extends StatelessWidget {
     final text = Theme.of(context).textTheme;
     return SizedBox(
       width: 140,
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(value, style: text.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
-        Text(label, style: text.bodySmall),
-      ]),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(value, style: text.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
+          Text(label, style: text.bodySmall),
+        ],
+      ),
     );
   }
 }
@@ -166,10 +185,12 @@ class _Line extends StatelessWidget {
     final style = bold ? const TextStyle(fontWeight: FontWeight.w600) : null;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
-      child: Row(children: [
-        Expanded(child: Text(label, style: style)),
-        Text(value, style: style),
-      ]),
+      child: Row(
+        children: [
+          Expanded(child: Text(label, style: style)),
+          Text(value, style: style),
+        ],
+      ),
     );
   }
 }
@@ -188,46 +209,61 @@ class _RouteQuestions extends StatelessWidget {
     final route = data.route;
     final maxHours = data.plan.trainingHoursMax;
     final hourChoices = [for (var h = 0.0; h <= maxHours + 0.001; h += 0.5) h];
-    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      const Divider(),
-      Text(t.psForCalculation, style: Theme.of(context).textTheme.labelLarge),
-      const SizedBox(height: 8),
-      SegmentedButton<String>(
-        segments: [
-          ButtonSegment(value: 'one_truck', label: Text(t.psFuelOne)),
-          ButtonSegment(value: 'split_day', label: Text(t.psFuelSplit)),
-          ButtonSegment(value: 'two_trucks', label: Text(t.psFuelTwo)),
-        ],
-        selected: {route.fuelMode},
-        showSelectedIcon: false,
-        onSelectionChanged: editable ? (v) => repo.setFuelMode(shiftId, v.first) : null,
+    final fuelLabel = switch (route.fuelMode) {
+      'split_day' => t.psFuelSplit,
+      'two_trucks' => t.psFuelTwo,
+      _ => t.psFuelOne,
+    };
+    // Answered once a day: folded away, with the current answers in the subtitle.
+    return ExpansionTile(
+      tilePadding: EdgeInsets.zero,
+      childrenPadding: const EdgeInsets.only(bottom: 8),
+      expandedCrossAxisAlignment: CrossAxisAlignment.stretch,
+      title: Text(t.psForCalculation, style: Theme.of(context).textTheme.labelLarge),
+      subtitle: Text(
+        [
+          fuelLabel,
+          if (route.swingTruck) t.psSwing,
+          if (route.trainingDay) '${t.psTrainingDay} (${_hours(context, route.trainingHoursRemoved)} h)',
+        ].join(' · '),
       ),
-      SwitchListTile(
-        contentPadding: EdgeInsets.zero,
-        title: Text(t.psSwingUsed),
-        value: route.swingTruck,
-        onChanged: editable ? (v) => repo.setSwingTruck(shiftId, v) : null,
-      ),
-      SwitchListTile(
-        contentPadding: EdgeInsets.zero,
-        title: Text(t.psTrainingDay),
-        value: route.trainingDay,
-        onChanged: editable
-            ? (v) => repo.setTraining(shiftId, day: v, hoursRemoved: v ? route.trainingHoursRemoved : 0)
-            : null,
-      ),
-      if (route.trainingDay)
-        Row(children: [
-          Expanded(child: Text(t.psTrainingHours)),
-          DropdownButton<double>(
-            value: hourChoices.contains(route.trainingHoursRemoved) ? route.trainingHoursRemoved : null,
-            items: [
-              for (final h in hourChoices)
-                DropdownMenuItem(value: h, child: Text(_hours(context, h))),
+      children: [
+        SegmentedButton<String>(
+          segments: [
+            ButtonSegment(value: 'one_truck', label: Text(t.psFuelOne)),
+            ButtonSegment(value: 'split_day', label: Text(t.psFuelSplit)),
+            ButtonSegment(value: 'two_trucks', label: Text(t.psFuelTwo)),
+          ],
+          selected: {route.fuelMode},
+          showSelectedIcon: false,
+          onSelectionChanged: editable ? (v) => repo.setFuelMode(shiftId, v.first) : null,
+        ),
+        SwitchListTile(
+          contentPadding: EdgeInsets.zero,
+          title: Text(t.psSwingUsed),
+          value: route.swingTruck,
+          onChanged: editable ? (v) => repo.setSwingTruck(shiftId, v) : null,
+        ),
+        SwitchListTile(
+          contentPadding: EdgeInsets.zero,
+          title: Text(t.psTrainingDay),
+          value: route.trainingDay,
+          onChanged: editable
+              ? (v) => repo.setTraining(shiftId, day: v, hoursRemoved: v ? route.trainingHoursRemoved : 0)
+              : null,
+        ),
+        if (route.trainingDay)
+          Row(
+            children: [
+              Expanded(child: Text(t.psTrainingHours)),
+              DropdownButton<double>(
+                value: hourChoices.contains(route.trainingHoursRemoved) ? route.trainingHoursRemoved : null,
+                items: [for (final h in hourChoices) DropdownMenuItem(value: h, child: Text(_hours(context, h)))],
+                onChanged: editable ? (h) => repo.setTraining(shiftId, day: true, hoursRemoved: h ?? 0) : null,
+              ),
             ],
-            onChanged: editable ? (h) => repo.setTraining(shiftId, day: true, hoursRemoved: h ?? 0) : null,
           ),
-        ]),
-    ]);
+      ],
+    );
   }
 }

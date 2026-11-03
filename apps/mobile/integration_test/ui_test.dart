@@ -107,9 +107,13 @@ void main() {
     expect(find.text('Tableau de bord'), findsOneWidget);
     expect(find.textContaining('Hors ligne'), findsOneWidget, reason: 'no sync configured in tests');
 
-    await tester.scrollUntilVisible(find.text('Soumettre la route'), 300);
+    await reveal(tester, find.text('Partage des profits'));
+    expect(find.text('Partage des profits'), findsOneWidget);
+    await reveal(tester, find.text('Dépotoir'));
     expect(find.text('Dépotoir'), findsOneWidget);
+    await reveal(tester, find.text('Comptant'));
     expect(find.text('Comptant'), findsOneWidget);
+    await reveal(tester, find.text('Soumettre la route'));
   });
 
   testWidgets('add a job through the form; the scoreboard updates', (tester) async {
@@ -117,6 +121,7 @@ void main() {
     await tester.pumpWidget(app(const Locale('en')));
     await settle(tester);
 
+    await reveal(tester, find.text('Add a job'));
     await tester.tap(find.text('Add a job'));
     await settle(tester);
     await tester.enterText(find.widgetWithText(TextFormField, 'Opportunity ID'), 'OPP-77');
@@ -133,8 +138,10 @@ void main() {
     await tester.tap(find.widgetWithText(FilledButton, 'Save'));
     await settle(tester);
 
+    await reveal(tester, find.text('OPP-77'));
     expect(find.text('OPP-77'), findsOneWidget);
     expect(find.text('\$200.00'), findsWidgets);
+    await reveal(tester, find.text('Tips per person'), step: -300);
     expect(find.text('\$10.00'), findsNWidgets(2), reason: "each crew member's half of the tip");
   });
 
@@ -142,6 +149,7 @@ void main() {
     await seed();
     await tester.pumpWidget(app(const Locale('en')));
     await settle(tester);
+    await reveal(tester, find.text('Add a job'));
     await tester.tap(find.text('Add a job'));
     await settle(tester);
     await tester.enterText(find.widgetWithText(TextFormField, 'Opportunity ID'), 'OPP-1');
@@ -245,6 +253,9 @@ void main() {
     expect(find.text('No % for this rank'), findsNWidgets(2), reason: 'the seed crew has no rank yet');
     expect(find.textContaining('Live: hours count up to now'), findsOneWidget);
 
+    await reveal(tester, find.text('For the calculation'));
+    await tester.tap(find.text('For the calculation'));
+    await settle(tester);
     await reveal(tester, find.text('2 trucks'));
     await tester.tap(find.text('2 trucks'));
     await settle(tester);
@@ -278,6 +289,7 @@ void main() {
     await tester.tap(find.widgetWithText(FilledButton, 'Take over').last);
     await settle(tester);
     expect(find.text('Take over'), findsNothing);
+    await reveal(tester, find.text('Add a job'));
     expect(find.text('Add a job'), findsOneWidget);
   });
 
@@ -299,6 +311,7 @@ void main() {
     expect(find.textContaining('not sent to the server yet'), findsOneWidget);
     await tester.tap(find.text('Stay signed in'));
     await settle(tester);
+    await reveal(tester, find.text('UNSENT'));
     expect(find.text('UNSENT'), findsOneWidget, reason: 'still signed in, nothing wiped');
   });
 }
