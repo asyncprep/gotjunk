@@ -64,3 +64,9 @@ select tests.login('a0000000-0000-0000-0000-000000000010');
 update shift_crew_member set position = 'onboarding'
  where shift_crew_id = (select shift_crew_id from shift_crew_member where position = 'navigator' limit 1);
 select tests.eq((select count(*) from shift_crew_member where position = 'onboarding'), 1::bigint, 'dispatcher sets onboarding');
+
+-- test: the tracker's route list is loaded, readable by dispatch, editable only with config rights
+select tests.login('a0000000-0000-0000-0000-000000000010');
+select tests.eq((select count(*) from route_name where active), 42::bigint, 'the 42 tracker routes');
+update route_name set active = false where name = 'TR2';
+select tests.eq((select count(*) from route_name where active), 42::bigint, 'dispatch cannot change the route list');
