@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from './lib/auth';
 import { supabase } from './lib/supabase';
 import { setLanguage } from './i18n';
+import './i18n.stripe';
 import Login from './pages/Login';
 import SetPassword from './pages/SetPassword';
 // Pages load on demand so the sign-in screen and first page arrive quickly.
@@ -13,6 +14,7 @@ const Config = lazy(() => import('./pages/Config'));
 const Team = lazy(() => import('./pages/Team'));
 const Audit = lazy(() => import('./pages/Audit'));
 const Project = lazy(() => import('./pages/Project'));
+const Payments = lazy(() => import('./pages/Payments'));
 import Brand from './components/Brand';
 import Toasts from './components/Toasts';
 
@@ -35,6 +37,9 @@ export default function App() {
     );
   }
 
+  // The Stripe function only answers administration.
+  const canReadStripe = role === 'admin' || role === 'senior_ops';
+
   return (
     <>
       <Toasts />
@@ -45,6 +50,7 @@ export default function App() {
           <NavLink to="/config">{t('nav.config')}</NavLink>
           <NavLink to="/team">{t('nav.team')}</NavLink>
           <NavLink to="/audit">{t('nav.audit')}</NavLink>
+          {canReadStripe && <NavLink to="/payments">{t('nav.payments')}</NavLink>}
           <NavLink to="/project">{t('nav.project')}</NavLink>
         </nav>
         <span className="spacer" />
@@ -68,6 +74,7 @@ export default function App() {
           <Route path="/team" element={<Team />} />
           <Route path="/audit" element={<Audit />} />
           <Route path="/project" element={<Project />} />
+          {canReadStripe && <Route path="/payments" element={<Payments />} />}
           <Route path="*" element={<Board />} />
         </Routes>
         </Suspense>
