@@ -12,7 +12,7 @@ The crew app replaces the paper route sheet. You enter your route on the truck's
 
 ## Signing in and finding your route
 
-1. Open **GOT-JUNK Équipe** on the truck's phone.
+1. Open **GOT-Crew** on the truck's phone.
 2. Sign in with the email and password you set from your invitation.
 3. **Route du jour (Today's route)** shows your truck, phone, crew with each person's position (Driver, Navigator or Onboarding) and status.
 

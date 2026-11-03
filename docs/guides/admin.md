@@ -8,7 +8,7 @@ Truck Team OS replaces the paper route sheet. Crews fill in their route on the t
 
 | Part | Who uses it | Where |
 | --- | --- | --- |
-| Crew app | Truck team members (crew lead on the truck's phone) | iPhone app "GOT-JUNK Équipe" (TestFlight during the pilot) |
+| Crew app | Truck team members (crew lead on the truck's phone) | iPhone app "GOT-Crew" (TestFlight during the pilot, then installed on the truck phones by Mosyle) |
 | Web admin | Dispatchers, administration, senior ops | https://gotjunk.innodigital.ca |
 | Database | Everyone, through the two apps | Supabase, Canada (Montréal region) |
 
