@@ -18,7 +18,7 @@ The product specification (v0.3) is a client document and is not stored in this 
 | `tools/dbtest/` | Test runner: migrations + tests in PGlite, no Docker needed |
 | `apps/mobile/` | Flutter crew app (iPhone; also runs on Android for development): `flutter run` (sync needs `--dart-define=POWERSYNC_URL=…`, see [docs/powersync-setup.md](docs/powersync-setup.md)) |
 | `apps/admin/` | React dispatch/admin web app: `npm install && npm run dev` (needs `.env.local`, see `.env.example`) |
-| `supabase/functions/` | Edge Functions (`invite-user`), deployed with the migrations |
+| `supabase/functions/` | Edge Functions (`invite-user`, `stripe-day`), deployed with the migrations |
 
 ## Tests
 

@@ -419,3 +419,8 @@ enabled = true
 enabled = true
 verify_jwt = true
 entrypoint = "./functions/invite-user/index.ts"
+
+[functions.stripe-day]
+enabled = true
+verify_jwt = true
+entrypoint = "./functions/stripe-day/index.ts"
