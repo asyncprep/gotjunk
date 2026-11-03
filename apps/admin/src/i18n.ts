@@ -28,6 +28,16 @@ const fr = {
   },
   position: { label: 'Poste', pick: 'Poste…', driver: 'Chauffeur', navigator: 'Navigateur', oneDriver: 'Choisissez un poste pour chaque membre, avec un seul chauffeur.' },
   hours: { regular_junk: 'Heures junk régulières', warehouse: 'Heures entrepôt', non_junk: 'Heures non-junk' },
+  paste: {
+    open: 'Coller depuis le tableau', title: 'Coller les routes du tableau',
+    help: 'Dans votre fichier, sélectionnez les lignes des routes (de ROUTE à END TIME, avec ou sans l’en-tête), copiez, puis collez ici. Les routes sont créées pour la date affichée. Collez de nouveau en fin de journée pour ajouter les heures de fin.',
+    placeholder: 'Collez ici (Ctrl+V)', nothing: 'Aucune route trouvée : copiez les colonnes ROUTE, PHONE, TRUCK, POSITION, NAME et START TIME.',
+    route: 'Route', result: 'Ce qui sera fait', willCreate: 'Nouvelle route', willUpdate: 'Mise à jour (heures, équipe)',
+    created: 'Route créée', updated: 'Route mise à jour', twoTrucks: '2 camions', choose: 'Choisir…',
+    unknownTruck: 'Camion inconnu : {{name}}', unknownPhone: 'Téléphone inconnu : {{name}}', unknownPerson: 'Personne inconnue : {{name}}',
+    frozen: 'Route déjà acceptée : rouvrez-la pour la modifier',
+    apply_one: 'Appliquer {{count}} route', apply_other: 'Appliquer {{count}} routes',
+  },
   board: {
     title: 'Routes du jour', newShift: 'Nouvelle route', truck: 'Camion', phone: 'Téléphone', crew: 'Équipe',
     status: 'Statut', revenue: 'Revenus', jobs: 'Travaux', issues: 'À régler', create: 'Créer la route',
@@ -181,6 +191,16 @@ const en: Dict = {
   },
   position: { label: 'Position', pick: 'Position…', driver: 'Driver', navigator: 'Navigator', oneDriver: 'Pick a position for each member, with exactly one driver.' },
   hours: { regular_junk: 'Regular junk hours', warehouse: 'Warehouse hours', non_junk: 'Non-junk hours' },
+  paste: {
+    open: 'Paste from tracker', title: 'Paste routes from the tracker',
+    help: 'In your file, select the route rows (ROUTE to END TIME, with or without the header), copy, then paste here. Routes are created for the date shown. Paste again at the end of the day to add the end times.',
+    placeholder: 'Paste here (Ctrl+V)', nothing: 'No routes found: copy the ROUTE, PHONE, TRUCK, POSITION, NAME and START TIME columns.',
+    route: 'Route', result: 'What will happen', willCreate: 'New route', willUpdate: 'Update (times, crew)',
+    created: 'Route created', updated: 'Route updated', twoTrucks: '2 trucks', choose: 'Choose…',
+    unknownTruck: 'Unknown truck: {{name}}', unknownPhone: 'Unknown phone: {{name}}', unknownPerson: 'Unknown person: {{name}}',
+    frozen: 'Route already accepted: reopen it to change it',
+    apply_one: 'Apply {{count}} route', apply_other: 'Apply {{count}} routes',
+  },
   board: {
     title: 'Routes', newShift: 'New route', truck: 'Truck', phone: 'Phone', crew: 'Crew',
     status: 'Status', revenue: 'Revenue', jobs: 'Jobs', issues: 'To fix', create: 'Create route',

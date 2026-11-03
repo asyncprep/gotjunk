@@ -3,12 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { businessToday, money, must, supabase, time, type Position, type ShiftStatus } from '../lib/supabase';
 import { useAction, useLoad } from '../lib/hooks';
+import PasteRoutes from '../components/PasteRoutes';
 
 type BoardShift = {
   shift_id: string;
   status: ShiftStatus;
   truck_id: string;
   phone_id: string;
+  route_code: string | null;
   truck: { unit_number: string } | null;
   phone: { label: string } | null;
   lead_employee_id: string | null;
@@ -33,7 +35,7 @@ async function loadBoard(date: string): Promise<BoardShift[]> {
   const shifts = await must(
     supabase
       .from('shift')
-      .select('shift_id, status, truck_id, phone_id, lead_employee_id, truck:truck_id(unit_number), phone:phone_id(label), crew:shift_crew_member(employee_id, left_at, position, employee:employee_id(full_name))')
+      .select('shift_id, status, truck_id, phone_id, route_code, lead_employee_id, truck:truck_id(unit_number), phone:phone_id(label), crew:shift_crew_member(employee_id, left_at, position, employee:employee_id(full_name))')
       .eq('shift_date', date)
       .neq('status', 'archived'),
   ) as unknown as Omit<BoardShift, 'revenue' | 'jobs' | 'errors'>[];
@@ -66,6 +68,7 @@ export default function Board() {
   const [date, setDate] = useState(businessToday());
   const [group, setGroup] = useState<Group>('all');
   const [showNew, setShowNew] = useState(false);
+  const [showPaste, setShowPaste] = useState(false);
   const [updatedAt, setUpdatedAt] = useState<string>(new Date().toISOString());
   const board = useLoad(async () => {
     const data = await loadBoard(date);
@@ -104,8 +107,13 @@ export default function Board() {
           {t('ui.updatedAt', { time: time(updatedAt, i18n.language) })}{' '}
           <button className="link" onClick={() => board.reload(true)}>{t('ui.refresh')}</button>
         </span>
-        <button className="go right" onClick={() => setShowNew((v) => !v)}>+ {t('board.newShift')}</button>
+        <button className="right" onClick={() => { setShowPaste((v) => !v); setShowNew(false); }}>{t('paste.open')}</button>
+        <button className="go" onClick={() => { setShowNew((v) => !v); setShowPaste(false); }}>+ {t('board.newShift')}</button>
       </div>
+
+      {showPaste && (
+        <PasteRoutes date={date} existing={all} onDone={() => board.reload(true)} onCancel={() => setShowPaste(false)} />
+      )}
 
       {showNew && (
         <NewShift
@@ -149,7 +157,7 @@ export default function Board() {
                     <tr key={s.shift_id} className="clickable" tabIndex={0}
                       onClick={() => navigate(`/shift/${s.shift_id}`)}
                       onKeyDown={(e) => e.key === 'Enter' && navigate(`/shift/${s.shift_id}`)}>
-                      <td><strong>{s.truck?.unit_number}</strong></td>
+                      <td>{s.route_code && <span className="muted">{s.route_code} · </span>}<strong>{s.truck?.unit_number}</strong></td>
                       <td>{s.phone?.label}</td>
                       <td>{s.crew.filter((c) => !c.left_at)
                         .map((c) => `${c.employee?.full_name ?? ''} (${t(`position.${c.position}`)})${c.employee_id === s.lead_employee_id ? ' ★' : ''}`).join(', ')}</td>
