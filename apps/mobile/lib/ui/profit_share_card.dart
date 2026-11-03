@@ -22,8 +22,18 @@ class ProfitShareCard extends StatefulWidget {
 }
 
 class _ProfitShareCardState extends State<ProfitShareCard> {
-  late final Stream<ProfitShareData?> _data = widget.repo.profitShareData(widget.shiftId);
+  late Stream<ProfitShareData?> _data = widget.repo.profitShareData(widget.shiftId);
   late final Timer _tick;
+
+  // The home screen moves to another route (e.g. today's syncs in after one left open from an
+  // earlier day) without rebuilding this card: follow it.
+  @override
+  void didUpdateWidget(ProfitShareCard old) {
+    super.didUpdateWidget(old);
+    if (old.shiftId != widget.shiftId || old.repo != widget.repo) {
+      _data = widget.repo.profitShareData(widget.shiftId);
+    }
+  }
 
   @override
   void initState() {

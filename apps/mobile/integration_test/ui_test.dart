@@ -270,6 +270,29 @@ void main() {
     expect(find.text('Fuel (7%)'), findsOneWidget);
   });
 
+  testWidgets('the profit share card follows the route on screen when today\'s arrives after an older open one', (tester) async {
+    await seed(status: 'archived');
+    await db.writeTransaction((tx) async {
+      await tx.execute("INSERT INTO employee (id, full_name) VALUES ('e3', 'Old Mate')");
+      await tx.execute(
+          "INSERT INTO shift (id, shift_date, status, truck_id, phone_id, hours_type, start_time, lead_employee_id) VALUES ('s-old', '2026-10-29', 'in_progress', 't1', 'p1', 'regular_junk', '2026-10-29 12:00:00Z', 'e1')");
+      await tx.execute(
+          "INSERT INTO shift_crew_member (id, shift_id, employee_id, joined_at, position) VALUES ('o1', 's-old', 'e1', '2020-01-01 00:00:00Z', 'driver'), ('o2', 's-old', 'e3', '2020-01-01 00:00:00Z', 'navigator')");
+    });
+    await tester.pumpWidget(app(const Locale('en')));
+    await settle(tester);
+    await reveal(tester, find.text('Profit share'));
+    expect(find.text('Old Mate'), findsOneWidget, reason: 'only the older route is open yet');
+
+    // Today's route syncs in; the screen moves to it.
+    await db.execute("UPDATE shift SET status = 'in_progress' WHERE id = ?", [shiftId]);
+    await settle(tester);
+    await reveal(tester, find.text('Crew Two'));
+    expect(find.text('Crew Two'), findsOneWidget);
+    expect(find.text('Old Mate'), findsNothing);
+    expect(find.textContaining('Old Mate'), findsNothing, reason: 'nor on the crew line');
+  });
+
   testWidgets('a crew member who is not the lead sees the shift read-only', (tester) async {
     await seed(lead: 'e2');
     await tester.pumpWidget(app(const Locale('en')));
