@@ -16,9 +16,7 @@ This file only records the answers received so far, so they are also in the repo
 | A12 | Which ranks exist? Do Recruits get profit share? Are Expert and JR Coach one rank or two? |
 | A13 | How are the trainer's 3 hours removed, and who records damages? |
 | A14 | Donation credit: $75 per 1,000 kg, or what the Oct 25 sheet shows (about $10)? |
-| F9 | Are card payments taken with Helcim, Stripe, or both? |
 | S12 | Which GOT-JUNK address sends invitations, and can we get its SMTP settings? |
-| F8 | How can a Stripe payment be linked to the crew who did the job, without anyone typing anything? (Payments carry the Opportunity ID, but the crew types it today. Does HQ know which truck did each job? Is the card reader or payment link tied to a truck or phone? Does the payment carry anything identifying the truck or crew?) |
 | F10 | Can dispatch get today's jobs per truck out of Pipeline without typing? (A Salesforce report with Opportunity ID, truck or crew, address and time, exported to CSV or emailed each morning. Can we get a sample? Failing that, read-only API access to those fields from HQ?) |
 
 ## Answers received (as of Nov 2, 2026)
@@ -33,8 +31,10 @@ This file only records the answers received so far, so they are also in the repo
 | S7 | Who maintains the system after launch? | Khalil |
 | S8 | Upgrade hosting to paid plans before the pilot? | Later |
 | H2 | Can a truck run two shifts the same day? | Yes |
-| F1 | Stripe API keys and webhooks? | Stripe is a sub-account of HQ; API keys can be created |
-| F2 | What do Stripe payments carry? | Opportunity ID, GST (TPS) and the pre-tax amount |
+| F1 | Stripe API keys and webhooks? | Stripe is a sub-account of HQ; API keys can be created. Checked Nov 3: a read-only restricted key works |
+| F2 | What do Stripe payments carry? | Checked in Stripe (Nov 3): Opportunity ID, tip, and the HQ app login of the crew member who took the payment. Amount = total with tax + tip; pre-tax = (amount − tip) ÷ 1.14975 |
+| F8 | Link a Stripe payment to the crew with no manual input? | From Stripe (Nov 3): the HQ app login on each payment, plus the day's crew list, gives the route and crew. Card readers don't (many cards are typed in). Needs each employee's HQ login in the system; cash jobs never reach Stripe |
+| F9 | Helcim, Stripe, or both? | Stripe only, as far as the data shows: all Oct 25 card jobs are in Stripe; the Helcim column is empty |
 | F3 | Export of what crews enter in the HQ app? | No |
 | P4 | US region for the offline-sync service during the pilot? | Accepted for the pilot |
 | R1 | Profit-share % by rank, by margin tier, or both? | Both: rank × COGS % band (profit-share sheet, Aug 2024) |
