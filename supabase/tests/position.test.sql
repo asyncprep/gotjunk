@@ -53,3 +53,8 @@ select tests.login('a0000000-0000-0000-0000-000000000010');
 select tests.eq((select position::text from shift_crew_member
                  where shift_id = 'c0000000-0000-0000-0000-000000000001' and employee_id = 'b0000000-0000-0000-0000-000000000001'),
                 'navigator', 'crew change matched no row');
+
+-- test: dispatch names the route (tracker paste); the crew can't
+select tests.login('a0000000-0000-0000-0000-000000000010');
+update shift set route_code = 'C1' where shift_id = (select shift_id from shift order by shift_date desc limit 1);
+select tests.eq((select count(*) from shift where route_code = 'C1'), 1::bigint, 'dispatcher sets the route name');
