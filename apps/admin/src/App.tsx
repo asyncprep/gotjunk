@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from './lib/auth';
 import { supabase } from './lib/supabase';
 import { setLanguage } from './i18n';
-import './i18n.stripe';
 import Login from './pages/Login';
 import SetPassword from './pages/SetPassword';
 // Pages load on demand so the sign-in screen and first page arrive quickly.

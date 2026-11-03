@@ -8,7 +8,7 @@ const fr = {
     dragHandle: 'Déplacer', updatedAt: 'Mis à jour à {{time}}', refresh: 'Actualiser', unsaved: 'Modifications non enregistrées',
     codeAuto: 'Généré automatiquement si vide',
   },
-  nav: { board: 'Tableau', config: 'Configuration', team: 'Équipe', audit: 'Journal', project: 'Projet', signOut: 'Se déconnecter' },
+  nav: { board: 'Tableau', config: 'Configuration', team: 'Équipe', audit: 'Journal', project: 'Projet', payments: 'Paiements', signOut: 'Se déconnecter' },
   common: {
     save: 'Enregistrer', cancel: 'Annuler', add: 'Ajouter', loading: 'Chargement…', none: 'Aucun',
     active: 'Actif', inactive: 'Inactif', yes: 'Oui', no: 'Non', name: 'Nom', code: 'Code', back: 'Retour',
@@ -139,6 +139,17 @@ const fr = {
     answerPlaceholder: 'Réponse du client…', resolutionPlaceholder: 'Comment c’est réglé…',
   },
   audit: { title: 'Journal d’audit', when: 'Quand', record: 'Enregistrement', action: 'Action', by: 'Par', reason: 'Raison', changes: 'Changements', exportTitle: 'Exporter les routes', fromDate: 'Du', toDate: 'Au' },
+  stripe: {
+    title: 'Paiements Stripe',
+    intro: 'Lecture seule : les paiements Stripe du jour, à côté de la job qui a le même numéro d’opportunité dans l’application. Avant taxes = (montant − pourboire) ÷ 1,14975.',
+    error: 'Lecture de Stripe impossible :',
+    byLogin: 'Par connexion HQ', login: 'Connexion HQ', payments: 'Paiements', none: 'Aucun paiement réussi ce jour-là.',
+    list_one: '{{count}} paiement', list_other: '{{count}} paiements',
+    time: 'Heure', opportunity: 'No d’opportunité', amount: 'Montant', tip: 'Pourboire', preTax: 'Avant taxes',
+    status: 'Statut', method: 'Carte', reader: 'Terminal', typed: 'Saisie manuelle', refunded: 'remboursé',
+    inApp: 'Dans l’application', notInApp: 'Pas encore saisie', differs: 'l’application dit {{amount}}',
+    st_succeeded: 'Réussi', st_failed: 'Échoué', st_pending: 'En attente',
+  },
 };
 
 type Dict = typeof fr;
@@ -150,7 +161,7 @@ const en: Dict = {
     dragHandle: 'Move', updatedAt: 'Updated at {{time}}', refresh: 'Refresh', unsaved: 'Unsaved changes',
     codeAuto: 'Generated automatically if empty',
   },
-  nav: { board: 'Board', config: 'Configuration', team: 'Team', audit: 'Audit log', project: 'Project', signOut: 'Sign out' },
+  nav: { board: 'Board', config: 'Configuration', team: 'Team', audit: 'Audit log', project: 'Project', payments: 'Payments', signOut: 'Sign out' },
   common: {
     save: 'Save', cancel: 'Cancel', add: 'Add', loading: 'Loading…', none: 'None',
     active: 'Active', inactive: 'Inactive', yes: 'Yes', no: 'No', name: 'Name', code: 'Code', back: 'Back',
@@ -281,6 +292,17 @@ const en: Dict = {
     answerPlaceholder: 'Client answer…', resolutionPlaceholder: 'How it was settled…',
   },
   audit: { title: 'Audit log', when: 'When', record: 'Record', action: 'Action', by: 'By', reason: 'Reason', changes: 'Changes', exportTitle: 'Export routes', fromDate: 'From', toDate: 'To' },
+  stripe: {
+    title: 'Stripe payments',
+    intro: 'Read-only: the day’s Stripe payments, next to the job with the same Opportunity ID in the app. Pre-tax = (amount − tip) ÷ 1.14975.',
+    error: 'Couldn’t read Stripe:',
+    byLogin: 'By HQ login', login: 'HQ login', payments: 'Payments', none: 'No successful payments that day.',
+    list_one: '{{count}} payment', list_other: '{{count}} payments',
+    time: 'Time', opportunity: 'Opportunity ID', amount: 'Amount', tip: 'Tip', preTax: 'Pre-tax',
+    status: 'Status', method: 'Card', reader: 'Reader', typed: 'Typed in', refunded: 'refunded',
+    inApp: 'In the app', notInApp: 'Not entered yet', differs: 'the app says {{amount}}',
+    st_succeeded: 'Succeeded', st_failed: 'Failed', st_pending: 'Pending',
+  },
 };
 
 function storedLanguage(): string {
