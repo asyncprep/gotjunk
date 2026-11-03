@@ -79,3 +79,8 @@ No third-party advertising or analytics SDKs.
 
 Sign-in information: a demo crew login, entered by Khalil in App Store Connect (never stored in
 the repository). The demo account needs a demo route on each day of the review.
+
+## Screenshots
+
+`docs/app-store-screenshots/` (1290 × 2796, iPhone 6.9"), in French, from the demo route of Nov 3, 2026:
+route and scoreboard, profit share, jobs, dump visit with cash and Submit.
