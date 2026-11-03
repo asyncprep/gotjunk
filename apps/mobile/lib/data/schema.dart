@@ -33,7 +33,7 @@ const schema = Schema([
     Column.text('employee_id'),
     Column.text('joined_at'),
     Column.text('left_at'),
-    Column.text('position'), // driver | navigator, set by dispatch
+    Column.text('position'), // driver | navigator | onboarding, set by dispatch
     Column.text('rank_id_snapshot'), // rank on the route date (kept current until acceptance)
     Column.real('tip_override'), // tip split set by dispatch
   ], indexes: [

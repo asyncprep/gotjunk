@@ -352,6 +352,7 @@ class _ShiftHeader extends StatelessWidget {
                   final position = switch (m['position']) {
                     'driver' => t.positionDriver,
                     'navigator' => t.positionNavigator,
+                    'onboarding' => t.positionOnboarding,
                     _ => null,
                   };
                   return position == null ? '${m['full_name'] ?? '…'}' : '${m['full_name'] ?? '…'} ($position)';

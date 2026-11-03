@@ -955,6 +955,12 @@ abstract class L10n {
   /// **'Navigateur'**
   String get positionNavigator;
 
+  /// No description provided for @positionOnboarding.
+  ///
+  /// In fr, this message translates to:
+  /// **'Intégration'**
+  String get positionOnboarding;
+
   /// No description provided for @profitShare.
   ///
   /// In fr, this message translates to:

@@ -481,6 +481,9 @@ class L10nFr extends L10n {
   String get positionNavigator => 'Navigateur';
 
   @override
+  String get positionOnboarding => 'Intégration';
+
+  @override
   String get profitShare => 'Partage des profits';
 
   @override

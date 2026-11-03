@@ -474,6 +474,9 @@ class L10nEn extends L10n {
   String get positionNavigator => 'Navigator';
 
   @override
+  String get positionOnboarding => 'Onboarding';
+
+  @override
   String get profitShare => 'Profit share';
 
   @override
