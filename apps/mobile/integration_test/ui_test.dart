@@ -201,8 +201,10 @@ void main() {
     await tester.pumpWidget(app(const Locale('en')));
     await settle(tester);
 
-    await tester.scrollUntilVisible(find.text('Submit route'), 300);
-    await tester.tap(find.text('Submit route'));
+    await reveal(tester, find.text('Submit route'));
+    await tester.ensureVisible(find.text('Submit route'));
+    await settle(tester);
+    await tester.tap(find.text('Submit route').hitTestable());
     await settle(tester);
     expect(find.text('Fix before submitting:'), findsOneWidget);
     expect(find.text('Cash photo missing'), findsOneWidget);
@@ -215,8 +217,10 @@ void main() {
     await seed();
     await tester.pumpWidget(app(const Locale('en')));
     await settle(tester);
-    await tester.scrollUntilVisible(find.text('Submit route'), 300);
-    await tester.tap(find.text('Submit route'));
+    await reveal(tester, find.text('Submit route'));
+    await tester.ensureVisible(find.text('Submit route'));
+    await settle(tester);
+    await tester.tap(find.text('Submit route').hitTestable());
     await settle(tester);
     expect(find.textContaining("won't be able to change it"), findsOneWidget);
     await tester.tap(find.widgetWithText(FilledButton, 'Submit route').last);
