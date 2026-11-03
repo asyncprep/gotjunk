@@ -8,6 +8,8 @@ import 'package:integration_test/integration_test.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:powersync/powersync.dart';
+import 'package:truck_team_os/data/profit_share.dart';
+import 'package:truck_team_os/data/profit_share_repo.dart';
 import 'package:truck_team_os/data/repo.dart';
 import 'package:truck_team_os/data/schema.dart';
 
@@ -243,6 +245,44 @@ void main() {
     expect(await repo.currentShift(me).first, isNull);
     await db.execute("UPDATE shift SET status = 'returned', return_reason = 'Fix ticket' WHERE id = ?", [shiftId]);
     expect((await repo.currentShift(me).first)?['return_reason'], 'Fix ticket');
+  });
+
+  testWidgets('profit share is calculated live from the route on the phone', (_) async {
+    await db.writeTransaction((tx) async {
+      await tx.execute(
+          "INSERT INTO rank (id, code, share_pct_low_cogs, share_pct_mid_cogs, share_pct_high_cogs) VALUES "
+          "('k-w', 'wingman', 3, 2, 1), ('k-r', 'recruit', NULL, NULL, NULL)");
+      await tx.execute("UPDATE shift_crew_member SET rank_id_snapshot = 'k-w' WHERE id = 'm-1'");
+      await tx.execute("UPDATE shift_crew_member SET rank_id_snapshot = 'k-r' WHERE id = 'm-2'");
+      await tx.execute('''INSERT INTO app_setting (id, value) VALUES ('profit_share_plan', '{"wage_per_hour": 26}')''');
+    });
+    await repo.startShift(shiftId, 'regular_junk');
+    await repo.saveJob(JobDraft(shiftId: shiftId, opportunityId: 'OPP-1', outcome: 'completed',
+        paymentMethod: 'card', preTax: 3000, total: 3449.25, tip: 0));
+    await repo.saveJob(JobDraft(shiftId: shiftId, opportunityId: 'OPP-2', outcome: 'cancelled_pending'));
+
+    final data = (await repo.profitShareData(shiftId).first)!;
+    expect(data.live, isTrue, reason: 'started, not finished');
+    // Ten hours into the day: 2 × 10 h × 26 + 16% + 4% of 3,000 = 1,120 → 37.33% COGS.
+    final r = data.compute(data.start!.add(const Duration(hours: 10)));
+    expect(r.teamHours, closeTo(20, 0.01));
+    expect(r.revenue, 3000);
+    expect(r.cancelRate, 0.5);
+    expect(r.band, CogsBand.low);
+    expect(r.qualifies, isTrue);
+    expect(r.shares.map((s) => (s.name, s.amount)), [('Crew One', 90.0), ('Crew Two', 0.0)]);
+
+    await _clearQueue(db);
+    await repo.setFuelMode(shiftId, 'two_trucks');
+    await repo.setSwingTruck(shiftId, true);
+    final tx = await db.getNextCrudTransaction();
+    expect(tx!.crud.single.opData, {'fuel_mode': 'two_trucks'}, reason: 'only what the lead changed');
+    await tx.complete();
+    final swing = (await db.getNextCrudTransaction())!.crud.single;
+    expect(serverValues(swing.table, swing.opData), {'swing_truck': true}, reason: 'sent as a real yes/no');
+    final after = (await repo.profitShareData(shiftId).first)!.compute(data.start!.add(const Duration(hours: 10)));
+    expect(after.fuel, 210);
+    expect(after.swingTruck, 60);
   });
 }
 

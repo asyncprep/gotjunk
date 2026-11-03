@@ -19,6 +19,12 @@ const schema = Schema([
     Column.text('submitted_at'),
     // Only the lead's login can change the shift (one shared phone per truck).
     Column.text('lead_employee_id'),
+    // Profit-share inputs from the route sheet. The crew lead sets the first four; damages is dispatch.
+    Column.text('fuel_mode'), // one_truck | split_day | two_trucks
+    Column.integer('swing_truck'),
+    Column.integer('training_day'),
+    Column.real('training_hours_removed'),
+    Column.integer('damages'),
     // Not synced down: sent only when a crew member takes over the phone.
     Column.text('truck_phone_confirmed_at'),
   ]),
@@ -28,6 +34,8 @@ const schema = Schema([
     Column.text('joined_at'),
     Column.text('left_at'),
     Column.text('position'), // driver | navigator, set by dispatch
+    Column.text('rank_id_snapshot'), // rank on the route date (kept current until acceptance)
+    Column.real('tip_override'), // tip split set by dispatch
   ], indexes: [
     Index('by_shift', [IndexedColumn('shift_id')]),
     Index('by_employee', [IndexedColumn('employee_id')]),
@@ -111,6 +119,15 @@ const schema = Schema([
     Column.integer('active'),
   ]),
   Table('employee', [Column.text('full_name')]),
+  // Profit share % of route revenue by COGS band; null = no profit share for that rank.
+  Table('rank', [
+    Column.text('code'),
+    Column.text('name_fr'),
+    Column.text('name_en'),
+    Column.real('share_pct_low_cogs'),
+    Column.real('share_pct_mid_cogs'),
+    Column.real('share_pct_high_cogs'),
+  ]),
   Table('app_user', [Column.text('employee_id'), Column.text('role')]),
   Table('truck', [Column.text('unit_number')]),
   Table('phone', [Column.text('label')]),
@@ -155,3 +172,15 @@ const writablePrimaryKeys = {
   'cash_submission': 'cash_submission_id',
   'photo': 'photo_id',
 };
+
+/// Yes/no columns the phone writes. SQLite stores them as 1/0; the server wants true/false.
+const writableBooleans = {
+  'shift': {'swing_truck', 'training_day'},
+};
+
+/// A change's values as the server expects them.
+Map<String, dynamic>? serverValues(String table, Map<String, dynamic>? data) {
+  final booleans = writableBooleans[table];
+  if (data == null || booleans == null) return data;
+  return {for (final e in data.entries) e.key: booleans.contains(e.key) && e.value is int ? e.value == 1 : e.value};
+}

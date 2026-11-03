@@ -479,4 +479,103 @@ class L10nFr extends L10n {
 
   @override
   String get positionNavigator => 'Navigateur';
+
+  @override
+  String get profitShare => 'Partage des profits';
+
+  @override
+  String get psQualifies => 'Admissible';
+
+  @override
+  String get psNotYet => 'Pas encore admissible';
+
+  @override
+  String get psNotQualified => 'Non admissible';
+
+  @override
+  String get psLive => 'En direct : les heures comptent jusqu’à maintenant.';
+
+  @override
+  String get psRevenuePerHour => 'Revenu par heure';
+
+  @override
+  String get psTeamHours => 'Heures d’équipe';
+
+  @override
+  String get psAverageJob => 'Moyenne par travail';
+
+  @override
+  String get psCogs => 'COGS';
+
+  @override
+  String get psDetails => 'Détail du calcul';
+
+  @override
+  String psWages(String hours, String rate) {
+    return 'Salaires ($hours h × $rate)';
+  }
+
+  @override
+  String get psDumps => 'Dépotoirs (coûts − crédits)';
+
+  @override
+  String psFranchise(String pct) {
+    return 'Redevances ($pct)';
+  }
+
+  @override
+  String psFuel(String pct) {
+    return 'Essence ($pct)';
+  }
+
+  @override
+  String get psSwing => 'Camion de relève';
+
+  @override
+  String get psTotalCogs => 'Total COGS';
+
+  @override
+  String psBlockRevenue(String value, String min) {
+    return 'Revenu : $value sur $min minimum';
+  }
+
+  @override
+  String psBlockRph(String value, String min) {
+    return 'Revenu par heure : $value sur $min minimum';
+  }
+
+  @override
+  String psBlockCogs(String max) {
+    return 'COGS au-dessus de $max';
+  }
+
+  @override
+  String get psBlockDamages => 'Dommages inscrits par la répartition';
+
+  @override
+  String get psBlockHours => 'Seules les heures Junk régulières comptent';
+
+  @override
+  String get psNoRank => 'Aucun % pour ce rang';
+
+  @override
+  String get psForCalculation => 'Pour le calcul';
+
+  @override
+  String get psFuelOne => 'Un camion';
+
+  @override
+  String get psFuelSplit => 'Journée partagée';
+
+  @override
+  String get psFuelTwo => '2 camions';
+
+  @override
+  String get psSwingUsed => 'Camion de relève utilisé';
+
+  @override
+  String get psTrainingDay => 'Journée de formation';
+
+  @override
+  String get psTrainingHours => 'Heures retirées (formateur)';
 }

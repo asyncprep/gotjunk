@@ -954,6 +954,180 @@ abstract class L10n {
   /// In fr, this message translates to:
   /// **'Navigateur'**
   String get positionNavigator;
+
+  /// No description provided for @profitShare.
+  ///
+  /// In fr, this message translates to:
+  /// **'Partage des profits'**
+  String get profitShare;
+
+  /// No description provided for @psQualifies.
+  ///
+  /// In fr, this message translates to:
+  /// **'Admissible'**
+  String get psQualifies;
+
+  /// No description provided for @psNotYet.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pas encore admissible'**
+  String get psNotYet;
+
+  /// No description provided for @psNotQualified.
+  ///
+  /// In fr, this message translates to:
+  /// **'Non admissible'**
+  String get psNotQualified;
+
+  /// No description provided for @psLive.
+  ///
+  /// In fr, this message translates to:
+  /// **'En direct : les heures comptent jusqu’à maintenant.'**
+  String get psLive;
+
+  /// No description provided for @psRevenuePerHour.
+  ///
+  /// In fr, this message translates to:
+  /// **'Revenu par heure'**
+  String get psRevenuePerHour;
+
+  /// No description provided for @psTeamHours.
+  ///
+  /// In fr, this message translates to:
+  /// **'Heures d’équipe'**
+  String get psTeamHours;
+
+  /// No description provided for @psAverageJob.
+  ///
+  /// In fr, this message translates to:
+  /// **'Moyenne par travail'**
+  String get psAverageJob;
+
+  /// No description provided for @psCogs.
+  ///
+  /// In fr, this message translates to:
+  /// **'COGS'**
+  String get psCogs;
+
+  /// No description provided for @psDetails.
+  ///
+  /// In fr, this message translates to:
+  /// **'Détail du calcul'**
+  String get psDetails;
+
+  /// No description provided for @psWages.
+  ///
+  /// In fr, this message translates to:
+  /// **'Salaires ({hours} h × {rate})'**
+  String psWages(String hours, String rate);
+
+  /// No description provided for @psDumps.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dépotoirs (coûts − crédits)'**
+  String get psDumps;
+
+  /// No description provided for @psFranchise.
+  ///
+  /// In fr, this message translates to:
+  /// **'Redevances ({pct})'**
+  String psFranchise(String pct);
+
+  /// No description provided for @psFuel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Essence ({pct})'**
+  String psFuel(String pct);
+
+  /// No description provided for @psSwing.
+  ///
+  /// In fr, this message translates to:
+  /// **'Camion de relève'**
+  String get psSwing;
+
+  /// No description provided for @psTotalCogs.
+  ///
+  /// In fr, this message translates to:
+  /// **'Total COGS'**
+  String get psTotalCogs;
+
+  /// No description provided for @psBlockRevenue.
+  ///
+  /// In fr, this message translates to:
+  /// **'Revenu : {value} sur {min} minimum'**
+  String psBlockRevenue(String value, String min);
+
+  /// No description provided for @psBlockRph.
+  ///
+  /// In fr, this message translates to:
+  /// **'Revenu par heure : {value} sur {min} minimum'**
+  String psBlockRph(String value, String min);
+
+  /// No description provided for @psBlockCogs.
+  ///
+  /// In fr, this message translates to:
+  /// **'COGS au-dessus de {max}'**
+  String psBlockCogs(String max);
+
+  /// No description provided for @psBlockDamages.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dommages inscrits par la répartition'**
+  String get psBlockDamages;
+
+  /// No description provided for @psBlockHours.
+  ///
+  /// In fr, this message translates to:
+  /// **'Seules les heures Junk régulières comptent'**
+  String get psBlockHours;
+
+  /// No description provided for @psNoRank.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun % pour ce rang'**
+  String get psNoRank;
+
+  /// No description provided for @psForCalculation.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pour le calcul'**
+  String get psForCalculation;
+
+  /// No description provided for @psFuelOne.
+  ///
+  /// In fr, this message translates to:
+  /// **'Un camion'**
+  String get psFuelOne;
+
+  /// No description provided for @psFuelSplit.
+  ///
+  /// In fr, this message translates to:
+  /// **'Journée partagée'**
+  String get psFuelSplit;
+
+  /// No description provided for @psFuelTwo.
+  ///
+  /// In fr, this message translates to:
+  /// **'2 camions'**
+  String get psFuelTwo;
+
+  /// No description provided for @psSwingUsed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Camion de relève utilisé'**
+  String get psSwingUsed;
+
+  /// No description provided for @psTrainingDay.
+  ///
+  /// In fr, this message translates to:
+  /// **'Journée de formation'**
+  String get psTrainingDay;
+
+  /// No description provided for @psTrainingHours.
+  ///
+  /// In fr, this message translates to:
+  /// **'Heures retirées (formateur)'**
+  String get psTrainingHours;
 }
 
 class _L10nDelegate extends LocalizationsDelegate<L10n> {

@@ -198,5 +198,85 @@
     }
   },
   "positionDriver": "Chauffeur",
-  "positionNavigator": "Navigateur"
+  "positionNavigator": "Navigateur",
+  "profitShare": "Partage des profits",
+  "psQualifies": "Admissible",
+  "psNotYet": "Pas encore admissible",
+  "psNotQualified": "Non admissible",
+  "psLive": "En direct : les heures comptent jusqu’à maintenant.",
+  "psRevenuePerHour": "Revenu par heure",
+  "psTeamHours": "Heures d’équipe",
+  "psAverageJob": "Moyenne par travail",
+  "psCogs": "COGS",
+  "psDetails": "Détail du calcul",
+  "psWages": "Salaires ({hours} h × {rate})",
+  "@psWages": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "rate": {
+        "type": "String"
+      }
+    }
+  },
+  "psDumps": "Dépotoirs (coûts − crédits)",
+  "psFranchise": "Redevances ({pct})",
+  "@psFranchise": {
+    "placeholders": {
+      "pct": {
+        "type": "String"
+      }
+    }
+  },
+  "psFuel": "Essence ({pct})",
+  "@psFuel": {
+    "placeholders": {
+      "pct": {
+        "type": "String"
+      }
+    }
+  },
+  "psSwing": "Camion de relève",
+  "psTotalCogs": "Total COGS",
+  "psBlockRevenue": "Revenu : {value} sur {min} minimum",
+  "@psBlockRevenue": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      },
+      "min": {
+        "type": "String"
+      }
+    }
+  },
+  "psBlockRph": "Revenu par heure : {value} sur {min} minimum",
+  "@psBlockRph": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      },
+      "min": {
+        "type": "String"
+      }
+    }
+  },
+  "psBlockCogs": "COGS au-dessus de {max}",
+  "@psBlockCogs": {
+    "placeholders": {
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "psBlockDamages": "Dommages inscrits par la répartition",
+  "psBlockHours": "Seules les heures Junk régulières comptent",
+  "psNoRank": "Aucun % pour ce rang",
+  "psForCalculation": "Pour le calcul",
+  "psFuelOne": "Un camion",
+  "psFuelSplit": "Journée partagée",
+  "psFuelTwo": "2 camions",
+  "psSwingUsed": "Camion de relève utilisé",
+  "psTrainingDay": "Journée de formation",
+  "psTrainingHours": "Heures retirées (formateur)"
 }

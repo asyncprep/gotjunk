@@ -21,7 +21,7 @@ tracked on the admin app's **Projet** page (table `spec_item`).
 | Tip split (B1, B2) | **Equal split; dispatch can change it** | Route page → Split by hand; amounts must add up to the route's tips (tip_override_mismatch blocks acceptance) |
 | Disposal (R3a–d, sheet) | **Metric tonnes; no minimum at Eco-Junk; each outside dump has its own $/ton and minimum; metal is a 0 credit** | Sites have an address; Waste Management, EBI, Dépôt du Nord, Waste Connections at 60/t, min 1,000 kg |
 | Ranks (A5) | **Recruit, Wingman, Professional, Expert, JR Coach**; Trainer is a role | Rank list (migration 1600) |
-| Profit share (R1, A1–A9) | **Rank % × route revenue, by COGS band** | Not built yet (V1b); formula and worked examples in profit-share.md |
+| Profit share (R1, A1–A9) | **Rank % × route revenue, by COGS band** | Live on the crew app (Nov 3, migration 1700); plan and % per rank are configuration. Formula and worked examples in profit-share.md |
 | Wording | **"Route", not "shift"** (Nov 2): a truck's day is a route, as in the Daily Route Journal | Admin and crew app labels, Projet items (migration 1200). Tables, columns and error codes keep `shift` |
 | Crew positions (S11) | **Each member is the driver or a navigator**; exactly one driver per route | Picked per member when creating the route; dispatch can change it on the route page. `shift_crew_member.position` (migration 1300) |
 | Crew phone (S10) | **One shared phone per truck, signed in by the crew lead**; the rest of the crew has no login | `shift.lead_employee_id`: only the lead's login writes; dispatch picks/changes the lead; if the lead leaves, the next crew member who signs in takes over (migration 1100) |
@@ -49,4 +49,4 @@ tracked on the admin app's **Projet** page (table `spec_item`).
 
 Placeholders that must be replaced: cancellation reasons, payment method list, rank list (Trainer).
 
-Not built yet (V1b): profit share engine, Stripe ingestion, scale import, reconciliation exceptions.
+Not built yet (V1b): profit share on the admin side, Stripe ingestion, scale import, reconciliation exceptions.

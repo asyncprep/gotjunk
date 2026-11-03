@@ -170,5 +170,85 @@
     }
   },
   "positionDriver": "Driver",
-  "positionNavigator": "Navigator"
+  "positionNavigator": "Navigator",
+  "profitShare": "Profit share",
+  "psQualifies": "Qualifies",
+  "psNotYet": "Not qualified yet",
+  "psNotQualified": "Doesn't qualify",
+  "psLive": "Live: hours count up to now.",
+  "psRevenuePerHour": "Revenue per hour",
+  "psTeamHours": "Team hours",
+  "psAverageJob": "Average job size",
+  "psCogs": "COGS",
+  "psDetails": "How it’s calculated",
+  "psWages": "Wages ({hours} h × {rate})",
+  "@psWages": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "rate": {
+        "type": "String"
+      }
+    }
+  },
+  "psDumps": "Dumps (costs − credits)",
+  "psFranchise": "Franchise fees ({pct})",
+  "@psFranchise": {
+    "placeholders": {
+      "pct": {
+        "type": "String"
+      }
+    }
+  },
+  "psFuel": "Fuel ({pct})",
+  "@psFuel": {
+    "placeholders": {
+      "pct": {
+        "type": "String"
+      }
+    }
+  },
+  "psSwing": "Swing truck",
+  "psTotalCogs": "Total COGS",
+  "psBlockRevenue": "Revenue: {value} of {min} minimum",
+  "@psBlockRevenue": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      },
+      "min": {
+        "type": "String"
+      }
+    }
+  },
+  "psBlockRph": "Revenue per hour: {value} of {min} minimum",
+  "@psBlockRph": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      },
+      "min": {
+        "type": "String"
+      }
+    }
+  },
+  "psBlockCogs": "COGS above {max}",
+  "@psBlockCogs": {
+    "placeholders": {
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "psBlockDamages": "Damages recorded by dispatch",
+  "psBlockHours": "Only regular junk hours count",
+  "psNoRank": "No % for this rank",
+  "psForCalculation": "For the calculation",
+  "psFuelOne": "One truck",
+  "psFuelSplit": "Split day",
+  "psFuelTwo": "2 trucks",
+  "psSwingUsed": "Swing truck used",
+  "psTrainingDay": "Training day",
+  "psTrainingHours": "Hours removed (trainer)"
 }

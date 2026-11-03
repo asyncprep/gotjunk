@@ -13,6 +13,7 @@ import 'camera.dart';
 import 'disposal_page.dart';
 import 'format.dart';
 import 'job_form.dart';
+import 'profit_share_card.dart';
 
 class HomePage extends ConsumerWidget {
   const HomePage({super.key, required this.userId});
@@ -181,6 +182,8 @@ class ShiftView extends StatelessWidget {
                 if (status != 'open') ...[
                   const SizedBox(height: 12),
                   _ScoreboardCard(repo: repo, shiftId: shiftId),
+                  const SizedBox(height: 12),
+                  ProfitShareCard(repo: repo, shiftId: shiftId, editable: editable),
                   const SizedBox(height: 12),
                   _JobsCard(repo: repo, shiftId: shiftId, editable: editable),
                   const SizedBox(height: 12),

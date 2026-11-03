@@ -47,10 +47,10 @@ class SupabaseConnector extends PowerSyncBackendConnector {
       try {
         switch (op.op) {
           case UpdateType.put:
-            await table.upsert({...?op.opData, pk: op.id});
+            await table.upsert({...?serverValues(op.table, op.opData), pk: op.id});
           case UpdateType.patch:
             // A change that matches no row (gone, or hidden by access rules) is not a success.
-            final rows = await table.update(op.opData!).eq(pk, op.id).select(pk);
+            final rows = await table.update(serverValues(op.table, op.opData)!).eq(pk, op.id).select(pk);
             if (rows.isEmpty) await _reject(database, op, 'PGRST116', 'not_found: ${op.table} ${op.id}');
           case UpdateType.delete:
             await table.delete().eq(pk, op.id);

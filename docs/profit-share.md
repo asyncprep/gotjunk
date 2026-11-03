@@ -2,7 +2,8 @@
 
 Source: the client's paper sheet "Profit Share", August 2024 version (received Nov 2, 2026). It
 answers open items R1, A1–A5, A8 and A9 on the Projet page. A6, A7 and the follow-ups A10–A13
-are still open. Nothing here is built yet; the profit-share engine is V1b.
+are still open. The crew app calculates it live during the day (Nov 3, migration 1700); see
+"In the app" below.
 
 ## Per route
 
@@ -52,18 +53,31 @@ route's COGS % band:
 
 Above 50% COGS, nobody gets a profit share. Tips are separate and are not part of COGS.
 
-## Compared with the app today
+## In the app (Nov 3, 2026)
 
-- The app already records most inputs: crew hours (start and finish, who joined or left),
-  revenue per job, cancellations, and disposal costs and credits from tickets.
-- Each person's rank is kept with its history, and the app freezes the rank in force on the
-  route's date.
-- Paperwork is covered by the route's acceptance checks.
-- Not recorded yet: split day / 2 trucks (fuel %), swing truck, training day (3 hours), and
-  damages. These wait for answers A11 and A13.
-- The dev seed ranks (Recruit, Wingman, Sales Professional, Trainer) don't match the sheet
-  (Wingman, Professional, Expert, JR Coach; Trainer is a role, not a rank). Production ranks are
-  entered on the Configuration page; see A12.
+The crew app shows a **Profit share** card under the scoreboard, recalculated as jobs, dump
+visits and hours come in, so nobody fills in the bottom of the sheet at the end of the day:
+- each crew member's % and amount, or why the route doesn't qualify yet (revenue or revenue per
+  hour under the minimum, COGS over 50%, damages, hours other than Regular Junk);
+- revenue per hour, COGS %, team hours, average job size, and the full COGS breakdown;
+- while the route is going, hours count up to now (recalculated every minute).
+
+Where the numbers come from:
+- Plan: `app_setting` `profit_share_plan` (JSON with every amount and threshold on the sheet,
+  editable on the Configuration page). `training_hours_off_revenue_per_hour` is false, as on the
+  sheets (A13).
+- % per rank: `rank.share_pct_low_cogs` / `mid` / `high`. No % (Recruit, A12 default) = no share.
+- Rank: `shift_crew_member.rank_id_snapshot`, now kept current from the rank history until the
+  route is accepted, then frozen as before.
+- Route inputs on `shift`: `fuel_mode` (one truck / split day / 2 trucks), `swing_truck`,
+  `training_day` and `training_hours_removed` (up to 3), set by the crew lead on the card;
+  `damages`, set by dispatch only.
+- Hours per person: from the route start (or when they joined) to the finish (or when they left).
+- The calculation is `apps/mobile/lib/data/profit_share.dart`; its tests reproduce the three
+  routes below to the cent.
+
+Not done yet: the same figures on the admin route review, and "paperwork complete" as a
+condition (the route's acceptance checks cover it).
 
 ## Worked examples: three routes of Oct 25, 2026
 

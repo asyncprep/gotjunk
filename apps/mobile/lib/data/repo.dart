@@ -90,13 +90,18 @@ class Repo {
       });
 
   /// Each crew member's share of the tips: a tip is split among the crew on the truck when the
-  /// job was completed. The phone is shared, so everyone's share shows.
+  /// job was completed. Once dispatch sets the split by hand, its amounts are used (blank = 0).
+  /// The phone is shared, so everyone's share shows.
   Stream<List<TipShare>> tipShares(String shiftId) => db.watch('''
       SELECT m.employee_id, e.full_name,
-        coalesce(sum(j.tip_amount / (
-          SELECT count(*) FROM shift_crew_member o WHERE o.shift_id = j.shift_id
-            AND julianday(o.joined_at) <= julianday(coalesce(j.completed_at, j.created_at))
-            AND (o.left_at IS NULL OR julianday(o.left_at) > julianday(coalesce(j.completed_at, j.created_at))))), 0) AS tips
+        CASE WHEN EXISTS (SELECT 1 FROM shift_crew_member o WHERE o.shift_id = m.shift_id AND o.tip_override IS NOT NULL)
+          THEN (SELECT coalesce(sum(o.tip_override), 0) FROM shift_crew_member o
+                 WHERE o.shift_id = m.shift_id AND o.employee_id = m.employee_id)
+          ELSE coalesce(sum(j.tip_amount / (
+            SELECT count(*) FROM shift_crew_member o WHERE o.shift_id = j.shift_id
+              AND julianday(o.joined_at) <= julianday(coalesce(j.completed_at, j.created_at))
+              AND (o.left_at IS NULL OR julianday(o.left_at) > julianday(coalesce(j.completed_at, j.created_at))))), 0)
+        END AS tips
       FROM shift_crew_member m
       LEFT JOIN employee e ON e.id = m.employee_id
       LEFT JOIN job j ON j.shift_id = m.shift_id AND j.outcome = 'completed' AND j.tip_amount > 0

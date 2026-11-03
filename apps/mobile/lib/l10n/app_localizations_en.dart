@@ -472,4 +472,103 @@ class L10nEn extends L10n {
 
   @override
   String get positionNavigator => 'Navigator';
+
+  @override
+  String get profitShare => 'Profit share';
+
+  @override
+  String get psQualifies => 'Qualifies';
+
+  @override
+  String get psNotYet => 'Not qualified yet';
+
+  @override
+  String get psNotQualified => 'Doesn\'t qualify';
+
+  @override
+  String get psLive => 'Live: hours count up to now.';
+
+  @override
+  String get psRevenuePerHour => 'Revenue per hour';
+
+  @override
+  String get psTeamHours => 'Team hours';
+
+  @override
+  String get psAverageJob => 'Average job size';
+
+  @override
+  String get psCogs => 'COGS';
+
+  @override
+  String get psDetails => 'How it’s calculated';
+
+  @override
+  String psWages(String hours, String rate) {
+    return 'Wages ($hours h × $rate)';
+  }
+
+  @override
+  String get psDumps => 'Dumps (costs − credits)';
+
+  @override
+  String psFranchise(String pct) {
+    return 'Franchise fees ($pct)';
+  }
+
+  @override
+  String psFuel(String pct) {
+    return 'Fuel ($pct)';
+  }
+
+  @override
+  String get psSwing => 'Swing truck';
+
+  @override
+  String get psTotalCogs => 'Total COGS';
+
+  @override
+  String psBlockRevenue(String value, String min) {
+    return 'Revenue: $value of $min minimum';
+  }
+
+  @override
+  String psBlockRph(String value, String min) {
+    return 'Revenue per hour: $value of $min minimum';
+  }
+
+  @override
+  String psBlockCogs(String max) {
+    return 'COGS above $max';
+  }
+
+  @override
+  String get psBlockDamages => 'Damages recorded by dispatch';
+
+  @override
+  String get psBlockHours => 'Only regular junk hours count';
+
+  @override
+  String get psNoRank => 'No % for this rank';
+
+  @override
+  String get psForCalculation => 'For the calculation';
+
+  @override
+  String get psFuelOne => 'One truck';
+
+  @override
+  String get psFuelSplit => 'Split day';
+
+  @override
+  String get psFuelTwo => '2 trucks';
+
+  @override
+  String get psSwingUsed => 'Swing truck used';
+
+  @override
+  String get psTrainingDay => 'Training day';
+
+  @override
+  String get psTrainingHours => 'Hours removed (trainer)';
 }

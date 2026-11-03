@@ -233,6 +233,28 @@ void main() {
     expect(find.text('Scoreboard'), findsOneWidget);
   });
 
+  testWidgets('the profit share card shows the live calculation; the lead answers the route questions', (tester) async {
+    await seed();
+    await Repo(db).saveJob(JobDraft(shiftId: shiftId, opportunityId: 'BIG-1', outcome: 'completed',
+        paymentMethod: 'card', preTax: 2500, total: 2874.38));
+    await tester.pumpWidget(app(const Locale('en')));
+    await settle(tester);
+
+    await reveal(tester, find.text('Profit share'));
+    expect(find.text('Profit share'), findsOneWidget);
+    expect(find.text('No % for this rank'), findsNWidgets(2), reason: 'the seed crew has no rank yet');
+    expect(find.textContaining('Live: hours count up to now'), findsOneWidget);
+
+    await reveal(tester, find.text('2 trucks'));
+    await tester.tap(find.text('2 trucks'));
+    await settle(tester);
+    expect((await db.get('SELECT fuel_mode FROM shift'))['fuel_mode'], 'two_trucks');
+    await reveal(tester, find.text('How it’s calculated'));
+    await tester.tap(find.text('How it’s calculated'));
+    await settle(tester);
+    expect(find.text('Fuel (7%)'), findsOneWidget);
+  });
+
   testWidgets('a crew member who is not the lead sees the shift read-only', (tester) async {
     await seed(lead: 'e2');
     await tester.pumpWidget(app(const Locale('en')));

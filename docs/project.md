@@ -76,10 +76,11 @@ A separate production project (also ca-central-1, Pro plan) is planned before th
 - Cash: expected amount, mandatory photo, dispatcher count and variance
 - Dispatcher end-of-day checklist
 - Live scoreboard: revenue, jobs, tips and tip split, net disposal, revenue/hour
+- Live profit share on the phone, as on the paper sheet: COGS, qualification, each person's share
 - Roles and row-level security; reconciliation-ready export
 
 **V1b – integrations and compensation (after client answers)**
-- Profit-share engine with versioned plans and a simulation tool
+- Profit share on the admin side, versioned plans and a simulation tool
 - Stripe webhooks and backfill; job ↔ payment matching
 - Scale-event import and a single signed disposal-cost ledger
 - Roster/rank and Ceridian imports
