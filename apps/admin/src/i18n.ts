@@ -8,7 +8,7 @@ const fr = {
     dragHandle: 'Déplacer', updatedAt: 'Mis à jour à {{time}}', refresh: 'Actualiser', unsaved: 'Modifications non enregistrées',
     codeAuto: 'Généré automatiquement si vide',
   },
-  nav: { board: 'Tableau', config: 'Configuration', team: 'Équipe', audit: 'Journal', project: 'Projet', payments: 'Paiements', signOut: 'Se déconnecter' },
+  nav: { board: 'Tableau', config: 'Configuration', team: 'Équipe', audit: 'Journal', project: 'Projet', payments: 'Paiements', guides: 'Guides', signOut: 'Se déconnecter' },
   common: {
     save: 'Enregistrer', cancel: 'Annuler', add: 'Ajouter', loading: 'Chargement…', none: 'Aucun',
     active: 'Actif', inactive: 'Inactif', yes: 'Oui', no: 'Non', name: 'Nom', code: 'Code', back: 'Retour',
@@ -37,6 +37,13 @@ const fr = {
     unknownTruck: 'Camion inconnu : {{name}}', unknownPhone: 'Téléphone inconnu : {{name}}', unknownPerson: 'Personne inconnue : {{name}}',
     frozen: 'Route déjà acceptée : rouvrez-la pour la modifier',
     apply_one: 'Appliquer {{count}} route', apply_other: 'Appliquer {{count}} routes',
+  },
+  guides: {
+    title: 'Guides', intro: 'Les guides d’utilisation en PDF, à lire à l’écran ou à imprimer. Ils sont rédigés en anglais, avec le nom français de chaque bouton.',
+    open: 'Ouvrir', download: 'Télécharger (PDF)',
+    dispatcher: 'Guide de la répartition', dispatcherFor: 'Créer les routes, les suivre, les vérifier et les accepter',
+    crew: 'Guide de l’application des équipes', crewFor: 'Pour les équipes : saisir la route sur l’iPhone du camion',
+    admin: 'Guide de l’administration', adminFor: 'Utilisateurs, configuration, tarifs, équipe, paiements et journal',
   },
   board: {
     title: 'Routes du jour', newShift: 'Nouvelle route', truck: 'Camion', phone: 'Téléphone', crew: 'Équipe',
@@ -171,7 +178,7 @@ const en: Dict = {
     dragHandle: 'Move', updatedAt: 'Updated at {{time}}', refresh: 'Refresh', unsaved: 'Unsaved changes',
     codeAuto: 'Generated automatically if empty',
   },
-  nav: { board: 'Board', config: 'Configuration', team: 'Team', audit: 'Audit log', project: 'Project', payments: 'Payments', signOut: 'Sign out' },
+  nav: { board: 'Board', config: 'Configuration', team: 'Team', audit: 'Audit log', project: 'Project', payments: 'Payments', guides: 'Guides', signOut: 'Sign out' },
   common: {
     save: 'Save', cancel: 'Cancel', add: 'Add', loading: 'Loading…', none: 'None',
     active: 'Active', inactive: 'Inactive', yes: 'Yes', no: 'No', name: 'Name', code: 'Code', back: 'Back',
@@ -200,6 +207,13 @@ const en: Dict = {
     unknownTruck: 'Unknown truck: {{name}}', unknownPhone: 'Unknown phone: {{name}}', unknownPerson: 'Unknown person: {{name}}',
     frozen: 'Route already accepted: reopen it to change it',
     apply_one: 'Apply {{count}} route', apply_other: 'Apply {{count}} routes',
+  },
+  guides: {
+    title: 'Guides', intro: 'The user guides as PDFs, to read on screen or print. They are written in English, with each button’s French name.',
+    open: 'Open', download: 'Download (PDF)',
+    dispatcher: 'Dispatcher guide', dispatcherFor: 'Create routes, follow them, check and accept them',
+    crew: 'Crew app guide', crewFor: 'For the crews: entering the route on the truck’s iPhone',
+    admin: 'Admin guide', adminFor: 'Users, configuration, rates, team, payments and audit log',
   },
   board: {
     title: 'Routes', newShift: 'New route', truck: 'Truck', phone: 'Phone', crew: 'Crew',

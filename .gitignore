@@ -13,3 +13,6 @@ supabase/.branches/
 dist/
 *.tsbuildinfo
 !apps/admin/.env.production
+
+# The user guides served by the admin (built by tools/guides/build.mjs).
+!apps/admin/public/pdf/*.pdf
