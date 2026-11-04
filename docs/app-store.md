@@ -12,8 +12,8 @@ Bundle ID `com.innodigital.gotjunk.crew`; builds come from Codemagic (`codemagic
 | Subtitle | Route sheet for truck teams |
 | Primary language | French (Canada) |
 | Category | Business (secondary: Productivity) |
-| Support URL | https://gotjunk.innodigital.ca/support.html |
-| Privacy policy URL | https://gotjunk.innodigital.ca/privacy.html |
+| Support URL | https://crew.ecodepotmontreal.com/support.html |
+| Privacy policy URL | https://crew.ecodepotmontreal.com/privacy.html |
 | Marketing URL | (none) |
 | Copyright | 2026 InnoDigital |
 | Age rating | 4+ (no objectionable content) |
