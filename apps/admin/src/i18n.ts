@@ -139,6 +139,9 @@ const fr = {
     ceridian: 'ID Ceridian', language: 'Langue', rank: 'Rang actuel', setRank: 'Changer le rang', since: 'Depuis',
     invite: 'Inviter un utilisateur', email: 'Courriel', role: 'Rôle', employee: 'Employé', sendInvite: 'Envoyer l’invitation',
     inviteSent: 'Invitation envoyée.', configRights: 'Droits de configuration', deactivate: 'Désactiver', activate: 'Activer',
+    passwordOptional: 'Mot de passe (optionnel)', createLogin: 'Créer la connexion', loginCreated: 'Connexion créée.',
+    passwordHint: 'Avec un mot de passe (12 caractères minimum), la connexion est prête tout de suite et aucun courriel n’est envoyé : donnez le courriel et le mot de passe à la personne. Sans mot de passe, une invitation est envoyée par courriel.',
+    setPassword: 'Mot de passe', newPassword: 'Nouveau mot de passe (12 caractères min.)', passwordSet: 'Mot de passe changé.',
   },
   role: { ttm: 'Membre d’équipe', dispatcher: 'Répartiteur', admin: 'Administration', senior_ops: 'Direction' },
   project: {
@@ -309,6 +312,9 @@ const en: Dict = {
     ceridian: 'Ceridian ID', language: 'Language', rank: 'Current rank', setRank: 'Change rank', since: 'Since',
     invite: 'Invite a user', email: 'Email', role: 'Role', employee: 'Employee', sendInvite: 'Send invitation',
     inviteSent: 'Invitation sent.', configRights: 'Configuration rights', deactivate: 'Deactivate', activate: 'Activate',
+    passwordOptional: 'Password (optional)', createLogin: 'Create login', loginCreated: 'Login created.',
+    passwordHint: 'With a password (at least 12 characters), the login is ready right away and no email is sent: give the person the email and password. Without a password, an invitation is emailed.',
+    setPassword: 'Password', newPassword: 'New password (12 characters min.)', passwordSet: 'Password changed.',
   },
   role: { ttm: 'Truck team member', dispatcher: 'Dispatcher', admin: 'Administration', senior_ops: 'Senior ops' },
   project: {

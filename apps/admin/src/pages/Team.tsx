@@ -120,21 +120,29 @@ function Users() {
     employees: await must(supabase.from('employee').select('employee_id, full_name').eq('active', true).order('full_name')) as any[],
   }), []);
   const action = useAction(data.reload);
-  const [invite, setInvite] = useState({ email: '', role: 'dispatcher' as Role, employee_id: '', can_edit_config: false });
+  const [invite, setInvite] = useState({ email: '', role: 'dispatcher' as Role, employee_id: '', can_edit_config: false, password: '' });
+  // A new password for one login, typed by the admin (shown inline on that login's row).
+  const [pw, setPw] = useState<{ user_id: string; password: string } | null>(null);
 
   if (!data.data) return <div className="card muted">{data.error ?? t('common.loading')}</div>;
   const { users, employees } = data.data;
 
-  async function sendInvite() {
-    const { data: result, error } = await supabase.functions.invoke('invite-user', {
-      body: { ...invite, employee_id: invite.employee_id || null, redirect_to: window.location.origin },
-    });
+  async function callUsers(body: Record<string, unknown>) {
+    const { data: result, error } = await supabase.functions.invoke('invite-user', { body });
     if (error) {
       const detail = await (error as any).context?.json?.().catch(() => null);
       throw new Error(detail?.error ?? error.message);
     }
     if ((result as any)?.error) throw new Error((result as any).error);
-    setInvite({ email: '', role: 'dispatcher', employee_id: '', can_edit_config: false });
+  }
+
+  async function sendInvite() {
+    const { password, ...rest } = invite;
+    await callUsers({
+      ...rest, employee_id: invite.employee_id || null, redirect_to: window.location.origin,
+      ...(password ? { password } : {}),
+    });
+    setInvite({ email: '', role: 'dispatcher', employee_id: '', can_edit_config: false, password: '' });
   }
 
   return (
@@ -153,11 +161,28 @@ function Users() {
                 <td>{u.employee?.full_name ?? '—'}</td>
                 <td>{u.role === 'senior_ops' || u.can_edit_config ? t('common.yes') : t('common.no')}</td>
                 <td>{u.active ? t('common.yes') : t('common.no')}</td>
-                <td>{canEdit && u.user_id !== session?.user.id && (u.role !== 'senior_ops' || role === 'senior_ops') && (
-                  <button className="link" disabled={action.busy} onClick={() => action.run(() => must(supabase.from('app_user')
-                    .update({ active: !u.active }).eq('user_id', u.user_id).select()))}>
-                    {u.active ? t('team.deactivate') : t('team.activate')}
-                  </button>
+                <td>{canEdit && (u.role !== 'senior_ops' || role === 'senior_ops') && (
+                  pw?.user_id === u.user_id ? (
+                    <span className="row">
+                      <input type="password" autoComplete="new-password" placeholder={t('team.newPassword')} value={pw!.password}
+                        onChange={(e) => setPw({ user_id: u.user_id, password: e.target.value })} />
+                      <button className="go" disabled={pw!.password.length < 12 || action.busy} onClick={() => action.run(async () => {
+                        await callUsers({ action: 'set_password', user_id: u.user_id, password: pw!.password });
+                        setPw(null);
+                      }, t('team.passwordSet'))}>{t('common.save')}</button>
+                      <button className="link" onClick={() => setPw(null)}>{t('common.cancel')}</button>
+                    </span>
+                  ) : (
+                    <span className="row">
+                      <button className="link" onClick={() => setPw({ user_id: u.user_id, password: '' })}>{t('team.setPassword')}</button>
+                      {u.user_id !== session?.user.id && (
+                        <button className="link" disabled={action.busy} onClick={() => action.run(() => must(supabase.from('app_user')
+                          .update({ active: !u.active }).eq('user_id', u.user_id).select()))}>
+                          {u.active ? t('team.deactivate') : t('team.activate')}
+                        </button>
+                      )}
+                    </span>
+                  )
                 )}</td>
               </tr>
             ))}
@@ -183,9 +208,16 @@ function Users() {
               <label className="row"><input type="checkbox" checked={invite.can_edit_config}
                 onChange={(e) => setInvite({ ...invite, can_edit_config: e.target.checked })} /> {t('team.configRights')}</label>
             )}
-            <button className="go" disabled={!invite.email || action.busy || (invite.role === 'ttm' && !invite.employee_id)}
-              onClick={() => action.run(sendInvite, t('team.inviteSent'))}>{t('team.sendInvite')}</button>
+            <input type="password" autoComplete="new-password" placeholder={t('team.passwordOptional')} value={invite.password}
+              onChange={(e) => setInvite({ ...invite, password: e.target.value })} />
+            <button className="go"
+              disabled={!invite.email || action.busy || (invite.role === 'ttm' && !invite.employee_id)
+                || (invite.password !== '' && invite.password.length < 12)}
+              onClick={() => action.run(sendInvite, invite.password ? t('team.loginCreated') : t('team.inviteSent'))}>
+              {invite.password ? t('team.createLogin') : t('team.sendInvite')}
+            </button>
           </div>
+          <p className="muted small">{t('team.passwordHint')}</p>
         </>
       )}
     </div>

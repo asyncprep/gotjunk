@@ -1,4 +1,5 @@
-// Invites a dispatcher, admin or crew member by email and links the login to its role.
+// Creates a login for a dispatcher, admin or crew member and links it to its role: by email
+// invitation, or directly with a password the admin chooses. Also sets a new password on a login.
 // Only signed-in admins / senior ops may call it. The service key never leaves this function.
 import { createClient } from 'npm:@supabase/supabase-js@2.118.0';
 
@@ -27,16 +28,36 @@ Deno.serve(async (req) => {
     return json({ error: 'not_allowed: only administration can invite users' }, 403);
   }
 
-  const { email, role, employee_id, can_edit_config, redirect_to } = await req.json().catch(() => ({}));
+  const { action, user_id, password, email, role, employee_id, can_edit_config, redirect_to } = await req.json().catch(() => ({}));
+  const admin = createClient(url, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
+  if (password !== undefined && (typeof password !== 'string' || password.length < 12)) {
+    return json({ error: 'password_too_short: at least 12 characters' }, 400);
+  }
+
+  // An admin sets a new password on an existing login (no email needed).
+  if (action === 'set_password') {
+    if (typeof user_id !== 'string' || typeof password !== 'string') return json({ error: 'invalid_request' }, 400);
+    const { data: target } = await caller.from('app_user').select('role').eq('user_id', user_id).maybeSingle();
+    if (!target) return json({ error: 'not_found' }, 404);
+    if (target.role === 'senior_ops' && callerRole !== 'senior_ops') {
+      return json({ error: 'not_allowed: only senior ops can change a senior ops password' }, 403);
+    }
+    const { error } = await admin.auth.admin.updateUserById(user_id, { password });
+    if (error) return json({ error: error.message }, 400);
+    return json({ user_id });
+  }
+
   if (typeof email !== 'string' || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return json({ error: 'invalid_email' }, 400);
   if (!ROLES.includes(role)) return json({ error: 'invalid_role' }, 400);
   if (role === 'ttm' && !employee_id) return json({ error: 'employee_required: crew logins must be linked to an employee' }, 400);
   if (role === 'senior_ops' && callerRole !== 'senior_ops') return json({ error: 'not_allowed: only senior ops can invite senior ops' }, 403);
 
-  const admin = createClient(url, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
-  const { data: invited, error: inviteError } = await admin.auth.admin.inviteUserByEmail(email, {
-    redirectTo: typeof redirect_to === 'string' ? redirect_to : undefined,
-  });
+  // With a password the login is created ready to use (no email sent); without one, an invitation is emailed.
+  const { data: invited, error: inviteError } = typeof password === 'string'
+    ? await admin.auth.admin.createUser({ email, password, email_confirm: true })
+    : await admin.auth.admin.inviteUserByEmail(email, {
+      redirectTo: typeof redirect_to === 'string' ? redirect_to : undefined,
+    });
   if (inviteError) return json({ error: inviteError.message }, 400);
 
   // Insert as the caller so row-level security applies and the audit log records who invited whom.
