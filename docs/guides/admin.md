@@ -33,7 +33,7 @@ Every login has one role. The role decides what the person sees and changes; the
 2. Enter their email and pick the role.
 3. For a crew member, pick their **Employé (Employee)**: a crew login must be linked to an employee, so their routes and profit share are theirs.
 4. Tick **Droits de configuration (Configuration rights)** only for people who should change rates and lists. Only senior ops can grant it.
-5. Click **Envoyer l'invitation (Send invitation)**. They receive an email, choose a password of at least 12 characters, and are in.
+5. Click **Envoyer l'invitation (Send invitation)**. They receive an email, choose a password of at least 8 characters, and are in.
 
 The invitation email currently comes from Supabase's own address (open question S12). A crew login that tries the web admin sees a message that it is for dispatch and administration only.
 

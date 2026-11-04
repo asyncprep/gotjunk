@@ -18,7 +18,7 @@ const fr = {
   login: {
     title: 'Connexion', email: 'Courriel', password: 'Mot de passe', submit: 'Se connecter',
     forgot: 'Mot de passe oublié?', resetSent: 'Si ce courriel existe, un lien de réinitialisation a été envoyé.',
-    setTitle: 'Choisir un mot de passe', setSubmit: 'Enregistrer le mot de passe', minLength: '12 caractères minimum',
+    setTitle: 'Choisir un mot de passe', setSubmit: 'Enregistrer le mot de passe', minLength: '8 caractères minimum',
     noAccess: 'Cette application est réservée à la répartition et à l’administration.',
     quickTitle: 'Connexion rapide', quickHint: 'Développement local seulement : absent du site en ligne.',
   },
@@ -140,8 +140,8 @@ const fr = {
     invite: 'Inviter un utilisateur', email: 'Courriel', role: 'Rôle', employee: 'Employé', sendInvite: 'Envoyer l’invitation',
     inviteSent: 'Invitation envoyée.', configRights: 'Droits de configuration', deactivate: 'Désactiver', activate: 'Activer',
     passwordOptional: 'Mot de passe (optionnel)', createLogin: 'Créer la connexion', loginCreated: 'Connexion créée.',
-    passwordHint: 'Avec un mot de passe (12 caractères minimum), la connexion est prête tout de suite et aucun courriel n’est envoyé : donnez le courriel et le mot de passe à la personne. Sans mot de passe, une invitation est envoyée par courriel.',
-    setPassword: 'Mot de passe', newPassword: 'Nouveau mot de passe (12 caractères min.)', passwordSet: 'Mot de passe changé.',
+    passwordHint: 'Avec un mot de passe (8 caractères minimum), la connexion est prête tout de suite et aucun courriel n’est envoyé : donnez le courriel et le mot de passe à la personne. Sans mot de passe, une invitation est envoyée par courriel.',
+    setPassword: 'Mot de passe', newPassword: 'Nouveau mot de passe (8 caractères min.)', passwordSet: 'Mot de passe changé.',
   },
   role: { ttm: 'Membre d’équipe', dispatcher: 'Répartiteur', admin: 'Administration', senior_ops: 'Direction' },
   project: {
@@ -191,7 +191,7 @@ const en: Dict = {
   login: {
     title: 'Sign in', email: 'Email', password: 'Password', submit: 'Sign in',
     forgot: 'Forgot password?', resetSent: 'If this email exists, a reset link has been sent.',
-    setTitle: 'Choose a password', setSubmit: 'Save password', minLength: 'At least 12 characters',
+    setTitle: 'Choose a password', setSubmit: 'Save password', minLength: 'At least 8 characters',
     noAccess: 'This app is for dispatch and administration only.',
     quickTitle: 'Quick sign-in', quickHint: 'Local development only: not on the live site.',
   },
@@ -313,8 +313,8 @@ const en: Dict = {
     invite: 'Invite a user', email: 'Email', role: 'Role', employee: 'Employee', sendInvite: 'Send invitation',
     inviteSent: 'Invitation sent.', configRights: 'Configuration rights', deactivate: 'Deactivate', activate: 'Activate',
     passwordOptional: 'Password (optional)', createLogin: 'Create login', loginCreated: 'Login created.',
-    passwordHint: 'With a password (at least 12 characters), the login is ready right away and no email is sent: give the person the email and password. Without a password, an invitation is emailed.',
-    setPassword: 'Password', newPassword: 'New password (12 characters min.)', passwordSet: 'Password changed.',
+    passwordHint: 'With a password (at least 8 characters), the login is ready right away and no email is sent: give the person the email and password. Without a password, an invitation is emailed.',
+    setPassword: 'Password', newPassword: 'New password (8 characters min.)', passwordSet: 'Password changed.',
   },
   role: { ttm: 'Truck team member', dispatcher: 'Dispatcher', admin: 'Administration', senior_ops: 'Senior ops' },
   project: {

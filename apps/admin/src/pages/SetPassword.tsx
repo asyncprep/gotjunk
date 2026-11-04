@@ -30,7 +30,7 @@ export default function SetPassword() {
         {error && <div className="notice err">{error}</div>}
         <label>
           {t('login.password')}
-          <input type="password" autoComplete="new-password" minLength={12} required value={password}
+          <input type="password" autoComplete="new-password" minLength={8} required value={password}
             onChange={(e) => setPassword(e.target.value)} />
           <span className="muted small">{t('login.minLength')}</span>
         </label>

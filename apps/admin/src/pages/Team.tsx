@@ -166,7 +166,7 @@ function Users() {
                     <span className="row">
                       <input type="password" autoComplete="new-password" placeholder={t('team.newPassword')} value={pw!.password}
                         onChange={(e) => setPw({ user_id: u.user_id, password: e.target.value })} />
-                      <button className="go" disabled={pw!.password.length < 12 || action.busy} onClick={() => action.run(async () => {
+                      <button className="go" disabled={pw!.password.length < 8 || action.busy} onClick={() => action.run(async () => {
                         await callUsers({ action: 'set_password', user_id: u.user_id, password: pw!.password });
                         setPw(null);
                       }, t('team.passwordSet'))}>{t('common.save')}</button>
@@ -212,7 +212,7 @@ function Users() {
               onChange={(e) => setInvite({ ...invite, password: e.target.value })} />
             <button className="go"
               disabled={!invite.email || action.busy || (invite.role === 'ttm' && !invite.employee_id)
-                || (invite.password !== '' && invite.password.length < 12)}
+                || (invite.password !== '' && invite.password.length < 8)}
               onClick={() => action.run(sendInvite, invite.password ? t('team.loginCreated') : t('team.inviteSent'))}>
               {invite.password ? t('team.createLogin') : t('team.sendInvite')}
             </button>

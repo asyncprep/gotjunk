@@ -30,8 +30,8 @@ Deno.serve(async (req) => {
 
   const { action, user_id, password, email, role, employee_id, can_edit_config, redirect_to } = await req.json().catch(() => ({}));
   const admin = createClient(url, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
-  if (password !== undefined && (typeof password !== 'string' || password.length < 12)) {
-    return json({ error: 'password_too_short: at least 12 characters' }, 400);
+  if (password !== undefined && (typeof password !== 'string' || password.length < 8)) {
+    return json({ error: 'password_too_short: at least 8 characters' }, 400);
   }
 
   // An admin sets a new password on an existing login (no email needed).
