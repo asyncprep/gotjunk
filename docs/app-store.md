@@ -1,7 +1,7 @@
 # GOT-Crew – App Store Connect listing
 
 Private custom app for 1-800-GOT-JUNK? Montréal, distributed through Apple Business Manager
-(organization ID 1466854443724875776) and installed on the truck iPhones by Mosyle.
+(organization 9279-3371 Québec Inc., ID 69647288) and installed on the truck iPhones by Mosyle.
 Bundle ID `com.innodigital.gotjunk.crew`; builds come from Codemagic (`codemagic.yaml`).
 
 ## App information
@@ -18,7 +18,7 @@ Bundle ID `com.innodigital.gotjunk.crew`; builds come from Codemagic (`codemagic
 | Copyright | 2026 InnoDigital |
 | Age rating | 4+ (no objectionable content) |
 | Price | Free |
-| Distribution | Private: Apple Business Manager, organization 1466854443724875776 |
+| Distribution | Private: Apple Business Manager, 9279-3371 Québec Inc. (ID 69647288), available in Canada |
 
 ## Description
 
