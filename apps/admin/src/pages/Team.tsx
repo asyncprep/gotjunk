@@ -126,6 +126,13 @@ function Users() {
 
   if (!data.data) return <div className="card muted">{data.error ?? t('common.loading')}</div>;
   const { users, employees } = data.data;
+  // An employee has at most one login, so the lists offer only people without one.
+  const taken = new Set(users.map((u) => u.employee_id).filter(Boolean));
+  const free = employees.filter((e) => !taken.has(e.employee_id));
+  // Nobody changes their own access, and only senior ops changes a senior ops login.
+  const canLink = (u: any) => canEdit && u.user_id !== session?.user.id && (u.role !== 'senior_ops' || role === 'senior_ops');
+  const linkEmployee = (u: any, employee_id: string) => action.run(() => must(supabase.from('app_user')
+    .update({ employee_id: employee_id || null }).eq('user_id', u.user_id).select()), t('team.employeeLinked'));
 
   async function callUsers(body: Record<string, unknown>) {
     const { data: result, error } = await supabase.functions.invoke('invite-user', { body });
@@ -158,7 +165,16 @@ function Users() {
               <tr key={u.user_id} className={u.active ? '' : 'muted'}>
                 <td>{u.email ?? '—'}</td>
                 <td>{t(`role.${u.role}`)}</td>
-                <td>{u.employee?.full_name ?? '—'}</td>
+                <td>
+                  {canLink(u) ? (
+                    <select aria-label={`${t('team.employee')} ${u.email ?? ''}`} value={u.employee_id ?? ''} disabled={action.busy}
+                      onChange={(e) => linkEmployee(u, e.target.value)}>
+                      {u.role !== 'ttm' && <option value="">—</option>}
+                      {u.employee_id && <option value={u.employee_id}>{u.employee?.full_name}</option>}
+                      {free.map((e) => <option key={e.employee_id} value={e.employee_id}>{e.full_name}</option>)}
+                    </select>
+                  ) : (u.employee?.full_name ?? '—')}
+                </td>
                 <td>{u.role === 'senior_ops' || u.can_edit_config ? t('common.yes') : t('common.no')}</td>
                 <td>{u.active ? t('common.yes') : t('common.no')}</td>
                 <td>{canEdit && (u.role !== 'senior_ops' || role === 'senior_ops') && (
@@ -201,7 +217,7 @@ function Users() {
             {invite.role === 'ttm' && (
               <select value={invite.employee_id} onChange={(e) => setInvite({ ...invite, employee_id: e.target.value })}>
                 <option value="">{t('team.employee')}…</option>
-                {employees.map((e) => <option key={e.employee_id} value={e.employee_id}>{e.full_name}</option>)}
+                {free.map((e) => <option key={e.employee_id} value={e.employee_id}>{e.full_name}</option>)}
               </select>
             )}
             {invite.role === 'admin' && role === 'senior_ops' && (

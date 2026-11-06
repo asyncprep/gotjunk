@@ -137,7 +137,7 @@ const fr = {
   team: {
     title: 'Équipe', employees: 'Employés', users: 'Utilisateurs', newEmployee: 'Nouvel employé',
     ceridian: 'ID Ceridian', language: 'Langue', rank: 'Rang actuel', setRank: 'Changer le rang', since: 'Depuis',
-    invite: 'Inviter un utilisateur', email: 'Courriel', role: 'Rôle', employee: 'Employé', sendInvite: 'Envoyer l’invitation',
+    invite: 'Inviter un utilisateur', email: 'Courriel', role: 'Rôle', employee: 'Employé', employeeLinked: 'Employé lié à la connexion', sendInvite: 'Envoyer l’invitation',
     inviteSent: 'Invitation envoyée.', configRights: 'Droits de configuration', deactivate: 'Désactiver', activate: 'Activer',
     passwordOptional: 'Mot de passe (optionnel)', createLogin: 'Créer la connexion', loginCreated: 'Connexion créée.',
     passwordHint: 'Avec un mot de passe (8 caractères minimum), la connexion est prête tout de suite et aucun courriel n’est envoyé : donnez le courriel et le mot de passe à la personne. Sans mot de passe, une invitation est envoyée par courriel.',
@@ -310,7 +310,7 @@ const en: Dict = {
   team: {
     title: 'Team', employees: 'Employees', users: 'Users', newEmployee: 'New employee',
     ceridian: 'Ceridian ID', language: 'Language', rank: 'Current rank', setRank: 'Change rank', since: 'Since',
-    invite: 'Invite a user', email: 'Email', role: 'Role', employee: 'Employee', sendInvite: 'Send invitation',
+    invite: 'Invite a user', email: 'Email', role: 'Role', employee: 'Employee', employeeLinked: 'Employee linked to the login', sendInvite: 'Send invitation',
     inviteSent: 'Invitation sent.', configRights: 'Configuration rights', deactivate: 'Deactivate', activate: 'Activate',
     passwordOptional: 'Password (optional)', createLogin: 'Create login', loginCreated: 'Login created.',
     passwordHint: 'With a password (at least 8 characters), the login is ready right away and no email is sent: give the person the email and password. Without a password, an invitation is emailed.',

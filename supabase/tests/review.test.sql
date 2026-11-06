@@ -132,3 +132,20 @@ select add_site_rate((select site_id from site where code = 'eco_junk'), (select
                      80, 'credit', 500, 'transaction', date '2026-12-01');
 select tests.eq((select min_applies_to::text from site_rate_config c join material_type m using (material_type_id)
                  where m.code = 'donation' and c.rate_per_ton = 80), 'never', 'credit has no minimum');
+
+-- test: an admin links an existing login to an employee, one login per employee
+select tests.login('a0000000-0000-0000-0000-000000000020');
+update app_user set employee_id = 'b0000000-0000-0000-0000-000000000004' where user_id = 'a0000000-0000-0000-0000-000000000010';
+select tests.eq((select employee_id from app_user where user_id = 'a0000000-0000-0000-0000-000000000010'),
+  'b0000000-0000-0000-0000-000000000004'::uuid, 'admin links a login to an employee');
+update app_user set employee_id = null where user_id = 'a0000000-0000-0000-0000-000000000010';
+select tests.throws($q$
+  update app_user set employee_id = 'b0000000-0000-0000-0000-000000000002' where user_id = 'a0000000-0000-0000-0000-000000000001'
+$q$, '%duplicate key%');
+select tests.throws($q$
+  update app_user set employee_id = null where user_id = 'a0000000-0000-0000-0000-000000000001'
+$q$, '%check constraint%');
+select tests.throws($q$
+  update app_user set employee_id = 'b0000000-0000-0000-0000-000000000004' where user_id = 'a0000000-0000-0000-0000-000000000020'
+$q$, 'not_allowed: you cannot change your own access');
+reset role;

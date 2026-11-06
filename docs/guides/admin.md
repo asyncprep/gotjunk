@@ -70,6 +70,8 @@ The **Équipe (Team)** page has two lists: **Employés (Employees)**, the people
 
 **Add an employee.** Click **Nouvel employé (New employee)** and enter the full name as it is written in the daily tracker, plus the Ceridian ID and language if you have them. The tracker paste finds people by this name, so "Marie-Ève Gagnon-Roy" in the tracker should be the same here.
 
+**Link a login to an employee.** In **Utilisateurs (Users)**, choose the person in the login's **Employé (Employee)** list; it saves right away. The list only offers employees without a login, because an employee has one login at most. A crew login always keeps an employee; a dispatcher or admin login can have none. You can't change your own login.
+
 **Change a rank.** Use **Changer le rang (Change rank)** with the date it takes effect (**Depuis / Since**). Ranks keep their history. A route uses the rank in force on its date, and that rank is frozen when dispatch accepts the route, so a later promotion never changes a past profit share.
 
 **Someone leaves.** Click **Désactiver (Deactivate)** on the employee, and deactivate their login in Users. They disappear from new routes but stay on past ones. Nothing is deleted.
