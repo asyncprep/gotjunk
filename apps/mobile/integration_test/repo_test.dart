@@ -274,15 +274,15 @@ void main() {
 
     await _clearQueue(db);
     await repo.setFuelMode(shiftId, 'two_trucks');
-    await repo.setSwingTruck(shiftId, true);
+    await repo.setSwingTrucks(shiftId, 3);
     final tx = await db.getNextCrudTransaction();
     expect(tx!.crud.single.opData, {'fuel_mode': 'two_trucks'}, reason: 'only what the lead changed');
     await tx.complete();
     final swing = (await db.getNextCrudTransaction())!.crud.single;
-    expect(serverValues(swing.table, swing.opData), {'swing_truck': true}, reason: 'sent as a real yes/no');
+    expect(serverValues(swing.table, swing.opData), {'swing_truck_count': 3}, reason: 'sent as a number');
     final after = (await repo.profitShareData(shiftId).first)!.compute(data.start!.add(const Duration(hours: 10)));
     expect(after.fuel, 210);
-    expect(after.swingTruck, 60);
+    expect(after.swingTruck, 180);
   });
 }
 

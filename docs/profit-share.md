@@ -23,7 +23,7 @@ are still open. The crew app calculates it live during the day (Nov 3, migration
 | Dumps | Dump costs − credits (accepted donations at Éco-Dépôt: $75 credit per 1,000 kg) |
 | Franchise fees | R × 16% |
 | Fuel | R × 4%; 5.5% on a split day; 7% for 2 trucks |
-| Swing truck fee | $60 per truck |
+| Swing truck fee | $60 × the number of swing trucks the crew lead enters |
 | **Total COGS** | Sum of the above |
 | **COGS %** | Total COGS ÷ R |
 

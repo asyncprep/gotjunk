@@ -205,7 +205,10 @@ class _Line extends StatelessWidget {
   }
 }
 
-/// What the paper sheet asked that only the crew knows: trucks used, swing truck, training.
+/// The server's limit on shift.swing_truck_count.
+const _maxSwingTrucks = 20;
+
+/// What the paper sheet asked that only the crew knows: trucks used, swing trucks, training.
 class _RouteQuestions extends StatelessWidget {
   const _RouteQuestions({required this.repo, required this.shiftId, required this.data, required this.editable});
   final Repo repo;
@@ -233,7 +236,7 @@ class _RouteQuestions extends StatelessWidget {
       subtitle: Text(
         [
           fuelLabel,
-          if (route.swingTruck) t.psSwing,
+          if (route.swingTrucks > 0) '${t.psSwing} × ${route.swingTrucks}',
           if (route.trainingDay) '${t.psTrainingDay} (${_hours(context, route.trainingHoursRemoved)} h)',
         ].join(' · '),
       ),
@@ -248,11 +251,29 @@ class _RouteQuestions extends StatelessWidget {
           showSelectedIcon: false,
           onSelectionChanged: editable ? (v) => repo.setFuelMode(shiftId, v.first) : null,
         ),
-        SwitchListTile(
-          contentPadding: EdgeInsets.zero,
-          title: Text(t.psSwingUsed),
-          value: route.swingTruck,
-          onChanged: editable ? (v) => repo.setSwingTruck(shiftId, v) : null,
+        Row(
+          children: [
+            Expanded(child: Text(t.psSwingUsed)),
+            IconButton(
+              icon: const Icon(Icons.remove_circle_outline),
+              tooltip: t.psSwingLess,
+              onPressed: editable && route.swingTrucks > 0
+                  ? () => repo.setSwingTrucks(shiftId, route.swingTrucks - 1)
+                  : null,
+            ),
+            SizedBox(
+              width: 32,
+              child: Text('${route.swingTrucks}', textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.titleMedium),
+            ),
+            IconButton(
+              icon: const Icon(Icons.add_circle_outline),
+              tooltip: t.psSwingMore,
+              onPressed: editable && route.swingTrucks < _maxSwingTrucks
+                  ? () => repo.setSwingTrucks(shiftId, route.swingTrucks + 1)
+                  : null,
+            ),
+          ],
         ),
         SwitchListTile(
           contentPadding: EdgeInsets.zero,

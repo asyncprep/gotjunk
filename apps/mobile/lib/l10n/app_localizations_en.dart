@@ -567,7 +567,13 @@ class L10nEn extends L10n {
   String get psFuelTwo => '2 trucks';
 
   @override
-  String get psSwingUsed => 'Swing truck used';
+  String get psSwingUsed => 'Swing trucks used';
+
+  @override
+  String get psSwingLess => 'One swing truck less';
+
+  @override
+  String get psSwingMore => 'One more swing truck';
 
   @override
   String get psTrainingDay => 'Training day';

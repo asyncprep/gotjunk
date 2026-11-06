@@ -22,6 +22,7 @@ const schema = Schema([
     // Profit-share inputs from the route sheet. The crew lead sets the first four; damages is dispatch.
     Column.text('fuel_mode'), // one_truck | split_day | two_trucks
     Column.integer('swing_truck'),
+    Column.integer('swing_truck_count'),
     Column.integer('training_day'),
     Column.real('training_hours_removed'),
     Column.integer('damages'),

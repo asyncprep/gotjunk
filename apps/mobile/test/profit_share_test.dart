@@ -77,11 +77,11 @@ void main() {
 
   test('swing truck fee and split-day fuel', () {
     final r = computeProfitShare(plan, RouteShareInput(
-      revenue: 3000, jobs: 5, dumps: 0, crew: [wingman(10), professional(10)], fuelMode: 'split_day', swingTruck: true,
+      revenue: 3000, jobs: 5, dumps: 0, crew: [wingman(10), professional(10)], fuelMode: 'split_day', swingTrucks: 3,
     ));
     expect(r.fuel, 165);
-    expect(r.swingTruck, 60);
-    expect(r.cogs, 520 + 480 + 165 + 60);
+    expect(r.swingTruck, 180, reason: r'$60 for each of the 3 swing trucks');
+    expect(r.cogs, 520 + 480 + 165 + 180);
   });
 
   test('plan read from the server setting, defaults for anything missing', () {

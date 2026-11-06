@@ -24,7 +24,7 @@ At the end of the day, don't sign out while items are still waiting to send: the
 
 1. Choose the **Type d'heures (Hours type)**: regular junk hours, warehouse hours or non-junk hours. Only regular junk hours earn a profit share.
 2. Tap **Commencer la route (Start route)**. The start time is recorded; dispatch can correct it from the tracker.
-3. Answer the route questions under **Pour le calcul (For the calculation)** when they apply: fuel (one truck, split day, 2 trucks), **Camion de relève utilisé (Swing truck used)**, and **Journée de formation (Training day)** with the hours the trainer removes.
+3. Answer the route questions under **Pour le calcul (For the calculation)** when they apply: fuel (one truck, split day, 2 trucks), **Camions de relève utilisés (Swing trucks used)**, with the number of trucks (+ and −; the fee is charged for each), and **Journée de formation (Training day)** with the hours the trainer removes.
 
 The status changes to **En cours (In progress)** and dispatch sees your route live.
 

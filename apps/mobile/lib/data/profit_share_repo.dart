@@ -44,7 +44,7 @@ class ProfitShareData {
       crew: byPerson.values.toList(),
       hoursType: route.hoursType,
       fuelMode: route.fuelMode,
-      swingTruck: route.swingTruck,
+      swingTrucks: route.swingTrucks,
       trainingDay: route.trainingDay,
       trainingHoursRemoved: route.trainingHoursRemoved,
       damages: route.damages,
@@ -54,7 +54,7 @@ class ProfitShareData {
 
 extension ProfitShareRepo on Repo {
   Stream<ProfitShareData?> profitShareData(String shiftId) => db.watch('''
-      SELECT s.start_time, s.finish_time, s.hours_type, s.fuel_mode, s.swing_truck, s.training_day,
+      SELECT s.start_time, s.finish_time, s.hours_type, s.fuel_mode, s.swing_truck, s.swing_truck_count, s.training_day,
         s.training_hours_removed, s.damages,
         m.employee_id, e.full_name, m.joined_at, m.left_at,
         r.share_pct_low_cogs, r.share_pct_mid_cogs, r.share_pct_high_cogs,
@@ -90,7 +90,8 @@ extension ProfitShareRepo on Repo {
             crew: const [],
             hoursType: r['hours_type'] as String?,
             fuelMode: (r['fuel_mode'] as String?) ?? 'one_truck',
-            swingTruck: r['swing_truck'] == 1,
+            // Until the new column has synced, only the old yes/no is on the phone.
+            swingTrucks: (r['swing_truck_count'] as int?) ?? (r['swing_truck'] == 1 ? 1 : 0),
             trainingDay: r['training_day'] == 1,
             trainingHoursRemoved: n(r['training_hours_removed']),
             damages: r['damages'] == 1,
@@ -116,8 +117,8 @@ extension ProfitShareRepo on Repo {
   Future<void> setFuelMode(String shiftId, String mode) =>
       db.execute('UPDATE shift SET fuel_mode = ? WHERE id = ?', [mode, shiftId]);
 
-  Future<void> setSwingTruck(String shiftId, bool used) =>
-      db.execute('UPDATE shift SET swing_truck = ? WHERE id = ?', [used ? 1 : 0, shiftId]);
+  Future<void> setSwingTrucks(String shiftId, int count) =>
+      db.execute('UPDATE shift SET swing_truck_count = ? WHERE id = ?', [count, shiftId]);
 
   Future<void> setTraining(String shiftId, {required bool day, required double hoursRemoved}) => db.execute(
       'UPDATE shift SET training_day = ?, training_hours_removed = ? WHERE id = ?',

@@ -277,7 +277,9 @@
   "psFuelOne": "Un camion",
   "psFuelSplit": "Journée partagée",
   "psFuelTwo": "2 camions",
-  "psSwingUsed": "Camion de relève utilisé",
+  "psSwingUsed": "Camions de relève utilisés",
+  "psSwingLess": "Un camion de relève de moins",
+  "psSwingMore": "Un camion de relève de plus",
   "psTrainingDay": "Journée de formation",
   "psTrainingHours": "Heures retirées (formateur)"
 }

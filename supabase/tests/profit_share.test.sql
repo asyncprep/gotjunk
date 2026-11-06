@@ -53,3 +53,13 @@ update app_setting set value = value || '{"wage_per_hour": 27}'::jsonb where key
 update rank set share_pct_low_cogs = 3.5 where code = 'wingman';
 select tests.eq((select (value ->> 'wage_per_hour')::numeric from app_setting where key = 'profit_share_plan'), 27::numeric, 'admin with config rights');
 select tests.eq((select share_pct_low_cogs from rank where code = 'wingman'), 3.50::numeric, 'admin with config rights');
+
+-- test: a route can use several swing trucks; the old yes/no follows (client, Nov 6)
+select tests.login('a0000000-0000-0000-0000-000000000001');
+update shift set swing_truck_count = 3 where shift_id = 'c0000000-0000-0000-0000-000000000001';
+select tests.eq((select swing_truck_count from shift where shift_id = 'c0000000-0000-0000-0000-000000000001'), 3, 'the crew lead enters the number');
+select tests.ok((select swing_truck from shift where shift_id = 'c0000000-0000-0000-0000-000000000001'), 'yes/no follows the number');
+update shift set swing_truck = false where shift_id = 'c0000000-0000-0000-0000-000000000001';
+select tests.eq((select swing_truck_count from shift where shift_id = 'c0000000-0000-0000-0000-000000000001'), 0, 'an older build turning it off clears the number');
+update shift set swing_truck = true where shift_id = 'c0000000-0000-0000-0000-000000000001';
+select tests.eq((select swing_truck_count from shift where shift_id = 'c0000000-0000-0000-0000-000000000001'), 1, 'an older build turning it on means one truck');

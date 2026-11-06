@@ -249,7 +249,9 @@
   "psFuelOne": "One truck",
   "psFuelSplit": "Split day",
   "psFuelTwo": "2 trucks",
-  "psSwingUsed": "Swing truck used",
+  "psSwingUsed": "Swing trucks used",
+  "psSwingLess": "One swing truck less",
+  "psSwingMore": "One more swing truck",
   "psTrainingDay": "Training day",
   "psTrainingHours": "Hours removed (trainer)"
 }

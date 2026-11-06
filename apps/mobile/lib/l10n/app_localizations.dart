@@ -1120,8 +1120,20 @@ abstract class L10n {
   /// No description provided for @psSwingUsed.
   ///
   /// In fr, this message translates to:
-  /// **'Camion de relève utilisé'**
+  /// **'Camions de relève utilisés'**
   String get psSwingUsed;
+
+  /// No description provided for @psSwingLess.
+  ///
+  /// In fr, this message translates to:
+  /// **'Un camion de relève de moins'**
+  String get psSwingLess;
+
+  /// No description provided for @psSwingMore.
+  ///
+  /// In fr, this message translates to:
+  /// **'Un camion de relève de plus'**
+  String get psSwingMore;
 
   /// No description provided for @psTrainingDay.
   ///

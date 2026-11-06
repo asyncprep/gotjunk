@@ -574,7 +574,13 @@ class L10nFr extends L10n {
   String get psFuelTwo => '2 camions';
 
   @override
-  String get psSwingUsed => 'Camion de relève utilisé';
+  String get psSwingUsed => 'Camions de relève utilisés';
+
+  @override
+  String get psSwingLess => 'Un camion de relève de moins';
+
+  @override
+  String get psSwingMore => 'Un camion de relève de plus';
 
   @override
   String get psTrainingDay => 'Journée de formation';

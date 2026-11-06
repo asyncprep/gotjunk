@@ -107,7 +107,7 @@ class RouteShareInput {
     required this.crew,
     this.hoursType,
     this.fuelMode = 'one_truck',
-    this.swingTruck = false,
+    this.swingTrucks = 0,
     this.trainingDay = false,
     this.trainingHoursRemoved = 0,
     this.damages = false,
@@ -121,7 +121,8 @@ class RouteShareInput {
   final List<CrewShareInput> crew;
   final String? hoursType;
   final String fuelMode;
-  final bool swingTruck;
+  /// Swing trucks used on the route; the fee is charged for each one.
+  final int swingTrucks;
   final bool trainingDay;
   final double trainingHoursRemoved;
   final bool damages;
@@ -202,7 +203,7 @@ ProfitShareResult computeProfitShare(ProfitSharePlan plan, RouteShareInput r) {
   final franchise = _cents(r.revenue * plan.franchisePct / 100);
   final fuelPct = plan.fuelPct[r.fuelMode] ?? plan.fuelPct['one_truck'] ?? 0;
   final fuel = _cents(r.revenue * fuelPct / 100);
-  final swing = r.swingTruck ? plan.swingTruckFee : 0.0;
+  final swing = r.swingTrucks * plan.swingTruckFee;
   final cogs = _cents(wages + dumps + franchise + fuel + swing);
   final cogsPct = r.revenue > 0 ? (cogs / r.revenue * 10000).roundToDouble() / 100 : double.infinity;
 
