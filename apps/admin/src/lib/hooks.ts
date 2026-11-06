@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { explainError } from '../i18n';
 import { toast } from '../components/Toasts';
 
@@ -8,16 +8,21 @@ export function useLoad<T>(load: () => Promise<T>, deps: unknown[]) {
   const [data, setData] = useState<T | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const latest = useRef(0);
 
   const reload = useCallback(async (quiet = false) => {
+    const request = ++latest.current;
     if (!quiet) setLoading(true);
     try {
-      setData(await load());
+      const result = await load();
+      // A slower, older request must not replace what a newer one (another date) asked for.
+      if (request !== latest.current) return;
+      setData(result);
       setError(null);
     } catch (e) {
-      setError(explainError((e as Error).message));
+      if (request === latest.current) setError(explainError((e as Error).message));
     } finally {
-      setLoading(false);
+      if (request === latest.current) setLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);

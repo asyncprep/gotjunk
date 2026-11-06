@@ -82,7 +82,7 @@ The **Équipe (Team)** page has two lists: **Employés (Employees)**, the people
 - each payment: time, Opportunity ID, amount, tip, revenue before tax, succeeded or failed, card reader or typed in, HQ login;
 - the matching job in the app with a link to its route, flagged when the app's total plus tip differs from Stripe.
 
-Revenue before tax is worked out as (amount − tip) ÷ 1.14975. Failed attempts are shown greyed; only succeeded payments count. Cash jobs never appear here. The page reads Stripe with a read-only key stored on the server; customer names, emails and card numbers are not shown.
+Revenue before tax is worked out as (amount − tip) ÷ 1.14975. The page updates by itself every minute while it is open. Failed attempts and payments refunded in full are shown greyed and don't count; a partial refund counts for what was kept. When a job is paid in two parts, the parts are added up before comparing with the app. Cash jobs never appear here. The page reads Stripe with a read-only key stored on the server; customer names, emails and card numbers are not shown.
 
 **Journal (Audit log)** lists every change made to routes, jobs, disposal, cash, crew, rates, employees and logins: when, what, who (by role), the reason and the fields changed. Filter by record type. Nothing can be edited or removed there.
 
