@@ -200,6 +200,8 @@
   "positionDriver": "Chauffeur",
   "positionNavigator": "Navigateur",
   "positionOnboarding": "Intégration",
+  "navRoute": "Route",
+  "navProfit": "Profits",
   "profitShare": "Partage des profits",
   "psQualifies": "Admissible",
   "psNotYet": "Pas encore admissible",

@@ -172,6 +172,8 @@
   "positionDriver": "Driver",
   "positionNavigator": "Navigator",
   "positionOnboarding": "Onboarding",
+  "navRoute": "Route",
+  "navProfit": "Profit",
   "profitShare": "Profit share",
   "psQualifies": "Qualifies",
   "psNotYet": "Not qualified yet",

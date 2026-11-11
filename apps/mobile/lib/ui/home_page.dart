@@ -41,7 +41,9 @@ class HomePage extends ConsumerWidget {
           ),
         ],
       ),
+      // The tab bar handles the bottom edge itself.
       body: SafeArea(
+        bottom: false,
         child: Column(
           children: [
             SyncBar(repo: repo),
@@ -170,38 +172,30 @@ class ShiftView extends StatelessWidget {
             final lead = leadSnap.data ?? const LeadState();
             // One shared phone per truck: only the lead's login changes the shift.
             final editable = lead.isMe && crewJobStatuses.contains(status);
-            return ListView(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 120),
-              children: [
-                _Rejections(repo: repo),
-                if (leadSnap.hasData && !lead.isMe && crewEditableStatuses.contains(status))
-                  _LeadBanner(lead: lead, onTakeOver: () => _confirmTakeOver(context, shiftId)),
-                _ShiftHeader(repo: repo, shift: shift),
-                if (status == 'open' && lead.isMe)
-                  _StartShift(repo: repo, shiftId: shiftId, current: shift['hours_type'] as String?),
-                if (status != 'open') ...[
-                  const SizedBox(height: 12),
-                  _ScoreboardCard(repo: repo, shiftId: shiftId),
-                  const SizedBox(height: 12),
-                  ProfitShareCard(repo: repo, shiftId: shiftId, editable: editable),
-                  const SizedBox(height: 12),
-                  _JobsCard(repo: repo, shiftId: shiftId, editable: editable),
-                  const SizedBox(height: 12),
-                  _DisposalCard(repo: repo, shiftId: shiftId, editable: editable),
-                  const SizedBox(height: 12),
-                  _CashCard(repo: repo, shiftId: shiftId, editable: editable),
-                  if (editable) ...[
-                    const SizedBox(height: 20),
-                    FilledButton.icon(
-                      icon: const Icon(Icons.flag_outlined),
-                      style: goButtonStyle(),
-                      onPressed: () => _confirmSubmit(context, shiftId),
-                      label: Text(t.submitShift),
-                    ),
-                  ],
-                ],
-              ],
-            );
+            final top = [
+              if (leadSnap.hasData && !lead.isMe && crewEditableStatuses.contains(status))
+                _LeadBanner(lead: lead, onTakeOver: () => _confirmTakeOver(context, shiftId)),
+              _ShiftHeader(repo: repo, shift: shift),
+            ];
+            return Column(children: [
+              // A refused change matters wherever the crew is in the app.
+              _Rejections(repo: repo),
+              Expanded(
+                child: status == 'open'
+                    ? ListView(padding: const EdgeInsets.fromLTRB(16, 12, 16, 120), children: [
+                        ...top,
+                        if (lead.isMe) _StartShift(repo: repo, shiftId: shiftId, current: shift['hours_type'] as String?),
+                      ])
+                    : _RouteTabs(
+                        key: ValueKey(shiftId),
+                        repo: repo,
+                        shiftId: shiftId,
+                        editable: editable,
+                        top: top,
+                        onSubmit: () => _confirmSubmit(context, shiftId),
+                      ),
+              ),
+            ]);
           },
         );
       },
@@ -264,6 +258,93 @@ class ShiftView extends StatelessWidget {
       ),
     );
     if (ok == true) await repo.submitShift(shiftId);
+  }
+}
+
+/// A started route, one thing per tab: the route and closing it, jobs, disposal, profit share.
+class _RouteTabs extends StatefulWidget {
+  const _RouteTabs({
+    super.key,
+    required this.repo,
+    required this.shiftId,
+    required this.editable,
+    required this.top,
+    required this.onSubmit,
+  });
+  final Repo repo;
+  final String shiftId;
+  final bool editable;
+  final List<Widget> top;
+  final VoidCallback onSubmit;
+
+  @override
+  State<_RouteTabs> createState() => _RouteTabsState();
+}
+
+class _RouteTabsState extends State<_RouteTabs> {
+  int _tab = 0;
+
+  // The keys keep each tab's scroll position when the crew comes back to it.
+  Widget _list(String name, List<Widget> children) => ListView(
+        key: PageStorageKey(name),
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 96),
+        children: children,
+      );
+
+  @override
+  Widget build(BuildContext context) {
+    final t = L10n.of(context);
+    final repo = widget.repo;
+    final shiftId = widget.shiftId;
+    final editable = widget.editable;
+    return Scaffold(
+      body: switch (_tab) {
+        0 => _list('route', [
+            ...widget.top,
+            const SizedBox(height: 12),
+            _ScoreboardCard(repo: repo, shiftId: shiftId),
+            const SizedBox(height: 12),
+            _CashCard(repo: repo, shiftId: shiftId, editable: editable),
+            if (editable) ...[
+              const SizedBox(height: 20),
+              FilledButton.icon(
+                icon: const Icon(Icons.flag_outlined),
+                style: goButtonStyle(),
+                onPressed: widget.onSubmit,
+                label: Text(t.submitShift),
+              ),
+            ],
+          ]),
+        1 => _list('jobs', [_JobsCard(repo: repo, shiftId: shiftId, editable: editable)]),
+        2 => _list('disposal', [_DisposalCard(repo: repo, shiftId: shiftId, editable: editable)]),
+        _ => _list('profit', [ProfitShareCard(repo: repo, shiftId: shiftId, editable: editable)]),
+      },
+      floatingActionButton: !editable
+          ? null
+          : switch (_tab) {
+              1 => FloatingActionButton.extended(
+                  icon: const Icon(Icons.add),
+                  onPressed: () => openJobForm(context, repo, shiftId, null),
+                  label: Text(t.addJob),
+                ),
+              2 => FloatingActionButton.extended(
+                  icon: const Icon(Icons.add),
+                  onPressed: () => openVisit(context, shiftId, editable: true),
+                  label: Text(t.addVisit),
+                ),
+              _ => null,
+            },
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _tab,
+        onDestinationSelected: (i) => setState(() => _tab = i),
+        destinations: [
+          NavigationDestination(icon: const Icon(Icons.local_shipping_outlined), selectedIcon: const Icon(Icons.local_shipping), label: t.navRoute),
+          NavigationDestination(icon: const Icon(Icons.checklist_outlined), selectedIcon: const Icon(Icons.checklist), label: t.jobs),
+          NavigationDestination(icon: const Icon(Icons.receipt_long_outlined), selectedIcon: const Icon(Icons.receipt_long), label: t.disposal),
+          NavigationDestination(icon: const Icon(Icons.savings_outlined), selectedIcon: const Icon(Icons.savings), label: t.navProfit),
+        ],
+      ),
+    );
   }
 }
 
@@ -502,15 +583,6 @@ class _JobsCard extends StatelessWidget {
           builder: (context, snap) {
             final jobs = snap.data ?? [];
             return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-              Row(children: [
-                Expanded(child: Text(t.jobs, style: Theme.of(context).textTheme.titleSmall)),
-                if (editable)
-                  FilledButton.tonalIcon(
-                    icon: const Icon(Icons.add),
-                    onPressed: () => openJobForm(context, repo, shiftId, null),
-                    label: Text(t.addJob),
-                  ),
-              ]),
               if (jobs.isEmpty) Padding(padding: const EdgeInsets.symmetric(vertical: 12), child: Text(t.noJobs)),
               for (final j in jobs)
                 ListTile(
@@ -552,15 +624,6 @@ class _DisposalCard extends StatelessWidget {
           builder: (context, snap) {
             final visits = snap.data ?? [];
             return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-              Row(children: [
-                Expanded(child: Text(t.disposal, style: Theme.of(context).textTheme.titleSmall)),
-                if (editable)
-                  FilledButton.tonalIcon(
-                    icon: const Icon(Icons.add),
-                    onPressed: () => openVisit(context, shiftId, editable: true),
-                    label: Text(t.addVisit),
-                  ),
-              ]),
               if (visits.isEmpty) Padding(padding: const EdgeInsets.symmetric(vertical: 12), child: Text(t.noVisits)),
               for (final v in visits)
                 ListTile(
@@ -645,18 +708,26 @@ class _Rejections extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     return StreamBuilder<List<Map<String, dynamic>>>(
       stream: repo.rejections(),
-      builder: (context, snap) => Column(children: [
-        for (final r in snap.data ?? [])
-          Card(
-            color: scheme.errorContainer,
-            child: ListTile(
-              leading: Icon(Icons.error_outline, color: scheme.onErrorContainer),
-              title: Text(t.rejected, style: TextStyle(color: scheme.onErrorContainer)),
-              subtitle: Text(explainRejection(t, '${r['message']}', sqlState: r['code'] as String?), style: TextStyle(color: scheme.onErrorContainer)),
-              trailing: TextButton(onPressed: () => repo.dismissRejection(r['id'] as String), child: Text(t.dismiss)),
-            ),
-          ),
-      ]),
+      builder: (context, snap) {
+        final rejections = snap.data ?? [];
+        if (rejections.isEmpty) return const SizedBox.shrink();
+        // Several at once scroll here, so they never push the tabs off the screen.
+        return ConstrainedBox(
+          constraints: const BoxConstraints(maxHeight: 200),
+          child: ListView(shrinkWrap: true, padding: const EdgeInsets.fromLTRB(16, 12, 16, 0), children: [
+            for (final r in rejections)
+              Card(
+                color: scheme.errorContainer,
+                child: ListTile(
+                  leading: Icon(Icons.error_outline, color: scheme.onErrorContainer),
+                  title: Text(t.rejected, style: TextStyle(color: scheme.onErrorContainer)),
+                  subtitle: Text(explainRejection(t, '${r['message']}', sqlState: r['code'] as String?), style: TextStyle(color: scheme.onErrorContainer)),
+                  trailing: TextButton(onPressed: () => repo.dismissRejection(r['id'] as String), child: Text(t.dismiss)),
+                ),
+              ),
+          ]),
+        );
+      },
     );
   }
 }

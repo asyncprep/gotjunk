@@ -84,6 +84,12 @@ void main() {
     await settle(tester);
   }
 
+  /// Opens one of the bottom tabs.
+  Future<void> openTab(WidgetTester tester, String label) async {
+    await tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text(label)));
+    await settle(tester);
+  }
+
   setUp(() async {
     dir = await getTemporaryDirectory();
     path = join(dir.path, 'ui_test_${DateTime.now().microsecondsSinceEpoch}.db');
@@ -107,13 +113,15 @@ void main() {
     expect(find.text('Tableau de bord'), findsOneWidget);
     expect(find.textContaining('Hors ligne'), findsOneWidget, reason: 'no sync configured in tests');
 
-    await reveal(tester, find.text('Partage des profits'));
-    expect(find.text('Partage des profits'), findsOneWidget);
-    await reveal(tester, find.text('Dépotoir'));
-    expect(find.text('Dépotoir'), findsOneWidget);
     await reveal(tester, find.text('Comptant'));
     expect(find.text('Comptant'), findsOneWidget);
     await reveal(tester, find.text('Soumettre la route'));
+
+    await openTab(tester, 'Profits');
+    expect(find.text('Partage des profits'), findsOneWidget);
+    expect(find.text('Comptant'), findsNothing, reason: 'one thing per tab');
+    await openTab(tester, 'Dépotoir');
+    expect(find.byType(FloatingActionButton), findsOneWidget);
   });
 
   testWidgets('add a job through the form; the scoreboard updates', (tester) async {
@@ -121,7 +129,7 @@ void main() {
     await tester.pumpWidget(app(const Locale('en')));
     await settle(tester);
 
-    await reveal(tester, find.text('Add a job'));
+    await openTab(tester, 'Jobs');
     await tester.tap(find.text('Add a job'));
     await settle(tester);
     await tester.enterText(find.widgetWithText(TextFormField, 'Opportunity ID'), 'OPP-77');
@@ -141,7 +149,8 @@ void main() {
     await reveal(tester, find.text('OPP-77'));
     expect(find.text('OPP-77'), findsOneWidget);
     expect(find.text('\$200.00'), findsWidgets);
-    await reveal(tester, find.text('Tips per person'), step: -300);
+    await openTab(tester, 'Route');
+    await reveal(tester, find.text('Tips per person'));
     expect(find.text('\$10.00'), findsNWidgets(2), reason: "each crew member's half of the tip");
   });
 
@@ -149,7 +158,7 @@ void main() {
     await seed();
     await tester.pumpWidget(app(const Locale('en')));
     await settle(tester);
-    await reveal(tester, find.text('Add a job'));
+    await openTab(tester, 'Jobs');
     await tester.tap(find.text('Add a job'));
     await settle(tester);
     await tester.enterText(find.widgetWithText(TextFormField, 'Opportunity ID'), 'OPP-1');
@@ -167,7 +176,7 @@ void main() {
     await tester.pumpWidget(app(const Locale('en')));
     await settle(tester);
 
-    await reveal(tester, find.text('Add a visit'));
+    await openTab(tester, 'Disposal');
     await tester.tap(find.text('Add a visit'));
     await settle(tester);
     await tester.tap(find.widgetWithText(DropdownButtonFormField<String>, 'Site'));
@@ -190,7 +199,7 @@ void main() {
     await reveal(tester, find.widgetWithText(FilledButton, 'Done'));
     await tester.tap(find.widgetWithText(FilledButton, 'Done'));
     await settle(tester);
-    await tester.scrollUntilVisible(find.text('Eco-Junk'), 300);
+    await reveal(tester, find.text('Eco-Junk'));
     expect(find.text('Eco-Junk'), findsOneWidget);
   });
 
@@ -228,6 +237,7 @@ void main() {
     expect((await db.get('SELECT status FROM shift WHERE id = ?', [shiftId]))['status'], 'submitted');
     await reveal(tester, find.text('Submitted — under review'), step: -300);
     expect(find.text('Submitted — under review'), findsOneWidget);
+    await openTab(tester, 'Jobs');
     expect(find.text('Add a job'), findsNothing, reason: 'read-only after submit');
   });
 
@@ -252,7 +262,7 @@ void main() {
     await tester.pumpWidget(app(const Locale('en')));
     await settle(tester);
 
-    await reveal(tester, find.text('Profit share'));
+    await openTab(tester, 'Profit');
     expect(find.text('Profit share'), findsOneWidget);
     expect(find.text('No % for this rank'), findsNWidgets(2), reason: 'the seed crew has no rank yet');
     expect(find.textContaining('Live: hours count up to now'), findsOneWidget);
@@ -281,16 +291,18 @@ void main() {
     });
     await tester.pumpWidget(app(const Locale('en')));
     await settle(tester);
-    await reveal(tester, find.text('Profit share'));
+    await openTab(tester, 'Profit');
     expect(find.text('Old Mate'), findsOneWidget, reason: 'only the older route is open yet');
 
     // Today's route syncs in; the screen moves to it.
     await db.execute("UPDATE shift SET status = 'in_progress' WHERE id = ?", [shiftId]);
     await settle(tester);
+    // A different route starts again on its first tab.
+    expect(find.textContaining('Old Mate'), findsNothing, reason: 'not on the crew line');
+    await openTab(tester, 'Profit');
     await reveal(tester, find.text('Crew Two'));
     expect(find.text('Crew Two'), findsOneWidget);
     expect(find.text('Old Mate'), findsNothing);
-    expect(find.textContaining('Old Mate'), findsNothing, reason: 'nor on the crew line');
   });
 
   testWidgets('a crew member who is not the lead sees the shift read-only', (tester) async {
@@ -300,9 +312,11 @@ void main() {
     expect(find.textContaining('Crew Two is the crew lead on this phone'), findsOneWidget);
     expect(find.text('Take over'), findsNothing, reason: 'the lead is still on the truck');
     expect(find.text('Add a job'), findsNothing);
-    expect(find.text('Tips per person'), findsOneWidget);
-    await tester.scrollUntilVisible(find.text('Cash'), 300);
+    await reveal(tester, find.text('Tips per person'));
+    await reveal(tester, find.text('Cash'));
     expect(find.text('Submit route'), findsNothing);
+    await openTab(tester, 'Jobs');
+    expect(find.text('Add a job'), findsNothing);
   });
 
   testWidgets('a shift without a lead offers to take over', (tester) async {
@@ -316,7 +330,7 @@ void main() {
     await tester.tap(find.widgetWithText(FilledButton, 'Take over').last);
     await settle(tester);
     expect(find.text('Take over'), findsNothing);
-    await reveal(tester, find.text('Add a job'));
+    await openTab(tester, 'Jobs');
     expect(find.text('Add a job'), findsOneWidget);
   });
 
@@ -338,6 +352,7 @@ void main() {
     expect(find.textContaining('not sent to the server yet'), findsOneWidget);
     await tester.tap(find.text('Stay signed in'));
     await settle(tester);
+    await openTab(tester, 'Jobs');
     await reveal(tester, find.text('UNSENT'));
     expect(find.text('UNSENT'), findsOneWidget, reason: 'still signed in, nothing wiped');
   });

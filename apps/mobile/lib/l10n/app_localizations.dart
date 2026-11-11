@@ -961,6 +961,18 @@ abstract class L10n {
   /// **'Intégration'**
   String get positionOnboarding;
 
+  /// No description provided for @navRoute.
+  ///
+  /// In fr, this message translates to:
+  /// **'Route'**
+  String get navRoute;
+
+  /// No description provided for @navProfit.
+  ///
+  /// In fr, this message translates to:
+  /// **'Profits'**
+  String get navProfit;
+
   /// No description provided for @profitShare.
   ///
   /// In fr, this message translates to:

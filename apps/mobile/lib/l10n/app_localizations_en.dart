@@ -477,6 +477,12 @@ class L10nEn extends L10n {
   String get positionOnboarding => 'Onboarding';
 
   @override
+  String get navRoute => 'Route';
+
+  @override
+  String get navProfit => 'Profit';
+
+  @override
   String get profitShare => 'Profit share';
 
   @override
