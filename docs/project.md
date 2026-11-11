@@ -94,7 +94,7 @@ A separate production project (also ca-central-1, Pro plan) is planned before th
 | --- | --- | --- |
 | 0 – Setup and decisions | Stack decision doc, repo, data dictionary, open-item defaults | Done, except client sign-off and offline spike |
 | 1 – Backend foundation | Schema, workflow, calculations, RLS, audit, seed, 49 tests, local explorer | **Done**; deployed to `gotjunk-ca` (Canada) on Oct 27, 2026 |
-| 2 – Admin web app (moved first) | Daily board and shift creation, review/accept/return/reopen, cash count, checklist, cancellations, config and rates, roster and ranks, user invites, audit log, CSV export, fr/en | **Live** on Vercel; includes the Projet page (spec inconsistencies and client questions) |
+| 2 – Admin web app (moved first) | Daily board and shift creation, review/accept/return/reopen, cash count, checklist, cancellations, config and rates, roster and ranks, user invites, audit log, CSV export, fr/en | **Live** on Vercel; includes Tickets (bugs, change requests and client questions, with a Report button on every page; replaced the Projet page on Nov 11, 2026) |
 | 3 – First crew slice | Flutter (Android first): login, today's shift, start shift, jobs, live scoreboard, submit, offline storage and sync status | **Built** (`apps/mobile`), tested on an Android emulator |
 | 4 – Crew app complete | Disposal visits and weigh-ins with price estimates, ticket and cash photos (queued offline), expected cash, pre-submit checklist, confirmed cancellation reasons, net disposal on the scoreboard | **Built**, tested on an Android emulator; photos also upload in the background on Android (WorkManager) even after the app is closed; sign-out warns about unsent data; live sync waits on the PowerSync database login ([setup](powersync-setup.md)); iOS configured (Oct 30, 2026: crews use iPhone only): icon, name, French permission texts, background upload; built and tested on an iPhone simulator by GitHub Actions; signed TestFlight builds via Codemagic (`codemagic.yaml`, same setup as Poubelle du Ski) once its one-time setup is done |
 | 5 – Pilot | 1–2 trucks alongside the paper journal for 2–4 weeks, then rollout | Planned |
@@ -109,3 +109,11 @@ A separate production project (also ca-central-1, Pro plan) is planned before th
 | Technology stack decision (for client approval) | [Claude Doc](https://claude.ai/artifact/SEmziqJqdMGBNsm9quMivz) |
 | Working defaults for open items | [decisions.md](decisions.md) |
 | Questions for the client | [client-questions.md](client-questions.md) |
+
+## Tickets and Central
+
+Tickets work like the other projects (The Seed Guardians): the `ticket` and `ticket_comment` tables, the private `ticket-files` bucket, and the Report button on every admin page. Central reads them through the `central-tickets` Edge Function, which follows Central's connector spec (read-only, no `updateUrl`):
+
+- Feed URL: `https://vrtvjnaykhlzyfbrllup.supabase.co/functions/v1/central-tickets`
+- Key: set the `CENTRAL_FEED_KEY` secret on the Supabase project (Edge Functions → Secrets) to a long random value, then enter the same value as the project's API key in Central. Until it is set, the feed answers 503 (switched off).
+- The feed sends titles, status, priority, dates and descriptions only; never reporters, browser details, files or comments.

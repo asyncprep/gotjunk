@@ -424,3 +424,9 @@ entrypoint = "./functions/invite-user/index.ts"
 enabled = true
 verify_jwt = true
 entrypoint = "./functions/stripe-day/index.ts"
+
+# Ticket feed for Central: it sends its own key (CENTRAL_FEED_KEY), not a Supabase sign-in.
+[functions.central-tickets]
+enabled = true
+verify_jwt = false
+entrypoint = "./functions/central-tickets/index.ts"

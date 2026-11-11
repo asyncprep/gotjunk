@@ -1,9 +1,9 @@
 # Questions for the client
 
-The live list is on the admin app's **Projet** page (Projet → Questions pour le client). It has
-the questions and the 17 spec inconsistencies, with their status, priority, what each blocks,
-what the app does meanwhile, and the client's answers. Use **Imprimer** for a meeting handout and
-**Exporter (CSV)** for a spreadsheet.
+The live list is on the admin app's **Tickets** page, as tickets of type Question (filter
+Type → Question). The questions and the 17 spec inconsistencies were copied there from the old
+Projet page on Nov 11, 2026, with their reference in the title (F8, I-03…), and the client's
+answers as the first comment. New questions are filed with the Report button.
 
 This file only records the answers received so far, so they are also in the repository history.
 

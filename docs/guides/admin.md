@@ -90,13 +90,15 @@ Revenue before tax is worked out as (amount − tip) ÷ 1.14975. The page update
 
 **Exporter les routes (Export routes)**, on the same page, downloads a CSV of every route between two dates with its hours, jobs, revenue, tips, expected cash, net disposal and revenue per hour, for a spreadsheet or the accountant.
 
-## Projet page
+## Tickets
 
-**Projet (Project)** tracks what is still to be decided with the client. It has two tabs: **Questions pour le client (Client questions)** and **Incohérences du cahier des charges (Spec inconsistencies)**.
+**Signaler (Report)**, at the bottom right of every page, files a ticket from where you are. Pick **Quelque chose ne marche pas (Something is broken)**, **Proposer un changement (Suggest a change)** or **Question pour le client (Question for the client)**, give a short title and say what happened or what should change. The page and the part of the app are filled in for you. You can add screenshots: paste one (Ctrl+V), drop a file, or use **Prendre une capture (Take a screenshot)**. Browser details and recent errors are attached unless you untick them, and you can see exactly what is sent.
 
-Each item shows its priority, what it blocks, what the app does until it is answered (**En attendant**), and the answer once recorded. Administration records an answer on the item; it is stamped with the date.
+The **Tickets** page lists them, with the number of open tickets next to it in the menu. Filter by status, type, priority or part of the app, or search. On a ticket, anyone in the admin app changes the status, priority, type or part, and adds comments with files; every change is kept in its activity. **Copier pour un développeur (Copy for a developer)** copies the whole ticket as text.
 
-Use **Imprimer (Print)** for a meeting handout and **Exporter (CSV)** for a spreadsheet. The counters at the top show how many questions are answered and how many blockers are still open.
+The old **Projet** page's client questions and spec inconsistencies are now tickets of type Question, with their reference in the title (for example "F8 · …") and the client's answer as the first comment. Answered items are closed.
+
+Tickets are never deleted: close them as **Terminé (Done)** or **Ne sera pas fait (Won't do)**. Central (central.innodigital.ca) reads them once the feed is connected.
 
 ## Rules the system enforces, and fixes
 
