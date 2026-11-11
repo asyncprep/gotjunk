@@ -96,8 +96,6 @@ Revenue before tax is worked out as (amount − tip) ÷ 1.14975. The page update
 
 The **Tickets** page lists them, with the number of open tickets next to it in the menu. Filter by status, type, priority or part of the app, or search. On a ticket, anyone in the admin app changes the status, priority, type or part, and adds comments with files; every change is kept in its activity. **Copier pour un développeur (Copy for a developer)** copies the whole ticket as text.
 
-The old **Projet** page's client questions and spec inconsistencies are now tickets of type Question, with their reference in the title (for example "F8 · …") and the client's answer as the first comment. Answered items are closed.
-
 Tickets are never deleted: close them as **Terminé (Done)** or **Ne sera pas fait (Won't do)**. Central (central.innodigital.ca) reads them once the feed is connected.
 
 ## Rules the system enforces, and fixes

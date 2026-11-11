@@ -1,14 +1,12 @@
--- test: every Projet item is copied as a ticket, answers as comments
-select tests.eq((select count(*) from ticket where spec_ref is not null), (select count(*) from spec_item), 'one ticket per item');
-select tests.eq((select status from ticket where spec_ref = 'F8'), 'done', 'answered item is done');
-select tests.ok((select resolved_at from ticket where spec_ref = 'F8') is not null, 'closed date kept');
-select tests.eq((select status from ticket where spec_ref = 'J3'), 'new', 'open item is new');
-select tests.ok((select title from ticket where spec_ref = 'J3') like 'J3 · %', 'reference kept in the title');
-select tests.ok(exists (select 1 from ticket_comment c join ticket t using (ticket_id)
-                        where t.spec_ref = 'F8' and c.kind = 'comment' and c.author_name = 'Projet'), 'answer is a comment');
-select tests.eq((select count(*) from ticket where number is null), 0::bigint, 'numbered');
+-- test: tickets start empty; the Projet items stay in spec_item
+select tests.eq((select count(*) from ticket), 0::bigint, 'no copied tickets');
+select tests.ok((select count(*) from spec_item) > 60, 'spec items kept');
 
 -- test: dispatch files a ticket; reporter comes from the session, not the browser
+select tests.login('a0000000-0000-0000-0000-000000000010');
+insert into ticket (type, title) values ('question', 'First ticket');
+reset role;
+select tests.eq((select number from ticket where title = 'First ticket'), 1, 'numbering starts at 1');
 select tests.login('a0000000-0000-0000-0000-000000000010');
 insert into ticket (type, title, description, priority, area, reporter_email, reporter_name)
 values ('bug', 'The board does not load', 'Blank page', 'high', 'board', 'someone@else.ca', 'Someone else');
@@ -44,8 +42,7 @@ select tests.eq((select author_id from ticket_comment where body = 'Working on i
 
 -- test: nobody fakes a trail entry or deletes a ticket
 select tests.login('a0000000-0000-0000-0000-000000000020');
+insert into ticket (type, title) values ('bug', 'Something');
 select tests.throws($$insert into ticket_comment (ticket_id, kind, event_field, event_to)
                       select ticket_id, 'event', 'status', 'done' from ticket limit 1$$, '%row-level security%');
-select tests.throws($$delete from ticket where spec_ref = 'J3'$$, '%permission denied%');
-reset role;
-select tests.ok(exists (select 1 from ticket where spec_ref = 'J3'), 'not deleted');
+select tests.throws($$delete from ticket$$, '%permission denied%');

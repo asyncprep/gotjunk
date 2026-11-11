@@ -1,9 +1,8 @@
 # Questions for the client
 
-The live list is on the admin app's **Tickets** page, as tickets of type Question (filter
-Type → Question). The questions and the 17 spec inconsistencies were copied there from the old
-Projet page on Nov 11, 2026, with their reference in the title (F8, I-03…), and the client's
-answers as the first comment. New questions are filed with the Report button.
+New questions for the client are tickets of type Question on the admin app's **Tickets** page,
+filed with the Report button. The Projet page's questions and the 17 spec inconsistencies were
+retired on Nov 11, 2026; they remain in the `spec_item` table and in the migrations.
 
 This file only records the answers received so far, so they are also in the repository history.
 
