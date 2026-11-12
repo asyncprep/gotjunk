@@ -1,7 +1,7 @@
 name: truck_team_os
 description: "Truck Team OS – crew app (Montréal 1-800-GOT-JUNK? truck teams)."
 publish_to: 'none'
-version: 0.1.0+1
+version: 0.1.1+1
 
 environment:
   sdk: ^3.12.2
