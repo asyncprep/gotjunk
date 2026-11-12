@@ -14,10 +14,13 @@ import 'disposal_page.dart';
 import 'format.dart';
 import 'job_form.dart';
 import 'profit_share_card.dart';
+import 'settings_page.dart';
 
 class HomePage extends ConsumerWidget {
-  const HomePage({super.key, required this.userId});
+  const HomePage({super.key, required this.userId, this.email});
   final String userId;
+  /// Shown in Settings.
+  final String? email;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -30,13 +33,22 @@ class HomePage extends ConsumerWidget {
         actions: [
           PopupMenuButton<String>(
             onSelected: (v) async {
-              if (v == 'fr' || v == 'en') ref.read(localeProvider.notifier).set(Locale(v));
+              if (v == 'settings') {
+                await Navigator.of(context).push(MaterialPageRoute<void>(
+                  builder: (_) => SettingsPage(userId: userId, email: email),
+                ));
+              }
               if (v == 'signout' && context.mounted) await _signOut(context, repo);
             },
             itemBuilder: (_) => [
-              const PopupMenuItem(value: 'fr', child: Text('Français')),
-              const PopupMenuItem(value: 'en', child: Text('English')),
-              PopupMenuItem(value: 'signout', child: Text(t.signOut)),
+              PopupMenuItem(
+                value: 'settings',
+                child: ListTile(leading: const Icon(Icons.settings_outlined), title: Text(t.settings), contentPadding: EdgeInsets.zero),
+              ),
+              PopupMenuItem(
+                value: 'signout',
+                child: ListTile(leading: const Icon(Icons.logout), title: Text(t.signOut), contentPadding: EdgeInsets.zero),
+              ),
             ],
           ),
         ],

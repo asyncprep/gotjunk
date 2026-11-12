@@ -10,6 +10,7 @@ import 'package:integration_test/integration_test.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:powersync/powersync.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:truck_team_os/data/photo_uploader.dart';
 import 'package:truck_team_os/data/repo.dart';
 import 'package:truck_team_os/data/schema.dart';
@@ -18,6 +19,15 @@ import 'package:truck_team_os/providers.dart';
 import 'package:truck_team_os/ui/home_page.dart';
 
 const user = 'u-1';
+
+/// Records what would be saved on the account, instead of calling the server.
+class _FakeLanguageServer extends LanguageServer {
+  String? saved;
+  @override
+  Future<String?> load(String userId) async => saved;
+  @override
+  Future<void> save(String code) async => saved = code;
+}
 const shiftId = 's-1';
 
 void main() {
@@ -26,6 +36,8 @@ void main() {
   late PowerSyncDatabase db;
   late String path;
   late Directory dir;
+  late SharedPreferences prefs;
+  late _FakeLanguageServer languageServer;
 
   Future<void> seed({String status = 'in_progress', String lead = 'e1'}) => db.writeTransaction((tx) async {
         await tx.execute("INSERT INTO app_user (id, employee_id, role) VALUES (?, 'e1', 'ttm')", [user]);
@@ -51,6 +63,8 @@ void main() {
   Widget app(Locale locale) => ProviderScope(
         overrides: [
           repoProvider.overrideWithValue(Repo(db)),
+          prefsProvider.overrideWithValue(prefs),
+          languageServerProvider.overrideWithValue(languageServer),
           photoDirProvider.overrideWithValue(Directory(join(dir.path, 'ui_photos'))),
           photoUploaderProvider.overrideWithValue(PhotoUploader(db)),
         ],
@@ -92,6 +106,9 @@ void main() {
 
   setUp(() async {
     dir = await getTemporaryDirectory();
+    SharedPreferences.setMockInitialValues({});
+    prefs = await SharedPreferences.getInstance();
+    languageServer = _FakeLanguageServer();
     path = join(dir.path, 'ui_test_${DateTime.now().microsecondsSinceEpoch}.db');
     db = PowerSyncDatabase(schema: schema, path: path);
     await db.initialize();
@@ -338,6 +355,21 @@ void main() {
     await tester.pumpWidget(app(const Locale('en')));
     await settle(tester);
     expect(find.textContaining("isn't linked to a crew member"), findsOneWidget);
+  });
+
+  testWidgets('settings: choosing a language saves it on the phone and on the account', (tester) async {
+    await seed();
+    await tester.pumpWidget(app(const Locale('en')));
+    await settle(tester);
+    await tester.tap(find.byType(PopupMenuButton<String>));
+    await settle(tester);
+    await tester.tap(find.text('Settings'));
+    await settle(tester);
+    expect(find.text('Language'), findsOneWidget);
+    await tester.tap(find.text('Français'));
+    await settle(tester);
+    expect(prefs.getString('language'), 'fr');
+    expect(languageServer.saved, 'fr');
   });
 
   testWidgets('signing out with unsent changes warns first', (tester) async {

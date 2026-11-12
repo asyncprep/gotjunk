@@ -33,6 +33,19 @@ class L10nEn extends L10n {
   String get signOut => 'Sign out';
 
   @override
+  String get settings => 'Settings';
+
+  @override
+  String get language => 'Language';
+
+  @override
+  String get languageHint =>
+      'Saved for your account: the app opens in this language on any phone you sign in on.';
+
+  @override
+  String get signedInAs => 'Signed in as';
+
+  @override
   String get notCrew =>
       'This account isn\'t linked to a crew member. Contact dispatch.';
 
@@ -319,9 +332,6 @@ class L10nEn extends L10n {
   @override
   String get problem_tax_check =>
       'The total with tax doesn\'t match the amount before tax';
-
-  @override
-  String get language => 'Language';
 
   @override
   String get disposal => 'Disposal';

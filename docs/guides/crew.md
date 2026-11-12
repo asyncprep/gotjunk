@@ -7,7 +7,7 @@ Montréal · November 3, 2026
 The crew app replaces the paper route sheet. You enter your route on the truck's iPhone during the day: jobs, dumps, cash and times. Dispatch sees it live and accepts it at the end of the day, and the app shows your profit share as you go.
 
 - **One person enters the route: the crew lead**, signed in on the truck's phone. The others can sign in to look, but only the crew lead can change it.
-- The app is in French or English; change it under **Langue (Language)**.
+- The app is in French or English: choose on the sign-in screen, or in the menu (⋮) → **Paramètres (Settings)** → **Langue (Language)**. Your choice is saved on your account, so on a shared truck phone the app switches to your language when you sign in.
 - It works without signal. Everything is saved on the phone and sent when signal comes back.
 
 ## Signing in and finding your route

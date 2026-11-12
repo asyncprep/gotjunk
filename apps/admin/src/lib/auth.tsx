@@ -1,5 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import type { Session } from '@supabase/supabase-js';
+import i18n from '../i18n';
+import { applyAccountLanguage } from './language';
 import { supabase, type Role } from './supabase';
 
 type AuthState = {
@@ -43,10 +45,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(true);
       const { data } = await supabase
         .from('app_user')
-        .select('role, can_edit_config, active')
+        .select('role, can_edit_config, active, language')
         .eq('user_id', session.user.id)
         .maybeSingle();
       if (cancelled) return;
+      // The language saved on the account follows the person to any computer.
+      void applyAccountLanguage(data?.language, i18n.language);
       setRole(data?.active ? (data.role as Role) : null);
       setCanEditConfig(Boolean(data?.active && (data.role === 'senior_ops' || data.can_edit_config)));
       setLoading(false);

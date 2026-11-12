@@ -145,6 +145,30 @@ abstract class L10n {
   /// **'Se déconnecter'**
   String get signOut;
 
+  /// No description provided for @settings.
+  ///
+  /// In fr, this message translates to:
+  /// **'Paramètres'**
+  String get settings;
+
+  /// No description provided for @language.
+  ///
+  /// In fr, this message translates to:
+  /// **'Langue'**
+  String get language;
+
+  /// No description provided for @languageHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Gardée pour votre compte : l’application s’ouvre dans cette langue sur tout téléphone où vous vous connectez.'**
+  String get languageHint;
+
+  /// No description provided for @signedInAs.
+  ///
+  /// In fr, this message translates to:
+  /// **'Connecté en tant que'**
+  String get signedInAs;
+
   /// No description provided for @notCrew.
   ///
   /// In fr, this message translates to:
@@ -678,12 +702,6 @@ abstract class L10n {
   /// In fr, this message translates to:
   /// **'Le total avec taxes ne correspond pas au montant avant taxes'**
   String get problem_tax_check;
-
-  /// No description provided for @language.
-  ///
-  /// In fr, this message translates to:
-  /// **'Langue'**
-  String get language;
 
   /// No description provided for @disposal.
   ///

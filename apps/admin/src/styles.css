@@ -306,3 +306,8 @@ dialog.lightbox figcaption { display: flex; flex-wrap: wrap; gap: 8px; justify-c
 
 /* Development-only quick sign-in (never in production builds) */
 .quick-signin { margin-top: 18px; padding: 12px; border: 1px dashed var(--line); border-radius: 8px; display: grid; gap: 6px; }
+
+/* Language choice on the sign-in page */
+.lang-switch { display: flex; justify-content: flex-end; gap: 4px; margin-bottom: 8px; }
+.lang-switch button { padding: 4px 10px; font-size: 13px; }
+.lang-switch button.on { background: var(--blue); border-color: var(--blue); color: #fff; }

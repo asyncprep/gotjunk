@@ -14,7 +14,7 @@ Truck Team OS replaces the paper route sheet. Crews fill in their route on the t
 
 As admin you set up who can sign in, the trucks, phones, dump sites and rates, payment methods, ranks and the profit-share values. Dispatchers use what you configure every day, so a wrong rate or a missing truck shows up on their screens first.
 
-The admin opens in French; switch to English with the FR / EN selector at the top right. This guide gives each screen's French name, then the English one in parentheses.
+The admin opens in French. Choose **English** on the sign-in page or with the FR / EN selector at the top right; your choice is saved on your account and follows you to any computer. This guide gives each screen's French name, then the English one in parentheses.
 
 ## Signing in, roles and invitations
 

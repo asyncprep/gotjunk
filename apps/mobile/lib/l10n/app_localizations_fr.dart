@@ -33,6 +33,19 @@ class L10nFr extends L10n {
   String get signOut => 'Se déconnecter';
 
   @override
+  String get settings => 'Paramètres';
+
+  @override
+  String get language => 'Langue';
+
+  @override
+  String get languageHint =>
+      'Gardée pour votre compte : l’application s’ouvre dans cette langue sur tout téléphone où vous vous connectez.';
+
+  @override
+  String get signedInAs => 'Connecté en tant que';
+
+  @override
   String get notCrew =>
       'Ce compte n’est pas lié à un membre d’équipe. Contactez la répartition.';
 
@@ -324,9 +337,6 @@ class L10nFr extends L10n {
   @override
   String get problem_tax_check =>
       'Le total avec taxes ne correspond pas au montant avant taxes';
-
-  @override
-  String get language => 'Langue';
 
   @override
   String get disposal => 'Dépotoir';

@@ -3,7 +3,7 @@ import { Navigate, NavLink, Route, Routes } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from './lib/auth';
 import { supabase } from './lib/supabase';
-import { setLanguage } from './i18n';
+import { chooseLanguage, type Language } from './lib/language';
 import Login from './pages/Login';
 import SetPassword from './pages/SetPassword';
 // Pages load on demand so the sign-in screen and first page arrive quickly.
@@ -81,7 +81,7 @@ export default function App() {
         <select
           aria-label="Language"
           value={i18n.language}
-          onChange={(e) => setLanguage(e.target.value as 'fr' | 'en')}
+          onChange={(e) => void chooseLanguage(e.target.value as Language, true)}
         >
           <option value="fr">FR</option>
           <option value="en">EN</option>

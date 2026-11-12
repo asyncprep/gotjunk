@@ -1,11 +1,12 @@
 import { useRef, useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
+import { chooseLanguage } from '../lib/language';
 import { supabase } from '../lib/supabase';
 import Brand from '../components/Brand';
 import { quickAccounts, type QuickAccount } from '../lib/quickSignIn';
 
 export default function Login() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
@@ -43,6 +44,14 @@ export default function Login() {
   return (
     <div className="center">
       <form className="card auth-card" onSubmit={signIn}>
+        <div className="lang-switch" role="group" aria-label="Langue / Language">
+          {(['fr', 'en'] as const).map((l) => (
+            <button key={l} type="button" aria-pressed={i18n.language === l} className={i18n.language === l ? 'on' : ''}
+              onClick={() => void chooseLanguage(l, false)}>
+              {l === 'fr' ? 'Français' : 'English'}
+            </button>
+          ))}
+        </div>
         <Brand size="large" />
         <h2>{t('login.title')}</h2>
         {message && <div className={`notice ${message.ok ? 'ok' : 'err'}`}>{message.text}</div>}

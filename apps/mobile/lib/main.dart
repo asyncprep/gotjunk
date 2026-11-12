@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'app_config.dart';
@@ -23,10 +24,11 @@ void main() {
 }
 
 class _Services {
-  _Services(this.repo, this.photoDir, this.uploader);
+  _Services(this.repo, this.photoDir, this.uploader, this.prefs);
   final Repo repo;
   final Directory photoDir;
   final PhotoUploader uploader;
+  final SharedPreferences prefs;
 }
 
 Future<_Services> _startServices() async {
@@ -37,12 +39,13 @@ Future<_Services> _startServices() async {
   final db = await openDatabase();
   final photoDir = await photoDirectory();
   final uploader = PhotoUploader(db)..start();
+  final prefs = await SharedPreferences.getInstance();
   debugPrint('Start-up: Supabase ${supabaseMs}ms, database ${clock.elapsedMilliseconds - supabaseMs}ms');
   // After the app is on screen: background setup never delays the crew.
   initBackgroundUploads().catchError((Object e) {
     debugPrint('Background uploads unavailable: $e'); // the in-app uploader still runs
   });
-  return _Services(Repo(db), photoDir, uploader);
+  return _Services(Repo(db), photoDir, uploader, prefs);
 }
 
 class BootApp extends StatefulWidget {
@@ -80,6 +83,7 @@ class _BootAppState extends State<BootApp> {
             repoProvider.overrideWithValue(s.repo),
             photoDirProvider.overrideWithValue(s.photoDir),
             photoUploaderProvider.overrideWithValue(s.uploader),
+            prefsProvider.overrideWithValue(s.prefs),
           ],
           child: const TruckTeamApp(),
         );
@@ -108,16 +112,40 @@ class TruckTeamApp extends ConsumerWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      // French unless the phone is set to English.
+      // Until someone picks a language: French unless the phone is set to English.
       localeResolutionCallback: (device, supported) =>
           device?.languageCode == 'en' ? const Locale('en') : const Locale('fr'),
       home: StreamBuilder<AuthState>(
         stream: Supabase.instance.client.auth.onAuthStateChange,
         builder: (context, _) {
           final session = Supabase.instance.client.auth.currentSession;
-          return session == null ? const LoginPage() : HomePage(userId: session.user.id);
+          return session == null
+              ? const LoginPage()
+              : _SignedIn(key: ValueKey(session.user.id), userId: session.user.id, email: session.user.email);
         },
       ),
     );
   }
+}
+
+/// Once someone is signed in, the app switches to the language saved on their account (or saves
+/// the one they just picked), so a shared truck phone follows whoever is using it.
+class _SignedIn extends ConsumerStatefulWidget {
+  const _SignedIn({super.key, required this.userId, this.email});
+  final String userId;
+  final String? email;
+
+  @override
+  ConsumerState<_SignedIn> createState() => _SignedInState();
+}
+
+class _SignedInState extends ConsumerState<_SignedIn> {
+  @override
+  void initState() {
+    super.initState();
+    ref.read(localeProvider.notifier).syncSignedIn(widget.userId);
+  }
+
+  @override
+  Widget build(BuildContext context) => HomePage(userId: widget.userId, email: widget.email);
 }
