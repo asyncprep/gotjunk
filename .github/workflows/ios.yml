@@ -52,15 +52,23 @@ jobs:
           echo "UDID=$UDID" >> "$GITHUB_ENV"
       - name: Device tests on the simulator
         # One file at a time: on the hosted simulator, relaunching the app for the next file
-        # sometimes can't reach the Dart VM in time. A file that can't connect gets one retry;
-        # a real test failure is not retried.
+        # sometimes can't reach the Dart VM in time, and can then hang until the job times out.
+        # Each attempt gets 15 minutes (a file normally takes under 10). A file that can't
+        # connect or hangs gets one retry; a real test failure is not retried.
         run: |
           set -o pipefail
           failed=0
           for file in integration_test/*_test.dart; do
             for attempt in 1 2; do
-              if flutter test "$file" -d "$UDID" 2>&1 | tee "$RUNNER_TEMP/test.log"; then break; fi
-              if [ "$attempt" = 1 ] && grep -q "Connecting to the VM Service timed out" "$RUNNER_TEMP/test.log"; then
+              status=0
+              # macOS has no `timeout`: perl's alarm ends the run with status 142.
+              perl -e 'alarm shift; exec @ARGV' 900 flutter test "$file" -d "$UDID" 2>&1 | tee "$RUNNER_TEMP/test.log" || status=$?
+              if [ "$status" = 0 ]; then break; fi
+              if [ "$status" = 142 ]; then
+                echo "::warning::$file did not finish within 15 minutes"
+                xcrun simctl terminate "$UDID" com.innodigital.gotjunk.crew 2>/dev/null || true
+              fi
+              if [ "$attempt" = 1 ] && { [ "$status" = 142 ] || grep -q "Connecting to the VM Service timed out" "$RUNNER_TEMP/test.log"; }; then
                 echo "::warning::$file could not connect to the simulator; retrying"
                 continue
               fi
