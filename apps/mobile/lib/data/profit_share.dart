@@ -17,7 +17,7 @@ class ProfitSharePlan {
     this.trainingMinRevenue = 1500,
     this.trainingMinRevenuePerHour = 125,
     this.trainingHoursMax = 3,
-    this.trainingHoursOffRevenuePerHour = false,
+    this.trainingHoursOffRevenuePerHour = true,
     this.lowCogsMaxPct = 43,
     this.midCogsMaxPct = 47,
     this.maxCogsPct = 50,
@@ -72,7 +72,7 @@ class ProfitSharePlan {
   final double trainingMinRevenue;
   final double trainingMinRevenuePerHour;
   final double trainingHoursMax;
-  /// A13 (open): on the sheets the trainer's hours come off wages only, not revenue per hour.
+  /// Client, Nov 12: the trainer's removed hours also come off revenue per hour.
   final bool trainingHoursOffRevenuePerHour;
   final double lowCogsMaxPct;
   final double midCogsMaxPct;
@@ -89,6 +89,9 @@ class CrewShareInput {
     this.pctLowCogs,
     this.pctMidCogs,
     this.pctHighCogs,
+    this.shareToTrainer = false,
+    this.trainer = false,
+    this.damageHold = false,
   });
   final String employeeId;
   final String? name;
@@ -96,6 +99,12 @@ class CrewShareInput {
   final double? pctLowCogs;
   final double? pctMidCogs;
   final double? pctHighCogs;
+  /// Recruit: the share is calculated but paid to the route's trainer.
+  final bool shareToTrainer;
+  /// Chosen by dispatch: receives the shares of the Recruits on the route.
+  final bool trainer;
+  /// Caused damage (dispatch): the share is held back for the repair.
+  final bool damageHold;
 }
 
 class RouteShareInput {
@@ -110,7 +119,6 @@ class RouteShareInput {
     this.swingTrucks = 0,
     this.trainingDay = false,
     this.trainingHoursRemoved = 0,
-    this.damages = false,
   });
   /// Route revenue before tax (sum of completed jobs, after discount).
   final double revenue;
@@ -125,21 +133,43 @@ class RouteShareInput {
   final int swingTrucks;
   final bool trainingDay;
   final double trainingHoursRemoved;
-  final bool damages;
 }
 
 enum CogsBand { low, mid, high, over }
 
-/// Why the route doesn't (yet) earn a profit share.
-enum ShareBlock { revenue, revenuePerHour, cogs, damages, hoursType }
+/// Why the route doesn't (yet) earn a profit share. Damages don't block the route: they hold back
+/// the share of the person who caused them (client, Nov 12).
+enum ShareBlock { revenue, revenuePerHour, cogs, hoursType }
 
 class CrewShare {
-  const CrewShare({required this.employeeId, this.name, required this.pct, required this.amount});
+  const CrewShare({
+    required this.employeeId,
+    this.name,
+    required this.pct,
+    required this.amount,
+    this.fromTrainees = 0,
+    this.toTrainer = false,
+    this.trainer = false,
+    this.held = false,
+  });
   final String employeeId;
   final String? name;
   /// Null when the rank has no profit share.
   final double? pct;
+  /// This person's own calculated share.
   final double amount;
+  /// Recruits' shares passed to this person as the route's trainer.
+  final double fromTrainees;
+  /// A Recruit: [amount] goes to the trainer, not to them.
+  final bool toTrainer;
+  final bool trainer;
+  /// Caused damage: everything they would get is held back for the repair.
+  final bool held;
+
+  /// What goes to payroll for this person.
+  double get payout => held || toTrainer ? 0 : _cents(amount + fromTrainees);
+  /// What is set aside for the repair.
+  double get heldAmount => held && !toTrainer ? _cents(amount + fromTrainees) : 0;
 }
 
 class ProfitShareResult {
@@ -185,7 +215,12 @@ class ProfitShareResult {
   final List<CrewShare> shares;
 
   bool get qualifies => blocks.isEmpty;
-  double get total => shares.fold(0, (s, c) => s + c.amount);
+  /// Every share calculated on the route, whoever it is paid to.
+  double get total => _cents(shares.fold(0, (s, c) => s + c.amount));
+  /// Recruits' shares while no trainer is chosen: paid to nobody until dispatch picks one.
+  double get waitingForTrainer => shares.any((s) => s.trainer)
+      ? 0
+      : _cents(shares.where((s) => s.toTrainer).fold(0, (s, c) => s + c.amount));
 }
 
 double _cents(double v) => (v * 100).roundToDouble() / 100;
@@ -228,25 +263,34 @@ ProfitShareResult computeProfitShare(ProfitSharePlan plan, RouteShareInput r) {
     if (r.revenue < minRevenue) ShareBlock.revenue,
     if (revenuePerHour < minRph) ShareBlock.revenuePerHour,
     if (band == CogsBand.over) ShareBlock.cogs,
-    if (r.damages) ShareBlock.damages,
   ];
 
+  double? pctOf(CrewShareInput c) => switch (band) {
+        CogsBand.low => c.pctLowCogs,
+        CogsBand.mid => c.pctMidCogs,
+        CogsBand.high => c.pctHighCogs,
+        CogsBand.over => null,
+      };
+  double amountOf(CrewShareInput c) {
+    final pct = pctOf(c);
+    return blocks.isEmpty && pct != null ? _cents(r.revenue * pct / 100) : 0;
+  }
+
+  // A Recruit marked as trainer can't receive Recruits' shares; they wait for a real trainer.
+  final trainerId = r.crew.where((c) => c.trainer && !c.shareToTrainer).firstOrNull?.employeeId;
+  final traineeTotal = _cents(r.crew.where((c) => c.shareToTrainer).fold(0.0, (s, c) => s + amountOf(c)));
   final shares = [
     for (final c in r.crew)
-      () {
-        final pct = switch (band) {
-          CogsBand.low => c.pctLowCogs,
-          CogsBand.mid => c.pctMidCogs,
-          CogsBand.high => c.pctHighCogs,
-          CogsBand.over => null,
-        };
-        return CrewShare(
-          employeeId: c.employeeId,
-          name: c.name,
-          pct: pct,
-          amount: blocks.isEmpty && pct != null ? _cents(r.revenue * pct / 100) : 0,
-        );
-      }(),
+      CrewShare(
+        employeeId: c.employeeId,
+        name: c.name,
+        pct: pctOf(c),
+        amount: amountOf(c),
+        fromTrainees: c.employeeId == trainerId ? traineeTotal : 0,
+        toTrainer: c.shareToTrainer,
+        trainer: c.employeeId == trainerId,
+        held: c.damageHold,
+      ),
   ];
 
   final booked = r.jobs + r.cancels;

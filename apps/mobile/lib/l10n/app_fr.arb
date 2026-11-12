@@ -276,7 +276,25 @@
       }
     }
   },
-  "psBlockDamages": "Dommages inscrits par la répartition",
+  "psHeldForDamage": "Retenu pour payer les dommages",
+  "psToTrainerNone": "Va au formateur (pas encore choisi par la répartition)",
+  "psToTrainer": "Va au formateur, {name}",
+  "@psToTrainer": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "psTrainer": "Formateur",
+  "psTrainerWith": "Formateur · inclut {amount} des recrues",
+  "@psTrainerWith": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
   "psBlockHours": "Seules les heures Junk régulières comptent",
   "psNoRank": "Aucun % pour ce rang",
   "psForCalculation": "Pour le calcul",

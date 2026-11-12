@@ -60,6 +60,8 @@ Open the route from **À réviser**. Work down the page; **Vérifications avant 
 3. **Dump visits.** Each visit shows the site, ticket number, ticket photo and materials with weight, billable weight, rate and amount (costs and credits). The amounts come from the rates in Configuration.
 4. **Cash.** The page shows the expected cash and the crew's cash photo. Count the envelope, enter the amount and click **Enregistrer le compte (Record count)**. The envelope label fills in by itself (date · crew lead · amount). A difference from the expected amount is a warning, not a blocker; add a note if you know why.
 5. **Crew and tips.** Check each person's position and start/end times (**Corriger les heures** to fix them), mark someone who left early, or add a member. Tips are split equally by default; click **Répartir à la main (Split by hand)** to set each person's share, which must add up to the total.
+   - **Formateur (Trainer):** tick the trainer when a Recruit is on the route. The Recruit's profit share is calculated at Wingman's % and paid to the trainer. With a Recruit and no trainer ticked, the page warns you and that share is paid to nobody.
+   - **Dommages (Damage):** tick the person who caused damage. Their profit share is still calculated, then held back to pay for the repair; the rest of the crew is paid as usual. The crew sees it on the phone at the next sync.
 6. **End-of-day checklist.** Tick each item (hours checked, cash matches, job info complete, tickets present, cancellations done, keys, phone and tools returned), or **Tout cocher (Check all)**.
 
 The scoreboard at the top (revenue before tax, jobs, tips, net disposal, expected cash, revenue per hour) updates as you go.

@@ -251,9 +251,9 @@ void main() {
     await db.writeTransaction((tx) async {
       await tx.execute(
           "INSERT INTO rank (id, code, share_pct_low_cogs, share_pct_mid_cogs, share_pct_high_cogs) VALUES "
-          "('k-w', 'wingman', 3, 2, 1), ('k-r', 'recruit', NULL, NULL, NULL)");
+          "('k-w', 'wingman', 3, 2, 1), ('k-x', 'expert', 5, 4, 3)");
       await tx.execute("UPDATE shift_crew_member SET rank_id_snapshot = 'k-w' WHERE id = 'm-1'");
-      await tx.execute("UPDATE shift_crew_member SET rank_id_snapshot = 'k-r' WHERE id = 'm-2'");
+      await tx.execute("UPDATE shift_crew_member SET rank_id_snapshot = 'k-x' WHERE id = 'm-2'");
       await tx.execute('''INSERT INTO app_setting (id, value) VALUES ('profit_share_plan', '{"wage_per_hour": 26}')''');
     });
     await repo.startShift(shiftId, 'regular_junk');
@@ -270,7 +270,23 @@ void main() {
     expect(r.cancelRate, 0.5);
     expect(r.band, CogsBand.low);
     expect(r.qualifies, isTrue);
-    expect(r.shares.map((s) => (s.name, s.amount)), [('Crew One', 90.0), ('Crew Two', 0.0)]);
+    expect(r.shares.map((s) => (s.name, s.amount)), [('Crew One', 90.0), ('Crew Two', 150.0)]);
+
+    // Dispatch (synced down): Crew One is a Recruit whose share goes to Crew Two, the trainer,
+    // and Crew Two caused damage, so everything Crew Two would get is held back.
+    await db.writeTransaction((tx) async {
+      await tx.execute(
+          "INSERT INTO rank (id, code, share_pct_low_cogs, share_pct_mid_cogs, share_pct_high_cogs, share_to_trainer) "
+          "VALUES ('k-r', 'recruit', 3, 2, 1, 1)");
+      await tx.execute("UPDATE shift_crew_member SET rank_id_snapshot = 'k-r' WHERE id = 'm-1'");
+      await tx.execute("UPDATE shift_crew_member SET trainer = 1 WHERE id = 'm-2'");
+    });
+    var flagged = (await repo.profitShareData(shiftId).first)!.compute(data.start!.add(const Duration(hours: 10)));
+    expect(flagged.shares.map((s) => (s.toTrainer, s.trainer, s.payout)), [(true, false, 0.0), (false, true, 240.0)]);
+    await db.execute("UPDATE shift_crew_member SET damage_hold = 1 WHERE id = 'm-2'");
+    flagged = (await repo.profitShareData(shiftId).first)!.compute(data.start!.add(const Duration(hours: 10)));
+    expect(flagged.shares.last.heldAmount, 240.0);
+    expect(flagged.shares.last.payout, 0);
 
     await _clearQueue(db);
     await repo.setFuelMode(shiftId, 'two_trucks');

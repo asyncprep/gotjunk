@@ -14,7 +14,7 @@ streams:
       - SELECT reason_id AS id, name_fr, name_en FROM cancellation_reason WHERE active = true
       - SELECT key AS id, value FROM app_setting
       - >-
-        SELECT rank_id AS id, code, name_fr, name_en, share_pct_low_cogs, share_pct_mid_cogs, share_pct_high_cogs
+        SELECT rank_id AS id, code, name_fr, name_en, share_pct_low_cogs, share_pct_mid_cogs, share_pct_high_cogs, share_to_trainer
         FROM rank
       - SELECT site_id AS id, code, name, issues_tickets, requires_ticket_photo, active FROM site
       - SELECT material_type_id AS id, code, name_fr, name_en, active FROM material_type
@@ -45,7 +45,7 @@ streams:
       - >-
         SELECT shift_crew_member.shift_crew_id AS id, shift_crew_member.shift_id,
                shift_crew_member.employee_id, shift_crew_member.joined_at, shift_crew_member.left_at, shift_crew_member.position,
-               shift_crew_member.rank_id_snapshot, shift_crew_member.tip_override
+               shift_crew_member.rank_id_snapshot, shift_crew_member.tip_override, shift_crew_member.trainer, shift_crew_member.damage_hold
         FROM shift_crew_member
         INNER JOIN shift_crew_member m ON m.shift_id = shift_crew_member.shift_id
         INNER JOIN app_user u ON u.employee_id = m.employee_id

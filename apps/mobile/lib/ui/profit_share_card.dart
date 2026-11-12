@@ -81,10 +81,27 @@ class _ProfitShareCardState extends State<ProfitShareCard> {
                     padding: const EdgeInsets.only(top: 6),
                     child: Row(
                       children: [
-                        Expanded(child: Text(s.name ?? '…', style: text.bodyLarge)),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(s.name ?? '…', style: text.bodyLarge),
+                              if (_note(context, t, r, s) case final note?)
+                                Text(note, style: text.bodySmall?.copyWith(color: s.held ? scheme.error : null)),
+                            ],
+                          ),
+                        ),
                         Text(s.pct == null ? t.psNoRank : pct(s.pct!), style: text.bodySmall),
                         const SizedBox(width: 12),
-                        Text(money(context, s.amount), style: text.titleLarge?.copyWith(fontWeight: FontWeight.w600)),
+                        // A Recruit's share and a held share are shown, but not as theirs to be paid.
+                        Text(
+                          money(context, s.toTrainer ? s.amount : s.held ? s.heldAmount : s.payout),
+                          style: text.titleLarge?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: s.toTrainer || s.held ? scheme.outline : null,
+                            decoration: s.held ? TextDecoration.lineThrough : null,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -148,9 +165,19 @@ class _ProfitShareCardState extends State<ProfitShareCard> {
     ShareBlock.revenue => t.psBlockRevenue(money(context, r.revenue), money(context, r.minRevenue)),
     ShareBlock.revenuePerHour => t.psBlockRph(money(context, r.revenuePerHour), money(context, r.minRevenuePerHour)),
     ShareBlock.cogs => t.psBlockCogs(_percent(context)(plan.maxCogsPct)),
-    ShareBlock.damages => t.psBlockDamages,
     ShareBlock.hoursType => t.psBlockHours,
   };
+
+  /// Under a name: where a Recruit's share goes, what the trainer receives, a share held for damage.
+  String? _note(BuildContext context, L10n t, ProfitShareResult r, CrewShare s) {
+    if (s.held) return t.psHeldForDamage;
+    if (s.toTrainer) {
+      final trainer = r.shares.where((x) => x.trainer).firstOrNull;
+      return trainer == null ? t.psToTrainerNone : t.psToTrainer(trainer.name ?? '…');
+    }
+    if (s.trainer) return s.fromTrainees > 0 ? t.psTrainerWith(money(context, s.fromTrainees)) : t.psTrainer;
+    return null;
+  }
 }
 
 /// "39,87 %" in French, "39.87%" in English.

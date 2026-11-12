@@ -19,7 +19,8 @@ const schema = Schema([
     Column.text('submitted_at'),
     // Only the lead's login can change the shift (one shared phone per truck).
     Column.text('lead_employee_id'),
-    // Profit-share inputs from the route sheet. The crew lead sets the first four; damages is dispatch.
+    // Profit-share inputs from the route sheet, set by the crew lead. damages is no longer used
+    // (Nov 12: damages are per person, shift_crew_member.damage_hold).
     Column.text('fuel_mode'), // one_truck | split_day | two_trucks
     Column.integer('swing_truck'),
     Column.integer('swing_truck_count'),
@@ -37,6 +38,8 @@ const schema = Schema([
     Column.text('position'), // driver | navigator | onboarding, set by dispatch
     Column.text('rank_id_snapshot'), // rank on the route date (kept current until acceptance)
     Column.real('tip_override'), // tip split set by dispatch
+    Column.integer('trainer'), // chosen by dispatch: receives the Recruits' profit share
+    Column.integer('damage_hold'), // set by dispatch: this person's share is held for repairs
   ], indexes: [
     Index('by_shift', [IndexedColumn('shift_id')]),
     Index('by_employee', [IndexedColumn('employee_id')]),
@@ -128,6 +131,7 @@ const schema = Schema([
     Column.real('share_pct_low_cogs'),
     Column.real('share_pct_mid_cogs'),
     Column.real('share_pct_high_cogs'),
+    Column.integer('share_to_trainer'), // Recruit: share paid to the route's trainer
   ]),
   Table('app_user', [Column.text('employee_id'), Column.text('role')]),
   Table('truck', [Column.text('unit_number')]),

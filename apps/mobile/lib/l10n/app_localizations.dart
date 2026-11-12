@@ -1105,11 +1105,35 @@ abstract class L10n {
   /// **'COGS au-dessus de {max}'**
   String psBlockCogs(String max);
 
-  /// No description provided for @psBlockDamages.
+  /// No description provided for @psHeldForDamage.
   ///
   /// In fr, this message translates to:
-  /// **'Dommages inscrits par la répartition'**
-  String get psBlockDamages;
+  /// **'Retenu pour payer les dommages'**
+  String get psHeldForDamage;
+
+  /// No description provided for @psToTrainerNone.
+  ///
+  /// In fr, this message translates to:
+  /// **'Va au formateur (pas encore choisi par la répartition)'**
+  String get psToTrainerNone;
+
+  /// No description provided for @psToTrainer.
+  ///
+  /// In fr, this message translates to:
+  /// **'Va au formateur, {name}'**
+  String psToTrainer(String name);
+
+  /// No description provided for @psTrainer.
+  ///
+  /// In fr, this message translates to:
+  /// **'Formateur'**
+  String get psTrainer;
+
+  /// No description provided for @psTrainerWith.
+  ///
+  /// In fr, this message translates to:
+  /// **'Formateur · inclut {amount} des recrues'**
+  String psTrainerWith(String amount);
 
   /// No description provided for @psBlockHours.
   ///

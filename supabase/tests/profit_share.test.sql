@@ -4,7 +4,9 @@
 select tests.eq((select (value ->> 'wage_per_hour')::numeric from app_setting where key = 'profit_share_plan'), 26::numeric, 'wage per hour');
 select tests.eq((select share_pct_low_cogs from rank where code = 'wingman'), 3.00::numeric, 'wingman under 43%');
 select tests.eq((select share_pct_high_cogs from rank where code = 'jr_coach'), 3.00::numeric, 'jr coach 47-50%');
-select tests.ok((select share_pct_low_cogs is null from rank where code = 'recruit'), 'recruit gets no share');
+select tests.eq((select share_pct_low_cogs from rank where code = 'recruit'), 3.00::numeric, 'recruit: wingman %');
+select tests.ok((select share_to_trainer from rank where code = 'recruit'), 'recruit share goes to the trainer');
+select tests.ok((select not share_to_trainer from rank where code = 'wingman'), 'wingman keeps their share');
 
 -- test: crew members get their rank as soon as they are on the route
 select tests.eq((select r.code from shift_crew_member m join rank r on r.rank_id = m.rank_id_snapshot
@@ -63,3 +65,26 @@ update shift set swing_truck = false where shift_id = 'c0000000-0000-0000-0000-0
 select tests.eq((select swing_truck_count from shift where shift_id = 'c0000000-0000-0000-0000-000000000001'), 0, 'an older build turning it off clears the number');
 update shift set swing_truck = true where shift_id = 'c0000000-0000-0000-0000-000000000001';
 select tests.eq((select swing_truck_count from shift where shift_id = 'c0000000-0000-0000-0000-000000000001'), 1, 'an older build turning it on means one truck');
+
+-- test: trainer hours come off revenue per hour too (client, Nov 12)
+select tests.ok((select (value ->> 'training_hours_off_revenue_per_hour')::boolean from app_setting where key = 'profit_share_plan'), 'off revenue per hour');
+
+-- test: dispatch picks one trainer per route and marks who caused damage; the crew can't
+select tests.login('a0000000-0000-0000-0000-000000000010');
+update shift_crew_member set trainer = true
+ where shift_id = 'c0000000-0000-0000-0000-000000000001' and employee_id = 'b0000000-0000-0000-0000-000000000002';
+update shift_crew_member set damage_hold = true
+ where shift_id = 'c0000000-0000-0000-0000-000000000001' and employee_id = 'b0000000-0000-0000-0000-000000000002';
+select tests.eq((select count(*)::int from shift_crew_member
+                  where shift_id = 'c0000000-0000-0000-0000-000000000001' and trainer and damage_hold), 1, 'dispatch sets both');
+select tests.throws($q$
+  update shift_crew_member set trainer = true
+   where shift_id = 'c0000000-0000-0000-0000-000000000001' and employee_id = 'b0000000-0000-0000-0000-000000000001'
+$q$, '%shift_crew_member_one_trainer%');
+select tests.login('a0000000-0000-0000-0000-000000000001');
+update shift_crew_member set damage_hold = false
+ where shift_id = 'c0000000-0000-0000-0000-000000000001' and employee_id = 'b0000000-0000-0000-0000-000000000002';
+select tests.login('a0000000-0000-0000-0000-000000000010');
+select tests.ok((select damage_hold from shift_crew_member
+                  where shift_id = 'c0000000-0000-0000-0000-000000000001' and employee_id = 'b0000000-0000-0000-0000-000000000002'),
+  'the crew cannot clear it');

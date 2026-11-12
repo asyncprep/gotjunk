@@ -248,7 +248,25 @@
       }
     }
   },
-  "psBlockDamages": "Damages recorded by dispatch",
+  "psHeldForDamage": "Held back to pay for damage",
+  "psToTrainerNone": "Goes to the trainer (dispatch hasn't chosen one yet)",
+  "psToTrainer": "Goes to the trainer, {name}",
+  "@psToTrainer": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "psTrainer": "Trainer",
+  "psTrainerWith": "Trainer · includes {amount} from recruits",
+  "@psTrainerWith": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
   "psBlockHours": "Only regular junk hours count",
   "psNoRank": "No % for this rank",
   "psForCalculation": "For the calculation",

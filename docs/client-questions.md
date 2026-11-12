@@ -18,6 +18,17 @@ This file only records the answers received so far, so they are also in the repo
 | S12 | Which GOT-JUNK address sends invitations, and can we get its SMTP settings? |
 | F10 | Can dispatch get today's jobs per truck out of Pipeline without typing? (A Salesforce report with Opportunity ID, truck or crew, address and time, exported to CSV or emailed each morning. Can we get a sample? Failing that, read-only API access to those fields from HQ?) |
 
+## Profit-share answers (Nov 12, 2026)
+
+| Ref | Answer |
+| --- | --- |
+| A10 | The formulas are in the master tracker and daily tracker sheets, and spelled out on the paper route journal. |
+| A12 | Recruits get no profit share: it is still calculated (at Wingman's %, Khalil) and goes to the trainer as an incentive. Expert and JR Coach are two ranks with the same %. Dispatch chooses the trainer (Khalil). |
+| A13 | The trainer's removed hours also come off revenue per hour, to give the trainer a better chance (training slows the route). Damages are separate: the share of the person who caused them is still calculated, but held back to pay for the repair instead of going to payroll. |
+| A14 | $75 per 1,000 kg. |
+| — | Only Regular Junk hours count, for now. |
+| — | Onboarding: their hours count in the team hours, and they get a share (by their rank). |
+
 ## Answers received (as of Nov 2, 2026)
 
 | Ref | Question | Answer |

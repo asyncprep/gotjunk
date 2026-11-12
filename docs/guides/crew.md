@@ -63,7 +63,7 @@ Each weigh-in shows an estimate from the site's rate: a cost for garbage, wood a
 
 - whether the route **qualifies**, is **not qualified yet**, or **doesn't qualify**, and what is missing (for example "Revenue: $1,600 of $2,000 minimum");
 - revenue per hour, team hours, average job size and COGS %;
-- each person's % and amount, based on their rank and the COGS band;
+- each person's % and amount, based on their rank and the COGS band. A Recruit's share is calculated but goes to the trainer dispatch chose, and shows under the trainer's name. If dispatch marked someone for damage, their share is struck through: it is held back to pay for the repair;
 - **How it's calculated:** wages (team hours × rate), dumps (costs − credits), franchise fees, fuel and swing truck.
 
 Hours count up to now while the route is going, so the numbers move during the day. The final amount is the one on the route dispatch accepts.

@@ -32,7 +32,7 @@ async function loadShift(id: string) {
       must(supabase.from('checklist_item').select('item_id, label_fr, label_en, required').eq('active', true).order('sort_order')),
       must(supabase.from('shift_checklist_check').select('item_id, checked').eq('shift_id', id)),
       must(supabase.from('shift_crew_member')
-        .select('shift_crew_id, employee_id, position, joined_at, left_at, tip_override, employee:employee_id(full_name), frozen:rank_id_snapshot(name_fr, name_en)')
+        .select('shift_crew_id, employee_id, position, joined_at, left_at, tip_override, trainer, damage_hold, employee:employee_id(full_name), frozen:rank_id_snapshot(name_fr, name_en, share_to_trainer)')
         .eq('shift_id', id).order('joined_at')),
       must(supabase.from('v_shift_tips_by_employee').select('employee_id, tips').eq('shift_id', id)),
       must(supabase.from('cancellation_reason').select('reason_id, name_fr, name_en').eq('active', true).order('sort_order')),
@@ -99,6 +99,15 @@ export default function ShiftReview() {
   }, t('shift.countSaved'));
   const toggleCheck = (itemId: string, value: boolean) => action.run(() => must(
     supabase.from('shift_checklist_check').upsert({ shift_id: shiftId, item_id: itemId, checked: value }, { onConflict: 'shift_id,item_id' }).select()));
+  // One trainer per route (client, Nov 12): they receive the Recruits' profit share.
+  const hasRecruit = d.crew.some((m: any) => m.frozen?.share_to_trainer);
+  const setTrainer = (m: any, on: boolean) => action.run(async () => {
+    if (on) {
+      await must(supabase.from('shift_crew_member').update({ trainer: false })
+        .eq('shift_id', shiftId).eq('trainer', true).select());
+    }
+    await must(supabase.from('shift_crew_member').update({ trainer: on }).eq('shift_crew_id', m.shift_crew_id).select());
+  }, t('ui.saved'));
   const checkAll = () => action.run(() => must(supabase.from('shift_checklist_check').upsert(
     d.items.map((i: any) => ({ shift_id: shiftId, item_id: i.item_id, checked: true })), { onConflict: 'shift_id,item_id' }).select()));
 
@@ -270,9 +279,17 @@ export default function ShiftReview() {
         <div className="card">
           <h2>{t('shift.crew')}</h2>
           <p className="muted small">{t('shift.leadHint')}</p>
+          <p className="muted small">{t('shift.trainerHint')}</p>
+          {hasRecruit && !d.crew.some((m: any) => m.trainer) && (
+            <div className="problem warning small">! {t('shift.noTrainer')}</div>
+          )}
           <div className="table-wrap">
             <table>
-              <thead><tr><th>{t('common.name')}</th><th>{t('position.label')}</th><th>{t('shift.rankFrozen')}</th><th className="num">{t('shift.tipShare')}</th><th /></tr></thead>
+              <thead><tr>
+                <th>{t('common.name')}</th><th>{t('position.label')}</th><th>{t('shift.rankFrozen')}</th>
+                <th>{t('shift.trainer')}</th><th>{t('shift.damage')}</th>
+                <th className="num">{t('shift.tipShare')}</th><th />
+              </tr></thead>
               <tbody>
                 {d.crew.map((m: any) => (
                   <tr key={m.shift_crew_id}>
@@ -319,7 +336,23 @@ export default function ShiftReview() {
                         <option value="onboarding">{t('position.onboarding')}</option>
                       </select>
                     </td>
-                    <td>{named(m.frozen, lang) || '—'}</td>
+                    <td>
+                      {named(m.frozen, lang) || '—'}
+                      {m.frozen?.share_to_trainer && <div className="muted small">{t('shift.shareToTrainer')}</div>}
+                    </td>
+                    <td>
+                      {m.frozen?.share_to_trainer ? '—' : (
+                        <input type="checkbox" checked={!!m.trainer} disabled={action.busy}
+                          aria-label={`${t('shift.trainer')} – ${m.employee?.full_name ?? ''}`}
+                          onChange={(e) => setTrainer(m, e.target.checked)} />
+                      )}
+                    </td>
+                    <td>
+                      <input type="checkbox" checked={!!m.damage_hold} disabled={action.busy}
+                        aria-label={`${t('shift.damage')} – ${m.employee?.full_name ?? ''}`} title={t('shift.damageHint')}
+                        onChange={(e) => action.run(() => must(supabase.from('shift_crew_member')
+                          .update({ damage_hold: e.target.checked }).eq('shift_crew_id', m.shift_crew_id).select()), t('ui.saved'))} />
+                    </td>
                     <td className="num">{tipEdit
                       ? <input inputMode="decimal" style={{ width: 90 }} aria-label={t('shift.tipShare')} value={tipEdit[m.shift_crew_id] ?? ''}
                           onChange={(e) => setTipEdit({ ...tipEdit, [m.shift_crew_id]: e.target.value })} />

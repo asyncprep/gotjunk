@@ -569,7 +569,24 @@ class L10nFr extends L10n {
   }
 
   @override
-  String get psBlockDamages => 'Dommages inscrits par la répartition';
+  String get psHeldForDamage => 'Retenu pour payer les dommages';
+
+  @override
+  String get psToTrainerNone =>
+      'Va au formateur (pas encore choisi par la répartition)';
+
+  @override
+  String psToTrainer(String name) {
+    return 'Va au formateur, $name';
+  }
+
+  @override
+  String get psTrainer => 'Formateur';
+
+  @override
+  String psTrainerWith(String amount) {
+    return 'Formateur · inclut $amount des recrues';
+  }
 
   @override
   String get psBlockHours => 'Seules les heures Junk régulières comptent';

@@ -352,7 +352,7 @@ const PLAN_DEFAULTS = {
   min_revenue: 2000, min_revenue_per_hour: 135,
   small_team_hours: 18, small_team_min_crew: 2, small_team_min_revenue: 1500,
   training_min_revenue: 1500, training_min_revenue_per_hour: 125, training_hours_max: 3,
-  training_hours_off_revenue_per_hour: false,
+  training_hours_off_revenue_per_hour: true,
   low_cogs_max_pct: 43, mid_cogs_max_pct: 47, max_cogs_pct: 50,
   hours_types: ['regular_junk'] as string[],
 };
@@ -368,12 +368,12 @@ function ProfitShare({ readOnly }: { readOnly: boolean }) {
   const data = useLoad(async () => ({
     setting: await must(supabase.from('app_setting').select('value').eq('key', PLAN_KEY).maybeSingle()) as any,
     ranks: await must(supabase.from('rank')
-      .select('rank_id, name_fr, name_en, active, share_pct_low_cogs, share_pct_mid_cogs, share_pct_high_cogs')
+      .select('rank_id, name_fr, name_en, active, share_pct_low_cogs, share_pct_mid_cogs, share_pct_high_cogs, share_to_trainer')
       .order('sort_order')) as any[],
   }), []);
   const action = useAction(data.reload);
   const [plan, setPlan] = useState<Plan | null>(null);
-  const [rankEdits, setRankEdits] = useState<Record<string, Record<string, number | null>>>({});
+  const [rankEdits, setRankEdits] = useState<Record<string, Record<string, number | boolean | null>>>({});
 
   if (!data.data) return <div className="card muted">{data.error ?? t('common.loading')}</div>;
   const stored = data.data.setting?.value ?? {};
@@ -395,7 +395,7 @@ function ProfitShare({ readOnly }: { readOnly: boolean }) {
     const value = changed && key in changed ? changed[key] : r[key];
     return (
       <td key={key} className="num">
-        <input className="narrow" type="number" min={0} max={100} step="any" value={value ?? ''} disabled={readOnly}
+        <input className="narrow" type="number" min={0} max={100} step="any" value={(value as number | null) ?? ''} disabled={readOnly}
           placeholder="—" onChange={(e) => setRankEdits({
             ...rankEdits, [r.rank_id]: { ...changed, [key]: e.target.value === '' ? null : Number(e.target.value) },
           })} />
@@ -478,6 +478,7 @@ function ProfitShare({ readOnly }: { readOnly: boolean }) {
               <th className="num">{t('ps.bandLow', { max: p.low_cogs_max_pct })}</th>
               <th className="num">{t('ps.bandMid', { min: p.low_cogs_max_pct, max: p.mid_cogs_max_pct })}</th>
               <th className="num">{t('ps.bandHigh', { min: p.mid_cogs_max_pct, max: p.max_cogs_pct })}</th>
+              <th>{t('ps.toTrainer')}</th>
               <th />
             </tr></thead>
             <tbody>
@@ -487,6 +488,11 @@ function ProfitShare({ readOnly }: { readOnly: boolean }) {
                   <tr key={r.rank_id} className={changed ? 'dirty' : ''}>
                     <td>{rankName(r)}</td>
                     {PCT_KEYS.map((k) => pctCell(r, k))}
+                    <td>
+                      <input type="checkbox" disabled={readOnly} aria-label={`${t('ps.toTrainer')} – ${rankName(r)}`}
+                        checked={!!(changed && 'share_to_trainer' in changed ? changed.share_to_trainer : r.share_to_trainer)}
+                        onChange={(e) => setRankEdits({ ...rankEdits, [r.rank_id]: { ...changed, share_to_trainer: e.target.checked } })} />
+                    </td>
                     <td>{changed && !readOnly && (
                       <div className="row">
                         <button className="primary" disabled={action.busy} onClick={() => action.run(async () => {

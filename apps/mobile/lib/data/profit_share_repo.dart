@@ -2,6 +2,20 @@ import 'field_repo.dart';
 import 'profit_share.dart';
 import 'repo.dart';
 
+/// One shift_crew_member row with its rank's % (a person who left and came back has several).
+typedef CrewRow = ({
+  String employeeId,
+  String? name,
+  DateTime? joined,
+  DateTime? left,
+  double? low,
+  double? mid,
+  double? high,
+  bool toTrainer,
+  bool trainer,
+  bool damageHold,
+});
+
 /// Everything the live profit share needs, read from the phone (works offline). Hours depend on
 /// the time of day, so the result is computed with [ProfitShareData.compute] at display time.
 class ProfitShareData {
@@ -17,7 +31,7 @@ class ProfitShareData {
   final RouteShareInput route;
   final DateTime? start;
   final DateTime? finish;
-  final List<({String employeeId, String? name, DateTime? joined, DateTime? left, double? low, double? mid, double? high})> crew;
+  final List<CrewRow> crew;
 
   bool get live => start != null && finish == null;
 
@@ -34,6 +48,10 @@ class ProfitShareData {
         pctLowCogs: c.low,
         pctMidCogs: c.mid,
         pctHighCogs: c.high,
+        shareToTrainer: c.toTrainer,
+        // A flag on any of their rows counts.
+        trainer: c.trainer || (prior?.trainer ?? false),
+        damageHold: c.damageHold || (prior?.damageHold ?? false),
       );
     }
     return computeProfitShare(plan, RouteShareInput(
@@ -47,7 +65,6 @@ class ProfitShareData {
       swingTrucks: route.swingTrucks,
       trainingDay: route.trainingDay,
       trainingHoursRemoved: route.trainingHoursRemoved,
-      damages: route.damages,
     ));
   }
 }
@@ -55,9 +72,9 @@ class ProfitShareData {
 extension ProfitShareRepo on Repo {
   Stream<ProfitShareData?> profitShareData(String shiftId) => db.watch('''
       SELECT s.start_time, s.finish_time, s.hours_type, s.fuel_mode, s.swing_truck, s.swing_truck_count, s.training_day,
-        s.training_hours_removed, s.damages,
-        m.employee_id, e.full_name, m.joined_at, m.left_at,
-        r.share_pct_low_cogs, r.share_pct_mid_cogs, r.share_pct_high_cogs,
+        s.training_hours_removed,
+        m.employee_id, e.full_name, m.joined_at, m.left_at, m.trainer, m.damage_hold,
+        r.share_pct_low_cogs, r.share_pct_mid_cogs, r.share_pct_high_cogs, r.share_to_trainer,
         (SELECT coalesce(sum(j.revenue_pre_tax), 0) FROM job j WHERE j.shift_id = s.id AND j.outcome = 'completed') AS revenue,
         (SELECT count(*) FROM job j WHERE j.shift_id = s.id AND j.outcome = 'completed') AS jobs,
         (SELECT count(*) FROM job j WHERE j.shift_id = s.id
@@ -94,7 +111,6 @@ extension ProfitShareRepo on Repo {
             swingTrucks: (r['swing_truck_count'] as int?) ?? (r['swing_truck'] == 1 ? 1 : 0),
             trainingDay: r['training_day'] == 1,
             trainingHoursRemoved: n(r['training_hours_removed']),
-            damages: r['damages'] == 1,
           ),
           crew: [
             for (final c in rows)
@@ -107,6 +123,9 @@ extension ProfitShareRepo on Repo {
                   low: pct(c['share_pct_low_cogs']),
                   mid: pct(c['share_pct_mid_cogs']),
                   high: pct(c['share_pct_high_cogs']),
+                  toTrainer: c['share_to_trainer'] == 1,
+                  trainer: c['trainer'] == 1,
+                  damageHold: c['damage_hold'] == 1,
                 ),
           ],
         );

@@ -562,7 +562,24 @@ class L10nEn extends L10n {
   }
 
   @override
-  String get psBlockDamages => 'Damages recorded by dispatch';
+  String get psHeldForDamage => 'Held back to pay for damage';
+
+  @override
+  String get psToTrainerNone =>
+      'Goes to the trainer (dispatch hasn\'t chosen one yet)';
+
+  @override
+  String psToTrainer(String name) {
+    return 'Goes to the trainer, $name';
+  }
+
+  @override
+  String get psTrainer => 'Trainer';
+
+  @override
+  String psTrainerWith(String amount) {
+    return 'Trainer · includes $amount from recruits';
+  }
 
   @override
   String get psBlockHours => 'Only regular junk hours count';

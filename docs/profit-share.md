@@ -1,8 +1,8 @@
 # Profit share: how the client calculates it today
 
 Source: the client's paper sheet "Profit Share", August 2024 version (received Nov 2, 2026). It
-answers open items R1, A1–A5, A8 and A9 on the Projet page. A6, A7 and the follow-ups A10–A13
-are still open. The crew app calculates it live during the day (Nov 3, migration 1700); see
+answers open items R1, A1–A5, A8 and A9 on the Projet page. The follow-ups A10, A12, A13 and A14
+were answered on Nov 12 (docs/client-questions.md). The crew app calculates it live during the day (Nov 3, migration 1700); see
 "In the app" below.
 
 ## Per route
@@ -34,11 +34,18 @@ All of these must hold for the route:
 1. R ≥ $2,000 and RPH ≥ $135. If the team works less than 18 hours in total (team of 2 or
    more), the minimum revenue is $1,500 instead.
 2. COGS % ≤ 50.00%.
-3. Paperwork completely filled out, and no damages.
+3. Paperwork completely filled out. (Damages: see below, they no longer cancel the route.)
 4. Company policies respected; donations never dumped in the garbage.
 
 Training day: the trainer can remove up to 3 hours from the calculation. The route then needs
-R ≥ $1,500 and RPH ≥ $125.
+R ≥ $1,500 and RPH ≥ $125. Client, Nov 12: the removed hours come off revenue per hour as well as
+wages, to give the trainer a better chance to qualify (training slows the route down).
+
+Recruits (client, Nov 12): a Recruit doesn't get a profit share, but it is still calculated, at
+Wingman's %, and paid to the trainer as an extra incentive. Dispatch chooses the trainer.
+
+Damages (client, Nov 12): a person who causes damage still has their share calculated, but it is
+held back to pay for the repair instead of going to payroll. The rest of the crew is paid as usual.
 
 ## How much each crew member gets
 
@@ -50,6 +57,7 @@ route's COGS % band:
 | Wingman | 1% | 2% | 3% |
 | Professional | 2% | 3% | 4% |
 | Expert & JR Coach | 3% | 4% | 5% |
+| Recruit (paid to the trainer) | 1% | 2% | 3% |
 
 Above 50% COGS, nobody gets a profit share. Tips are separate and are not part of COGS.
 
@@ -58,20 +66,26 @@ Above 50% COGS, nobody gets a profit share. Tips are separate and are not part o
 The crew app shows a **Profit share** card under the scoreboard, recalculated as jobs, dump
 visits and hours come in, so nobody fills in the bottom of the sheet at the end of the day:
 - each crew member's % and amount, or why the route doesn't qualify yet (revenue or revenue per
-  hour under the minimum, COGS over 50%, damages, hours other than Regular Junk);
+  hour under the minimum, COGS over 50%, hours other than Regular Junk);
+- under a Recruit, "goes to the trainer"; under the trainer, the Recruits' part included in their
+  amount; a person who caused damage, their amount struck through as "held back";
 - revenue per hour, COGS %, team hours, average job size, and the full COGS breakdown;
 - while the route is going, hours count up to now (recalculated every minute).
 
 Where the numbers come from:
 - Plan: `app_setting` `profit_share_plan` (JSON with every amount and threshold on the sheet,
-  editable on Configuration → Profit share, one field per value). `training_hours_off_revenue_per_hour` is false, as on the
-  sheets (A13).
-- % per rank: `rank.share_pct_low_cogs` / `mid` / `high`, on the same tab. No % (Recruit, A12 default) = no share.
+  editable on Configuration → Profit share, one field per value). `training_hours_off_revenue_per_hour` is true since Nov 12
+  (on the Oct 25 sheets it was wages only).
+- % per rank: `rank.share_pct_low_cogs` / `mid` / `high`, on the same tab. No % = no share.
+  `rank.share_to_trainer` (Recruit): the share is calculated with that % and paid to the trainer.
 - Rank: `shift_crew_member.rank_id_snapshot`, now kept current from the rank history until the
   route is accepted, then frozen as before.
 - Route inputs on `shift`: `fuel_mode` (one truck / split day / 2 trucks), `swing_truck`,
-  `training_day` and `training_hours_removed` (up to 3), set by the crew lead on the card;
-  `damages`, set by dispatch only.
+  `training_day` and `training_hours_removed` (up to 3), set by the crew lead on the card.
+  (`shift.damages` is no longer used; crew app 0.1.0 still reads it.)
+- Per person on `shift_crew_member`, set by dispatch on the route page: `trainer` (one per route)
+  and `damage_hold`. With a Recruit on the route and no trainer chosen, the Recruit's share goes
+  to nobody.
 - Hours per person: from the route start (or when they joined) to the finish (or when they left).
 - The calculation is `apps/mobile/lib/data/profit_share.dart`; its tests reproduce the three
   routes below to the cent.
@@ -114,7 +128,7 @@ Things on the sheets that don't add up (asked on the Projet page):
 - Route 1: the two donation credits are $1.20 for 120 kg and $1.40 for 190 kg, about $10 per
   1,000 kg instead of $75 (A14).
 - Route 1: wages drop 3 hours for the training day, but RPH still uses all 21.5 hours, and the
-  second crew member gets no share (A13).
+  second crew member gets no share (A13; answered Nov 12, see above).
 - Route 2: one garbage ticket of 520 kg is charged $83.20, which is $160 per 1,000 kg, the
   outside-dump rate.
 - Route 3: the credits total is written as 17, but the lines add up to 12 (the dumps line

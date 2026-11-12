@@ -46,7 +46,7 @@ The **Configuration** page holds every list and rate the apps calculate from. Wi
 | Tab (French) | English | What it holds | When to change it |
 | --- | --- | --- | --- |
 | Tarifs de dépotoir | Disposal rates | $ per tonne for each site and material, as a cost, a credit or free; minimum weight and when it applies; start and end dates | A dump changes its price |
-| Partage des profits | Profit share | Wage per team hour, franchise fees, fuel % (one truck, split day, 2 trucks), swing truck fee, minimums, training-day rule, COGS bands, % per rank | The profit-share sheet changes |
+| Partage des profits | Profit share | Wage per team hour, franchise fees, fuel % (one truck, split day, 2 trucks), swing truck fee, minimums, training-day rule, COGS bands, % per rank, and which ranks' share goes to the trainer (**Au formateur / To trainer**, Recruit) | The profit-share sheet changes |
 | Raisons d'annulation | Cancellation reasons | Reasons dispatch picks when a job is cancelled | A new reason is needed |
 | Liste de fin de journée | End-of-day checklist | What dispatch ticks before accepting a route; "required" items block acceptance | The closing routine changes |
 | Rangs | Ranks | Wingman, Professional, Expert, JR Coach… | A rank is added or renamed |
@@ -114,4 +114,4 @@ These rules hold for everyone, in both apps:
 | "Lecture seule" on Configuration | The login has no configuration rights; senior ops grants them |
 | A crew member doesn't see their route | Their login must be linked to the right employee, and they must be on that day's route |
 | An invitation didn't arrive | Check spam; invite again from Users |
-| Profit share looks wrong | Check the values in Configuration → Partage des profits and the person's rank on the route's date |
+| Profit share looks wrong | Check the values in Configuration → Partage des profits, the person's rank on the route's date, and on the route page who is ticked as trainer or for damage |

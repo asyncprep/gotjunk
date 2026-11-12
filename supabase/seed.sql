@@ -9,6 +9,8 @@ insert into public.rank (code, name_fr, name_en, sort_order) values
 -- Profit share % by COGS band (sheet of Aug 2024); expert and jr_coach get theirs in migration 1700.
 update public.rank set share_pct_high_cogs = 1, share_pct_mid_cogs = 2, share_pct_low_cogs = 3 where code = 'wingman';
 update public.rank set share_pct_high_cogs = 2, share_pct_mid_cogs = 3, share_pct_low_cogs = 4 where code = 'sales_pro';
+-- A Recruit's share uses Wingman's % and is paid to the trainer (client, Nov 12; migration 2800).
+update public.rank set share_pct_high_cogs = 1, share_pct_mid_cogs = 2, share_pct_low_cogs = 3, share_to_trainer = true where code = 'recruit';
 
 insert into public.site (code, name, site_type, issues_tickets, requires_ticket_photo) values
   ('eco_junk',     'Eco-Junk',             'eco_junk',     true, true),

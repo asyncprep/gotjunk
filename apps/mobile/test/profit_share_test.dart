@@ -3,18 +3,22 @@ import 'package:truck_team_os/data/profit_share.dart';
 
 // The three filled route sheets of Oct 25, 2026 (docs/profit-share.md) are the expected results.
 const plan = ProfitSharePlan();
+// The sheets of Oct 25 took the trainer's hours off wages only; since Nov 12 they come off revenue per hour too.
+const sheetPlan = ProfitSharePlan(trainingHoursOffRevenuePerHour: false);
 
-CrewShareInput recruit(double h) => CrewShareInput(employeeId: 'r', hours: h);
+// A Recruit's share uses Wingman's % and goes to the trainer (client, Nov 12).
+CrewShareInput recruit(double h) => CrewShareInput(
+    employeeId: 'r', hours: h, pctLowCogs: 3, pctMidCogs: 2, pctHighCogs: 1, shareToTrainer: true);
 CrewShareInput wingman(double h) =>
     CrewShareInput(employeeId: 'w', hours: h, pctLowCogs: 3, pctMidCogs: 2, pctHighCogs: 1);
 CrewShareInput professional(double h) =>
     CrewShareInput(employeeId: 'p', hours: h, pctLowCogs: 4, pctMidCogs: 3, pctHighCogs: 2);
-CrewShareInput expert(double h) =>
-    CrewShareInput(employeeId: 'e', hours: h, pctLowCogs: 5, pctMidCogs: 4, pctHighCogs: 3);
+CrewShareInput expert(double h, {bool trainer = false, bool damageHold = false}) => CrewShareInput(
+    employeeId: 'e', hours: h, pctLowCogs: 5, pctMidCogs: 4, pctHighCogs: 3, trainer: trainer, damageHold: damageHold);
 
 void main() {
   test('route 1: one truck, training day with 3 hours off wages', () {
-    final r = computeProfitShare(plan, RouteShareInput(
+    final r = computeProfitShare(sheetPlan, RouteShareInput(
       revenue: 3522, jobs: 9, dumps: 222 - 3.10, crew: [expert(10.75), recruit(10.75)],
       hoursType: 'regular_junk', trainingDay: true, trainingHoursRemoved: 3,
     ));
@@ -28,8 +32,58 @@ void main() {
     expect(r.cogsPct, 39.87);
     expect(r.band, CogsBand.low);
     expect(r.qualifies, isTrue);
-    expect(r.shares.map((s) => s.amount), [176.10, 0]);
-    expect(r.shares.last.pct, isNull, reason: 'no % for that rank');
+    expect(r.shares.first.amount, 176.10);
+  });
+
+  test('training day: the removed hours come off revenue per hour too', () {
+    final r = computeProfitShare(plan, RouteShareInput(
+      revenue: 3522, jobs: 9, dumps: 222 - 3.10, crew: [expert(10.75), recruit(10.75)],
+      hoursType: 'regular_junk', trainingDay: true, trainingHoursRemoved: 3,
+    ));
+    expect(r.wageHours, 18.5);
+    expect(r.revenuePerHour, 190.38, reason: r'$3,522 / 18.5 h');
+    expect(r.wages, 481.00);
+  });
+
+  test("a Recruit's share is calculated at Wingman's % and paid to the trainer chosen by dispatch", () {
+    RouteShareInput route({bool trainer = true}) => RouteShareInput(
+        revenue: 3522, jobs: 9, dumps: 218.90, crew: [expert(10.75, trainer: trainer), recruit(10.75)],
+        hoursType: 'regular_junk', trainingDay: true, trainingHoursRemoved: 3);
+    final r = computeProfitShare(plan, route());
+    final (trainer, trainee) = (r.shares.first, r.shares.last);
+    expect(trainee.amount, 105.66, reason: '3% of revenue');
+    expect(trainee.toTrainer, isTrue);
+    expect(trainee.payout, 0);
+    expect(trainer.trainer, isTrue);
+    expect(trainer.fromTrainees, 105.66);
+    expect(trainer.payout, 281.76, reason: '176.10 + 105.66');
+    expect(r.waitingForTrainer, 0);
+
+    final none = computeProfitShare(plan, route(trainer: false));
+    expect(none.shares.first.payout, 176.10);
+    expect(none.waitingForTrainer, 105.66, reason: 'paid to nobody until dispatch picks the trainer');
+  });
+
+  test('damage holds back only the share of the person who caused it', () {
+    final r = computeProfitShare(plan, RouteShareInput(
+      revenue: 4196, jobs: 5, dumps: 266.70, crew: [wingman(10.25), expert(10.5, damageHold: true)],
+      hoursType: 'regular_junk', fuelMode: 'two_trucks',
+    ));
+    expect(r.qualifies, isTrue, reason: 'damage no longer cancels the route');
+    expect(r.shares.first.payout, 125.88);
+    final held = r.shares.last;
+    expect(held.amount, 209.80, reason: 'still calculated');
+    expect(held.payout, 0);
+    expect(held.heldAmount, 209.80);
+  });
+
+  test("a trainer's share with the Recruits' part is held when the trainer caused damage", () {
+    final r = computeProfitShare(plan, RouteShareInput(
+      revenue: 3522, jobs: 9, dumps: 218.90, crew: [expert(10.75, trainer: true, damageHold: true), recruit(10.75)],
+      hoursType: 'regular_junk', trainingDay: true, trainingHoursRemoved: 3,
+    ));
+    expect(r.shares.first.payout, 0);
+    expect(r.shares.first.heldAmount, 281.76);
   });
 
   test('route 2: two trucks', () {
@@ -59,10 +113,10 @@ void main() {
     expect(r.shares.map((s) => s.amount), [58.71, 88.06]);
   });
 
-  test('no share below the minimums, over 50% COGS, with damages or non-junk hours', () {
-    RouteShareInput route({double revenue = 3000, bool damages = false, String hours = 'regular_junk', double dumps = 0}) =>
+  test('no share below the minimums, over 50% COGS, or with non-junk hours', () {
+    RouteShareInput route({double revenue = 3000, String hours = 'regular_junk', double dumps = 0}) =>
         RouteShareInput(revenue: revenue, jobs: 5, dumps: dumps, crew: [wingman(10), professional(10)],
-            hoursType: hours, damages: damages);
+            hoursType: hours);
     expect(computeProfitShare(plan, route(revenue: 1900)).blocks, contains(ShareBlock.revenue));
     expect(computeProfitShare(plan, route(revenue: 2600)).blocks, contains(ShareBlock.revenuePerHour),
         reason: r'$130 an hour');
@@ -70,7 +124,6 @@ void main() {
     expect(over.band, CogsBand.over);
     expect(over.blocks, [ShareBlock.cogs]);
     expect(over.total, 0);
-    expect(computeProfitShare(plan, route(damages: true)).blocks, [ShareBlock.damages]);
     expect(computeProfitShare(plan, route(hours: 'warehouse')).blocks, [ShareBlock.hoursType]);
     expect(computeProfitShare(plan, route()).qualifies, isTrue);
   });
@@ -85,10 +138,11 @@ void main() {
   });
 
   test('plan read from the server setting, defaults for anything missing', () {
-    final p = ProfitSharePlan.fromSetting('{"wage_per_hour": 27, "fuel_pct": {"one_truck": 5}, "training_hours_off_revenue_per_hour": true}');
+    final p = ProfitSharePlan.fromSetting('{"wage_per_hour": 27, "fuel_pct": {"one_truck": 5}, "training_hours_off_revenue_per_hour": false}');
     expect(p.wagePerHour, 27);
     expect(p.fuelPct['one_truck'], 5);
-    expect(p.trainingHoursOffRevenuePerHour, isTrue);
+    expect(p.trainingHoursOffRevenuePerHour, isFalse);
+    expect(ProfitSharePlan.fromSetting('{}').trainingHoursOffRevenuePerHour, isTrue);
     expect(p.franchisePct, 16);
     expect(ProfitSharePlan.fromSetting('not json').wagePerHour, 26);
   });
