@@ -151,42 +151,6 @@ void main() {
     expect(shares(await repo.tipShares(shiftId).first), {'Crew One': 19, 'Crew Two': 10});
   });
 
-  testWidgets('only the lead changes the shift; a crew member takes over once the lead has left', (_) async {
-    var lead = await repo.lead(shiftId, me).first;
-    expect(lead.isMe, isTrue);
-    expect(lead.canTakeOver, isFalse);
-
-    lead = await repo.lead(shiftId, mate).first;
-    expect(lead.isMe, isFalse, reason: 'a crewmate signed in on the phone only views the shift');
-    expect(lead.leadName, 'Crew One');
-    expect(lead.canTakeOver, isFalse, reason: 'the lead is still on the truck');
-
-    final past = DateTime.now().toUtc().subtract(const Duration(minutes: 1));
-    await db.execute('UPDATE shift_crew_member SET left_at = ? WHERE id = ?',
-        ['${past.toIso8601String().replaceFirst('T', ' ').replaceFirst('Z', '')}000Z', 'm-1']);
-    await _clearQueue(db);
-    lead = await repo.lead(shiftId, mate).first;
-    expect(lead.leadLeft, isTrue);
-    expect(lead.canTakeOver, isTrue);
-
-    await repo.takeOver(shiftId, mate);
-    lead = await repo.lead(shiftId, mate).first;
-    expect(lead.isMe, isTrue);
-    expect(lead.canTakeOver, isFalse);
-    final tx = await db.getNextCrudTransaction();
-    final op = tx!.crud.single;
-    expect(op.table, 'shift', reason: 'the takeover is queued before anything the new lead enters');
-    expect(op.opData!.keys.toSet(), {'truck_phone_confirmed_at'}, reason: 'crew may not send lead_employee_id');
-  });
-
-  testWidgets('a shift with no lead can be taken over', (_) async {
-    await db.execute('UPDATE shift SET lead_employee_id = NULL WHERE id = ?', [shiftId]);
-    final lead = await repo.lead(shiftId, mate).first;
-    expect(lead.isMe, isFalse);
-    expect(lead.leadName, isNull);
-    expect(lead.canTakeOver, isTrue);
-  });
-
   testWidgets('a new job uploads as an insert without server-calculated fields', (_) async {
     await repo.saveJob(JobDraft(shiftId: shiftId, opportunityId: 'OPP-9', outcome: 'completed',
         paymentMethod: 'card', preTax: 50, total: 57.49, tip: 0));

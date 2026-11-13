@@ -115,7 +115,6 @@
   "problem_hours_type_unconfirmed": "Hours type not confirmed",
   "problem_cancellation_pending": "A cancellation is waiting for dispatch",
   "problem_tax_check": "The total with tax doesn't match the amount before tax",
-  "language": "Language",
   "disposal": "Disposal",
   "addVisit": "Add a visit",
   "visitTitle": "Disposal visit",
@@ -152,27 +151,9 @@
   "quickTitle": "Quick sign-in",
   "quickHint": "Development build only: not in the builds crews install.",
   "tipShares": "Tips per person",
-  "leadIs": "{name} is the crew lead on this phone. You can view the route, but only the crew lead can change it.",
-  "leadLeft": "{name} has left the route. Take over to keep entering it.",
-  "noLead": "This route has no crew lead. Take over to enter it.",
-  "takeOver": "Take over",
-  "takeOverConfirm": "You become the crew lead on this phone: you will enter this route’s jobs, disposal and cash.",
   "err_not_lead": "Only the crew lead signed in on the truck phone can change this route",
+  "err_not_crew": "Only someone on this route’s crew can change it",
   "err_lead_not_crew": "The crew lead must be on this route’s crew",
-  "@leadIs": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "@leadLeft": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
   "positionDriver": "Driver",
   "positionNavigator": "Navigator",
   "positionOnboarding": "Onboarding",
@@ -277,5 +258,7 @@
   "psSwingLess": "One swing truck less",
   "psSwingMore": "One more swing truck",
   "psTrainingDay": "Training day",
-  "psTrainingHours": "Hours removed (trainer)"
+  "psTrainingHours": "Hours removed (trainer)",
+  "showPassword": "Show password",
+  "hidePassword": "Hide password"
 }

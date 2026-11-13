@@ -178,56 +178,30 @@ class ShiftView extends StatelessWidget {
         if (shift == null) return _Message(t.noShift);
         final shiftId = shift['id'] as String;
         final status = shift['status'] as String?;
-        return StreamBuilder<LeadState>(
-          stream: repo.lead(shiftId, employeeId),
-          builder: (context, leadSnap) {
-            final lead = leadSnap.data ?? const LeadState();
-            // One shared phone per truck: only the lead's login changes the shift.
-            final editable = lead.isMe && crewJobStatuses.contains(status);
-            final top = [
-              if (leadSnap.hasData && !lead.isMe && crewEditableStatuses.contains(status))
-                _LeadBanner(lead: lead, onTakeOver: () => _confirmTakeOver(context, shiftId)),
-              _ShiftHeader(repo: repo, shift: shift),
-            ];
-            return Column(children: [
-              // A refused change matters wherever the crew is in the app.
-              _Rejections(repo: repo),
-              Expanded(
-                child: status == 'open'
-                    ? ListView(padding: const EdgeInsets.fromLTRB(16, 12, 16, 120), children: [
-                        ...top,
-                        if (lead.isMe) _StartShift(repo: repo, shiftId: shiftId, current: shift['hours_type'] as String?),
-                      ])
-                    : _RouteTabs(
-                        key: ValueKey(shiftId),
-                        repo: repo,
-                        shiftId: shiftId,
-                        editable: editable,
-                        top: top,
-                        onSubmit: () => _confirmSubmit(context, shiftId),
-                      ),
-              ),
-            ]);
-          },
-        );
+        // Every crew member on the route can enter it, from any phone signed in to their login.
+        final editable = crewJobStatuses.contains(status);
+        final top = [_ShiftHeader(repo: repo, shift: shift)];
+        return Column(children: [
+          // A refused change matters wherever the crew is in the app.
+          _Rejections(repo: repo),
+          Expanded(
+            child: status == 'open'
+                ? ListView(padding: const EdgeInsets.fromLTRB(16, 12, 16, 120), children: [
+                    ...top,
+                    _StartShift(repo: repo, shiftId: shiftId, current: shift['hours_type'] as String?),
+                  ])
+                : _RouteTabs(
+                    key: ValueKey(shiftId),
+                    repo: repo,
+                    shiftId: shiftId,
+                    editable: editable,
+                    top: top,
+                    onSubmit: () => _confirmSubmit(context, shiftId),
+                  ),
+          ),
+        ]);
       },
     );
-  }
-
-  Future<void> _confirmTakeOver(BuildContext context, String shiftId) async {
-    final t = L10n.of(context);
-    final ok = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(t.takeOver),
-        content: Text(t.takeOverConfirm),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(t.cancel)),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: Text(t.takeOver)),
-        ],
-      ),
-    );
-    if (ok == true) await repo.takeOver(shiftId, employeeId);
   }
 
   /// Checks on the phone first (works offline), so the crew fixes problems before leaving the truck.
@@ -355,47 +329,6 @@ class _RouteTabsState extends State<_RouteTabs> {
           NavigationDestination(icon: const Icon(Icons.receipt_long_outlined), selectedIcon: const Icon(Icons.receipt_long), label: t.disposal),
           NavigationDestination(icon: const Icon(Icons.savings_outlined), selectedIcon: const Icon(Icons.savings), label: t.navProfit),
         ],
-      ),
-    );
-  }
-}
-
-/// Shown to a crew member who isn't the lead: the shift is read-only on their login.
-class _LeadBanner extends StatelessWidget {
-  const _LeadBanner({required this.lead, required this.onTakeOver});
-  final LeadState lead;
-  final VoidCallback onTakeOver;
-
-  @override
-  Widget build(BuildContext context) {
-    final t = L10n.of(context);
-    final scheme = Theme.of(context).colorScheme;
-    final name = lead.leadName ?? '…';
-    final text = lead.leadName == null && !lead.leadLeft
-        ? t.noLead
-        : lead.leadLeft
-            ? t.leadLeft(name)
-            : t.leadIs(name);
-    return Card(
-      color: scheme.tertiaryContainer,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Icon(Icons.lock_outline, color: scheme.onTertiaryContainer),
-            const SizedBox(width: 12),
-            Expanded(child: Text(text, style: TextStyle(color: scheme.onTertiaryContainer))),
-          ]),
-          if (lead.canTakeOver) ...[
-            const SizedBox(height: 12),
-            FilledButton.icon(
-              icon: const Icon(Icons.swap_horiz),
-              style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(48)),
-              onPressed: onTakeOver,
-              label: Text(t.takeOver),
-            ),
-          ],
-        ]),
       ),
     );
   }

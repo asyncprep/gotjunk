@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../lib/auth';
 import Brand from '../components/Brand';
+import PasswordInput from '../components/PasswordInput';
 
 // Shown after following an invite or password-reset link.
 export default function SetPassword() {
@@ -30,7 +31,7 @@ export default function SetPassword() {
         {error && <div className="notice err">{error}</div>}
         <label>
           {t('login.password')}
-          <input type="password" autoComplete="new-password" minLength={8} required value={password}
+          <PasswordInput autoComplete="new-password" minLength={8} required value={password}
             onChange={(e) => setPassword(e.target.value)} />
           <span className="muted small">{t('login.minLength')}</span>
         </label>

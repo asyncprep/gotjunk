@@ -919,41 +919,17 @@ abstract class L10n {
   /// **'Pourboires par personne'**
   String get tipShares;
 
-  /// No description provided for @leadIs.
-  ///
-  /// In fr, this message translates to:
-  /// **'{name} est le chef d’équipe sur ce téléphone. Vous pouvez consulter la route, mais seul le chef d’équipe peut la modifier.'**
-  String leadIs(String name);
-
-  /// No description provided for @leadLeft.
-  ///
-  /// In fr, this message translates to:
-  /// **'{name} a quitté la route. Prenez la relève pour continuer à la saisir.'**
-  String leadLeft(String name);
-
-  /// No description provided for @noLead.
-  ///
-  /// In fr, this message translates to:
-  /// **'Cette route n’a pas de chef d’équipe. Prenez la relève pour la saisir.'**
-  String get noLead;
-
-  /// No description provided for @takeOver.
-  ///
-  /// In fr, this message translates to:
-  /// **'Prendre la relève'**
-  String get takeOver;
-
-  /// No description provided for @takeOverConfirm.
-  ///
-  /// In fr, this message translates to:
-  /// **'Vous devenez le chef d’équipe sur ce téléphone : c’est vous qui saisirez les travaux, le dépotoir et le comptant de cette route.'**
-  String get takeOverConfirm;
-
   /// No description provided for @err_not_lead.
   ///
   /// In fr, this message translates to:
   /// **'Seul le chef d’équipe connecté sur le téléphone du camion peut modifier cette route'**
   String get err_not_lead;
+
+  /// No description provided for @err_not_crew.
+  ///
+  /// In fr, this message translates to:
+  /// **'Seule une personne de l’équipe de cette route peut la modifier'**
+  String get err_not_crew;
 
   /// No description provided for @err_lead_not_crew.
   ///
@@ -1200,6 +1176,18 @@ abstract class L10n {
   /// In fr, this message translates to:
   /// **'Heures retirées (formateur)'**
   String get psTrainingHours;
+
+  /// No description provided for @showPassword.
+  ///
+  /// In fr, this message translates to:
+  /// **'Afficher le mot de passe'**
+  String get showPassword;
+
+  /// No description provided for @hidePassword.
+  ///
+  /// In fr, this message translates to:
+  /// **'Masquer le mot de passe'**
+  String get hidePassword;
 }
 
 class _L10nDelegate extends LocalizationsDelegate<L10n> {

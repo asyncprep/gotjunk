@@ -4,7 +4,6 @@ import 'package:uuid/uuid.dart';
 import '../business_time.dart';
 
 /// Statuses in which the crew may change their shift (server enforces the same rule).
-const crewEditableStatuses = {'open', 'in_progress', 'returned', 'reopened'};
 const crewJobStatuses = {'in_progress', 'returned', 'reopened'};
 
 String nowUtc() => DateTime.now().toUtc().toIso8601String();
@@ -47,36 +46,6 @@ class Repo {
       SELECT j.*, r.name_fr AS reason_fr, r.name_en AS reason_en
       FROM job j LEFT JOIN cancellation_reason r ON r.id = j.cancellation_reason_id
       WHERE j.shift_id = ? ORDER BY j.created_at, j.id''', parameters: [shiftId]).map(_list);
-
-  /// Who may change the shift from this phone: only the lead's login. With no lead, or once the
-  /// lead has left, the signed-in crew member can take over.
-  Stream<LeadState> lead(String shiftId, String employeeId) => db.watch('''
-      SELECT s.lead_employee_id AS lead_id, e.full_name AS lead_name,
-        EXISTS (SELECT 1 FROM shift_crew_member m WHERE m.shift_id = s.id AND m.employee_id = s.lead_employee_id
-                  AND m.left_at IS NOT NULL AND julianday(m.left_at) <= julianday('now')) AS lead_left,
-        EXISTS (SELECT 1 FROM shift_crew_member m WHERE m.shift_id = s.id AND m.employee_id = ?
-                  AND (m.left_at IS NULL OR julianday(m.left_at) > julianday('now'))) AS me_on_crew,
-        EXISTS (SELECT 1 FROM lead_claim c WHERE c.shift_id = s.id AND c.employee_id = ?) AS claimed
-      FROM shift s LEFT JOIN employee e ON e.id = s.lead_employee_id
-      WHERE s.id = ?''', parameters: [employeeId, employeeId, shiftId]).map((rows) {
-        final r = rows.isEmpty ? const <String, dynamic>{} : rows.first;
-        final leadId = r['lead_id'] as String?;
-        final open = leadId == null || r['lead_left'] == 1;
-        return LeadState(
-          leadName: leadId == null ? null : r['lead_name'] as String?,
-          leadLeft: leadId != null && r['lead_left'] == 1,
-          isMe: leadId == employeeId || (open && r['claimed'] == 1),
-          canTakeOver: open && r['claimed'] != 1 && r['me_on_crew'] == 1,
-        );
-      });
-
-  /// The server makes the next crew login to change the shift its lead. This change is queued
-  /// before anything else this person does, so their jobs and disposal arrive after the takeover.
-  Future<void> takeOver(String shiftId, String employeeId) => db.writeTransaction((tx) async {
-        await tx.execute('INSERT INTO lead_claim (id, shift_id, employee_id) VALUES (?, ?, ?)',
-            [_uuid.v7(), shiftId, employeeId]);
-        await tx.execute('UPDATE shift SET truck_phone_confirmed_at = ? WHERE id = ?', [nowUtc(), shiftId]);
-      });
 
   /// Live scoreboard, calculated on the phone so it works offline.
   Stream<Scoreboard> scoreboard(String shiftId) => db.watch('''
@@ -194,17 +163,6 @@ class TipShare {
   final String employeeId;
   final String? name;
   final double amount;
-}
-
-class LeadState {
-  const LeadState({this.leadName, this.leadLeft = false, this.isMe = false, this.canTakeOver = false});
-  /// The lead's name; null when the shift has no lead.
-  final String? leadName;
-  final bool leadLeft;
-  /// This login may change the shift.
-  final bool isMe;
-  /// No lead, or the lead left: this crew member can take over the phone.
-  final bool canTakeOver;
 }
 
 class JobDraft {

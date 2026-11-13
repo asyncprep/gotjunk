@@ -22,7 +22,7 @@ Every login has one role. The role decides what the person sees and changes; the
 
 | Role (French name) | Signs in to | Can do |
 | --- | --- | --- |
-| Membre d'équipe (Truck team member) | Crew app only | Enter their own route until it is submitted |
+| Membre d'équipe (Truck team member) | Crew app only | Enter their own route until it is submitted (every crew member on the route, not only the crew lead) |
 | Répartiteur (Dispatcher) | Web admin | Create routes, review, return, accept and reopen them, count cash; read configuration |
 | Administration | Web admin | Everything a dispatcher does, plus invite users and manage the team; edit configuration only with configuration rights |
 | Direction (Senior ops) | Web admin | Everything, including configuration and granting senior ops or configuration rights |

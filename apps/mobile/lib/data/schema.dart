@@ -17,7 +17,7 @@ const schema = Schema([
     Column.text('return_reason'),
     Column.text('reopen_reason'),
     Column.text('submitted_at'),
-    // Only the lead's login can change the shift (one shared phone per truck).
+    // The crew lead picked by dispatch (envelope label, ★). Every crew member can change the shift.
     Column.text('lead_employee_id'),
     // Profit-share inputs from the route sheet, set by the crew lead. damages is no longer used
     // (Nov 12: damages are per person, shift_crew_member.damage_hold).
@@ -151,12 +151,6 @@ const schema = Schema([
     Column.text('storage_path'),
     Column.integer('attempts'),
     Column.text('last_error'),
-  ]),
-  // Shifts this login took over (no lead, or the lead left) and the server hasn't confirmed yet.
-  // Never uploaded.
-  Table.localOnly('lead_claim', [
-    Column.text('shift_id'),
-    Column.text('employee_id'),
   ]),
   // Writes the server refused (e.g. a submit that wasn't ready). Never uploaded.
   Table.localOnly('sync_rejection', [

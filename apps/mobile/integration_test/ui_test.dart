@@ -322,31 +322,20 @@ void main() {
     expect(find.text('Old Mate'), findsNothing);
   });
 
-  testWidgets('a crew member who is not the lead sees the shift read-only', (tester) async {
+  testWidgets('a crew member who is not the lead can enter the route too', (tester) async {
     await seed(lead: 'e2');
     await tester.pumpWidget(app(const Locale('en')));
     await settle(tester);
-    expect(find.textContaining('Crew Two is the crew lead on this phone'), findsOneWidget);
-    expect(find.text('Take over'), findsNothing, reason: 'the lead is still on the truck');
-    expect(find.text('Add a job'), findsNothing);
-    await reveal(tester, find.text('Tips per person'));
-    await reveal(tester, find.text('Cash'));
-    expect(find.text('Submit route'), findsNothing);
+    expect(find.text('Take over'), findsNothing);
     await openTab(tester, 'Jobs');
-    expect(find.text('Add a job'), findsNothing);
+    expect(find.text('Add a job'), findsOneWidget);
   });
 
-  testWidgets('a shift without a lead offers to take over', (tester) async {
+  testWidgets('a shift without a lead is editable', (tester) async {
     await seed();
     await db.execute('UPDATE shift SET lead_employee_id = NULL');
     await tester.pumpWidget(app(const Locale('en')));
     await settle(tester);
-    expect(find.text('Add a job'), findsNothing);
-    await tester.tap(find.widgetWithText(FilledButton, 'Take over'));
-    await settle(tester);
-    await tester.tap(find.widgetWithText(FilledButton, 'Take over').last);
-    await settle(tester);
-    expect(find.text('Take over'), findsNothing);
     await openTab(tester, 'Jobs');
     expect(find.text('Add a job'), findsOneWidget);
   });

@@ -17,6 +17,7 @@ class _LoginPageState extends State<LoginPage> {
   final _email = TextEditingController();
   final _password = TextEditingController();
   bool _busy = false;
+  bool _showPassword = false;
   String? _error;
 
   final _passwordFocus = FocusNode();
@@ -91,10 +92,18 @@ class _LoginPageState extends State<LoginPage> {
                     TextField(
                       controller: _password,
                       focusNode: _passwordFocus,
-                      obscureText: true,
+                      obscureText: !_showPassword,
                       autofillHints: const [AutofillHints.password],
                       onSubmitted: (_) => _signIn(),
-                      decoration: InputDecoration(labelText: t.password, border: const OutlineInputBorder()),
+                      decoration: InputDecoration(
+                        labelText: t.password,
+                        border: const OutlineInputBorder(),
+                        suffixIcon: IconButton(
+                          icon: Icon(_showPassword ? Icons.visibility_off_outlined : Icons.visibility_outlined),
+                          tooltip: _showPassword ? t.hidePassword : t.showPassword,
+                          onPressed: () => setState(() => _showPassword = !_showPassword),
+                        ),
+                      ),
                     ),
                     const SizedBox(height: 20),
                     FilledButton(

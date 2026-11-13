@@ -456,29 +456,12 @@ class L10nFr extends L10n {
   String get tipShares => 'Pourboires par personne';
 
   @override
-  String leadIs(String name) {
-    return '$name est le chef d’équipe sur ce téléphone. Vous pouvez consulter la route, mais seul le chef d’équipe peut la modifier.';
-  }
-
-  @override
-  String leadLeft(String name) {
-    return '$name a quitté la route. Prenez la relève pour continuer à la saisir.';
-  }
-
-  @override
-  String get noLead =>
-      'Cette route n’a pas de chef d’équipe. Prenez la relève pour la saisir.';
-
-  @override
-  String get takeOver => 'Prendre la relève';
-
-  @override
-  String get takeOverConfirm =>
-      'Vous devenez le chef d’équipe sur ce téléphone : c’est vous qui saisirez les travaux, le dépotoir et le comptant de cette route.';
-
-  @override
   String get err_not_lead =>
       'Seul le chef d’équipe connecté sur le téléphone du camion peut modifier cette route';
+
+  @override
+  String get err_not_crew =>
+      'Seule une personne de l’équipe de cette route peut la modifier';
 
   @override
   String get err_lead_not_crew =>
@@ -620,4 +603,10 @@ class L10nFr extends L10n {
 
   @override
   String get psTrainingHours => 'Heures retirées (formateur)';
+
+  @override
+  String get showPassword => 'Afficher le mot de passe';
+
+  @override
+  String get hidePassword => 'Masquer le mot de passe';
 }

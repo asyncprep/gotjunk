@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { businessToday, isAdminRole, must, supabase, type Role } from '../lib/supabase';
+import PasswordInput from '../components/PasswordInput';
 import { useAction, useLoad } from '../lib/hooks';
 import { useAuth } from '../lib/auth';
 
@@ -195,7 +196,7 @@ function Users() {
                 <td>{canEdit && (u.role !== 'senior_ops' || role === 'senior_ops') && (
                   pw?.user_id === u.user_id ? (
                     <span className="row">
-                      <input type="password" autoComplete="new-password" placeholder={t('team.newPassword')} value={pw!.password}
+                      <PasswordInput autoComplete="new-password" placeholder={t('team.newPassword')} value={pw!.password}
                         onChange={(e) => setPw({ user_id: u.user_id, password: e.target.value })} />
                       <button className="go" disabled={pw!.password.length < 8 || action.busy} onClick={() => action.run(async () => {
                         await callUsers({ action: 'set_password', user_id: u.user_id, password: pw!.password });
@@ -239,7 +240,7 @@ function Users() {
               <label className="row"><input type="checkbox" checked={invite.can_edit_config}
                 onChange={(e) => setInvite({ ...invite, can_edit_config: e.target.checked })} /> {t('team.configRights')}</label>
             )}
-            <input type="password" autoComplete="new-password" placeholder={t('team.passwordOptional')} value={invite.password}
+            <PasswordInput autoComplete="new-password" placeholder={t('team.passwordOptional')} value={invite.password}
               onChange={(e) => setInvite({ ...invite, password: e.target.value })} />
             <button className="go"
               disabled={!invite.email || action.busy || (invite.role === 'ttm' && !invite.employee_id)

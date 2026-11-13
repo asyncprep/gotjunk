@@ -451,28 +451,11 @@ class L10nEn extends L10n {
   String get tipShares => 'Tips per person';
 
   @override
-  String leadIs(String name) {
-    return '$name is the crew lead on this phone. You can view the route, but only the crew lead can change it.';
-  }
-
-  @override
-  String leadLeft(String name) {
-    return '$name has left the route. Take over to keep entering it.';
-  }
-
-  @override
-  String get noLead => 'This route has no crew lead. Take over to enter it.';
-
-  @override
-  String get takeOver => 'Take over';
-
-  @override
-  String get takeOverConfirm =>
-      'You become the crew lead on this phone: you will enter this route’s jobs, disposal and cash.';
-
-  @override
   String get err_not_lead =>
       'Only the crew lead signed in on the truck phone can change this route';
+
+  @override
+  String get err_not_crew => 'Only someone on this route’s crew can change it';
 
   @override
   String get err_lead_not_crew => 'The crew lead must be on this route’s crew';
@@ -613,4 +596,10 @@ class L10nEn extends L10n {
 
   @override
   String get psTrainingHours => 'Hours removed (trainer)';
+
+  @override
+  String get showPassword => 'Show password';
+
+  @override
+  String get hidePassword => 'Hide password';
 }

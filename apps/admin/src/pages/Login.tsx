@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { chooseLanguage } from '../lib/language';
 import { supabase } from '../lib/supabase';
 import Brand from '../components/Brand';
+import PasswordInput from '../components/PasswordInput';
 import { quickAccounts, type QuickAccount } from '../lib/quickSignIn';
 
 export default function Login() {
@@ -61,7 +62,7 @@ export default function Login() {
         </label>
         <label>
           {t('login.password')}
-          <input ref={passwordInput} type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+          <PasswordInput ref={passwordInput} autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} />
         </label>
         <div className="row">
           <button className="go" disabled={busy}>{t('login.submit')}</button>

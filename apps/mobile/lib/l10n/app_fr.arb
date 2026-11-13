@@ -115,7 +115,6 @@
   "problem_hours_type_unconfirmed": "Type d’heures non confirmé",
   "problem_cancellation_pending": "Une annulation attend la répartition",
   "problem_tax_check": "Le total avec taxes ne correspond pas au montant avant taxes",
-  "language": "Langue",
   "disposal": "Dépotoir",
   "addVisit": "Ajouter une visite",
   "visitTitle": "Visite au dépotoir",
@@ -180,27 +179,9 @@
   "quickTitle": "Connexion rapide",
   "quickHint": "Version de développement seulement : absent des versions installées par l’équipe.",
   "tipShares": "Pourboires par personne",
-  "leadIs": "{name} est le chef d’équipe sur ce téléphone. Vous pouvez consulter la route, mais seul le chef d’équipe peut la modifier.",
-  "leadLeft": "{name} a quitté la route. Prenez la relève pour continuer à la saisir.",
-  "noLead": "Cette route n’a pas de chef d’équipe. Prenez la relève pour la saisir.",
-  "takeOver": "Prendre la relève",
-  "takeOverConfirm": "Vous devenez le chef d’équipe sur ce téléphone : c’est vous qui saisirez les travaux, le dépotoir et le comptant de cette route.",
   "err_not_lead": "Seul le chef d’équipe connecté sur le téléphone du camion peut modifier cette route",
+  "err_not_crew": "Seule une personne de l’équipe de cette route peut la modifier",
   "err_lead_not_crew": "Le chef d’équipe doit faire partie de l’équipe de cette route",
-  "@leadIs": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "@leadLeft": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
   "positionDriver": "Chauffeur",
   "positionNavigator": "Navigateur",
   "positionOnboarding": "Intégration",
@@ -305,5 +286,7 @@
   "psSwingLess": "Un camion de relève de moins",
   "psSwingMore": "Un camion de relève de plus",
   "psTrainingDay": "Journée de formation",
-  "psTrainingHours": "Heures retirées (formateur)"
+  "psTrainingHours": "Heures retirées (formateur)",
+  "showPassword": "Afficher le mot de passe",
+  "hidePassword": "Masquer le mot de passe"
 }

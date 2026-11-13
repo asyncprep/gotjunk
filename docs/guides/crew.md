@@ -6,7 +6,7 @@ Montréal · November 3, 2026
 
 The crew app replaces the paper route sheet. You enter your route on the truck's iPhone during the day: jobs, dumps, cash and times. Dispatch sees it live and accepts it at the end of the day, and the app shows your profit share as you go.
 
-- **One person enters the route: the crew lead**, signed in on the truck's phone. The others can sign in to look, but only the crew lead can change it.
+- **Every crew member on the route can enter it.** The crew lead signs in on the truck's phone; the others can sign in with their own login, on the truck's phone or another one, and enter jobs, dumps and cash too.
 - The app is in French or English: choose on the sign-in screen, or in the menu (⋮) → **Paramètres (Settings)** → **Langue (Language)**. Your choice is saved on your account, so on a shared truck phone the app switches to your language when you sign in.
 - It works without signal. Everything is saved on the phone and sent when signal comes back.
 
@@ -16,7 +16,7 @@ The crew app replaces the paper route sheet. You enter your route on the truck's
 2. Sign in with the email and password you set from your invitation.
 3. **Route du jour (Today's route)** shows your truck, phone, crew with each person's position (Driver, Navigator or Onboarding) and status.
 
-If you see **No route assigned today**, dispatch hasn't put you on a route for today: call them. If it says another person is the crew lead, you can look but not change anything. If the crew lead has left, or there is none, tap **Prendre la relève (Take over)** to become crew lead on this phone.
+If you see **No route assigned today**, dispatch hasn't put you on a route for today: call them. Once you have left the route (dispatch marks you as left), you can still look at it but no longer change it.
 
 At the end of the day, don't sign out while items are still waiting to send: the app warns you, and signing out then would lose them.
 
@@ -82,7 +82,7 @@ Hours count up to now while the route is going, so the numbers move during the d
 
 | Message | What to do |
 | --- | --- |
-| Only the crew lead can change this route | Ask the crew lead, or **Take over** if they left |
+| Only someone on this route's crew can change it | You were marked as left, or you're not on this route: call dispatch |
 | This opportunity number is already on this route | Check the number; each job has its own |
 | No active rate for this material at this site | Tell dispatch; they add the rate |
 | A crew member is already on another active route that day | Call dispatch |

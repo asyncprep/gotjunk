@@ -55,6 +55,10 @@ input, select, textarea, button { font: inherit; color: inherit; }
 input, select, textarea {
   padding: 7px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); min-width: 0;
 }
+.pw-field { position: relative; display: inline-flex; align-items: center; }
+.pw-field input { width: 100%; padding-right: 38px; }
+.pw-eye { position: absolute; right: 4px; padding: 4px 6px; border: 0; background: transparent; color: var(--muted, #666); line-height: 0; }
+.pw-eye:hover { background: transparent; color: var(--blue); }
 input:focus, select:focus, textarea:focus { border-color: var(--blue); outline: none; box-shadow: 0 0 0 3px rgba(0, 83, 159, 0.15); }
 button {
   padding: 7px 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface);
@@ -181,6 +185,8 @@ dialog .actions { display: flex; justify-content: flex-end; gap: 8px; margin-top
 .auth-card .brand { margin-bottom: 20px; }
 .auth-card label { display: block; margin-bottom: 12px; font-weight: 500; }
 .auth-card input { width: 100%; margin-top: 4px; }
+.auth-card .pw-field { display: flex; width: 100%; margin-top: 4px; }
+.auth-card .pw-field input { margin-top: 0; }
 .auth-card button.go { width: 100%; padding: 10px; }
 .loading-screen { min-height: 100vh; display: grid; place-items: center; color: var(--muted); }
 

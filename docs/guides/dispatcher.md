@@ -87,7 +87,7 @@ Return, reopen and cancel each ask for a reason, and every action is recorded wi
 | "Route inconnue", "Camion inconnu", "Téléphone inconnu" or "Personne inconnue" in the preview | Pick the right one from the list next to it, or ask the admin to add it with the tracker's spelling |
 | "Choisissez un poste… un seul chauffeur" | Each crew member needs Driver, Navigator or Onboarding, and the route exactly one driver |
 | A person is already on another route that day | Take them off the other route first (mark them as left), or check the tracker |
-| The crew can't see their route on the phone | The crew lead must sign in on that route's phone, and be on that route |
+| The crew can't see their route on the phone | They must sign in with their own login, and be on that route's crew |
 | "Photo pas encore reçue du téléphone" | The phone hasn't uploaded the photo yet; ask the crew to open the app with signal |
 | Écart de comptant (cash variance) | Count again; if it stands, write why in the note and accept |
 | You accepted too early | **Rouvrir** with a reason, fix, and accept again |
