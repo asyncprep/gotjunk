@@ -147,6 +147,8 @@ const fr = {
     passwordOptional: 'Mot de passe (optionnel)', createLogin: 'Créer la connexion', loginCreated: 'Connexion créée.',
     passwordHint: 'Avec un mot de passe (8 caractères minimum), la connexion est prête tout de suite et aucun courriel n’est envoyé : donnez le courriel et le mot de passe à la personne. Sans mot de passe, une invitation est envoyée par courriel.',
     setPassword: 'Mot de passe', newPassword: 'Nouveau mot de passe (8 caractères min.)', passwordSet: 'Mot de passe changé.',
+    roleChanged: 'Rôle changé.', ttmNeedsEmployee: 'Liez d’abord un employé pour en faire un membre d’équipe',
+    roleHint: 'Le changement de rôle s’applique tout de suite. Quitter le rôle Administration retire les droits de configuration.',
   },
   role: { ttm: 'Membre d’équipe', dispatcher: 'Répartiteur', admin: 'Administration', senior_ops: 'Direction' },
   tickets: {
@@ -369,6 +371,8 @@ const en: Dict = {
     passwordOptional: 'Password (optional)', createLogin: 'Create login', loginCreated: 'Login created.',
     passwordHint: 'With a password (at least 8 characters), the login is ready right away and no email is sent: give the person the email and password. Without a password, an invitation is emailed.',
     setPassword: 'Password', newPassword: 'New password (8 characters min.)', passwordSet: 'Password changed.',
+    roleChanged: 'Role changed.', ttmNeedsEmployee: 'Link an employee first to make this a truck team member',
+    roleHint: 'A role change applies right away. Leaving the Administration role removes configuration rights.',
   },
   role: { ttm: 'Truck team member', dispatcher: 'Dispatcher', admin: 'Administration', senior_ops: 'Senior ops' },
   tickets: {

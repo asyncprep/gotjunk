@@ -72,3 +72,39 @@ describe('Linking a login to an employee', () => {
     expect(picker('s@test.ca')).toBeNull();
   });
 });
+
+const rolePicker = (email: string) => screen.queryByRole('combobox', { name: `Role ${email}` }) as HTMLSelectElement | null;
+
+describe('Changing the role of a login', () => {
+  it('saves the role chosen on another login', async () => {
+    await openUsers();
+    fireEvent.change(rolePicker('d@test.ca')!, { target: { value: 'admin' } });
+    await waitFor(() => expect(update).toHaveBeenCalledWith({ role: 'admin' }));
+  });
+
+  it('offers crew only to a login linked to an employee, and never senior ops to an admin', async () => {
+    await openUsers();
+    const opts = (email: string) => Object.fromEntries(within(rolePicker(email)!).getAllByRole('option')
+      .map((o) => [(o as HTMLOptionElement).value, (o as HTMLOptionElement).disabled]));
+    expect(opts('d@test.ca')).toEqual({ dispatcher: false, admin: false, ttm: true });
+    expect(opts('c@test.ca')).toEqual({ dispatcher: false, admin: false, ttm: false });
+  });
+
+  it('gives no role list on your own login or on a senior ops login', async () => {
+    await openUsers();
+    expect(rolePicker('me@test.ca')).toBeNull();
+    expect(rolePicker('s@test.ca')).toBeNull();
+  });
+
+  it('lets senior ops give senior ops', async () => {
+    auth.role = 'senior_ops';
+    try {
+      await openUsers();
+      expect(within(rolePicker('d@test.ca')!).getAllByRole('option').map((o) => (o as HTMLOptionElement).value))
+        .toContain('senior_ops');
+      expect(rolePicker('s@test.ca')).not.toBeNull();
+    } finally {
+      auth.role = 'admin';
+    }
+  });
+});

@@ -35,6 +35,16 @@ Every login has one role. The role decides what the person sees and changes; the
 4. Tick **Droits de configuration (Configuration rights)** only for people who should change rates and lists. Only senior ops can grant it.
 5. Click **Envoyer l'invitation (Send invitation)**. They receive an email, choose a password of at least 8 characters, and are in.
 
+**Change someone's role**
+
+In **Équipe (Team)** → **Utilisateurs (Users)**, pick the new role in the **Rôle (Role)** column of their row. It applies right away, the next time their screen loads.
+
+- You can't change your own role. Ask another administrator.
+- Only senior ops can make someone senior ops, or change a senior ops login.
+- **Membre d'équipe (Truck team member)** is offered only once the login is linked to an employee in the **Employé (Employee)** column.
+- Moving someone off **Administration** removes their configuration rights. If they become an administrator again, senior ops has to grant those rights again.
+- Every role change is recorded in the **Journal (Audit log)**.
+
 The invitation email currently comes from Supabase's own address (open question S12). A crew login that tries the web admin sees a message that it is for dispatch and administration only.
 
 Forgot password: the person clicks **Mot de passe oublié?** on the sign-in page and gets a reset link by email.

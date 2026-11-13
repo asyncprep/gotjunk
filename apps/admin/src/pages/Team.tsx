@@ -133,6 +133,10 @@ function Users() {
   const canLink = (u: any) => canEdit && u.user_id !== session?.user.id && (u.role !== 'senior_ops' || role === 'senior_ops');
   const linkEmployee = (u: any, employee_id: string) => action.run(() => must(supabase.from('app_user')
     .update({ employee_id: employee_id || null }).eq('user_id', u.user_id).select()), t('team.employeeLinked'));
+  // The roles this admin may give; senior ops only by senior ops (the database checks it too).
+  const roles = ['dispatcher', 'admin', 'ttm', ...(role === 'senior_ops' ? ['senior_ops'] : [])] as Role[];
+  const changeRole = (u: any, next: Role) => action.run(() => must(supabase.from('app_user')
+    .update({ role: next }).eq('user_id', u.user_id).select()), t('team.roleChanged'));
 
   async function callUsers(body: Record<string, unknown>) {
     const { data: result, error } = await supabase.functions.invoke('invite-user', { body });
@@ -164,7 +168,18 @@ function Users() {
             {users.map((u) => (
               <tr key={u.user_id} className={u.active ? '' : 'muted'}>
                 <td>{u.email ?? '—'}</td>
-                <td>{t(`role.${u.role}`)}</td>
+                <td>
+                  {canLink(u) ? (
+                    <select aria-label={`${t('team.role')} ${u.email ?? ''}`} value={u.role} disabled={action.busy}
+                      onChange={(e) => changeRole(u, e.target.value as Role)}>
+                      {roles.map((r) => (
+                        // A crew login must be linked to an employee.
+                        <option key={r} value={r} disabled={r === 'ttm' && !u.employee_id}
+                          title={r === 'ttm' && !u.employee_id ? t('team.ttmNeedsEmployee') : undefined}>{t(`role.${r}`)}</option>
+                      ))}
+                    </select>
+                  ) : t(`role.${u.role}`)}
+                </td>
                 <td>
                   {canLink(u) ? (
                     <select aria-label={`${t('team.employee')} ${u.email ?? ''}`} value={u.employee_id ?? ''} disabled={action.busy}
@@ -205,14 +220,14 @@ function Users() {
           </tbody>
         </table>
       </div>
+      {canEdit && <p className="muted small">{t('team.roleHint')}</p>}
       {canEdit && (
         <>
           <h2 style={{ marginTop: 16 }}>{t('team.invite')}</h2>
           <div className="row">
             <input type="email" placeholder={t('team.email')} value={invite.email} onChange={(e) => setInvite({ ...invite, email: e.target.value })} />
             <select value={invite.role} onChange={(e) => setInvite({ ...invite, role: e.target.value as Role })}>
-              {(['dispatcher', 'admin', 'ttm', ...(role === 'senior_ops' ? ['senior_ops'] : [])] as Role[])
-                .map((r) => <option key={r} value={r}>{t(`role.${r}`)}</option>)}
+              {roles.map((r) =><option key={r} value={r}>{t(`role.${r}`)}</option>)}
             </select>
             {invite.role === 'ttm' && (
               <select value={invite.employee_id} onChange={(e) => setInvite({ ...invite, employee_id: e.target.value })}>
