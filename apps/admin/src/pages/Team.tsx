@@ -130,12 +130,12 @@ function Users() {
   // An employee has at most one login, so the lists offer only people without one.
   const taken = new Set(users.map((u) => u.employee_id).filter(Boolean));
   const free = employees.filter((e) => !taken.has(e.employee_id));
-  // Nobody changes their own access, and only senior ops changes a senior ops login.
-  const canLink = (u: any) => canEdit && u.user_id !== session?.user.id && (u.role !== 'senior_ops' || role === 'senior_ops');
+  // Nobody changes their own access, and only an admin changes an admin login.
+  const canLink = (u: any) => canEdit && u.user_id !== session?.user.id && (u.role !== 'admin' || role === 'admin');
   const linkEmployee = (u: any, employee_id: string) => action.run(() => must(supabase.from('app_user')
     .update({ employee_id: employee_id || null }).eq('user_id', u.user_id).select()), t('team.employeeLinked'));
-  // The roles this admin may give; senior ops only by senior ops (the database checks it too).
-  const roles = ['dispatcher', 'admin', 'ttm', ...(role === 'senior_ops' ? ['senior_ops'] : [])] as Role[];
+  // The roles this login may give; admin only by an admin (the database checks it too).
+  const roles = ['dispatcher', 'senior_ops', 'ttm', ...(role === 'admin' ? ['admin'] : [])] as Role[];
   const changeRole = (u: any, next: Role) => action.run(() => must(supabase.from('app_user')
     .update({ role: next }).eq('user_id', u.user_id).select()), t('team.roleChanged'));
 
@@ -191,9 +191,9 @@ function Users() {
                     </select>
                   ) : (u.employee?.full_name ?? '—')}
                 </td>
-                <td>{u.role === 'senior_ops' || u.can_edit_config ? t('common.yes') : t('common.no')}</td>
+                <td>{u.role === 'admin' || u.can_edit_config ? t('common.yes') : t('common.no')}</td>
                 <td>{u.active ? t('common.yes') : t('common.no')}</td>
-                <td>{canEdit && (u.role !== 'senior_ops' || role === 'senior_ops') && (
+                <td>{canEdit && (u.role !== 'admin' || role === 'admin') && (
                   pw?.user_id === u.user_id ? (
                     <span className="row">
                       <PasswordInput autoComplete="new-password" placeholder={t('team.newPassword')} value={pw!.password}
@@ -236,7 +236,7 @@ function Users() {
                 {free.map((e) => <option key={e.employee_id} value={e.employee_id}>{e.full_name}</option>)}
               </select>
             )}
-            {invite.role === 'admin' && role === 'senior_ops' && (
+            {invite.role === 'senior_ops' && role === 'admin' && (
               <label className="row"><input type="checkbox" checked={invite.can_edit_config}
                 onChange={(e) => setInvite({ ...invite, can_edit_config: e.target.checked })} /> {t('team.configRights')}</label>
             )}

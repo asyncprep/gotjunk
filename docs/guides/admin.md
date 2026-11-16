@@ -24,15 +24,15 @@ Every login has one role. The role decides what the person sees and changes; the
 | --- | --- | --- |
 | Membre d'équipe (Truck team member) | Crew app only | Enter their own route until it is submitted (every crew member on the route, not only the crew lead) |
 | Répartiteur (Dispatcher) | Web admin | Create routes, review, return, accept and reopen them, count cash; read configuration |
-| Administration | Web admin | Everything a dispatcher does, plus invite users and manage the team; edit configuration only with configuration rights |
-| Direction (Senior ops) | Web admin | Everything, including configuration and granting senior ops or configuration rights |
+| Direction (Senior ops) | Web admin | Everything a dispatcher does, plus invite users and manage the team; edit configuration only with configuration rights |
+| Administration (Admin) | Web admin | Everything, including configuration and granting admin or configuration rights. The highest role |
 
 **Invite someone**
 
 1. Go to **Équipe (Team)** → **Utilisateurs (Users)** → **Inviter un utilisateur (Invite a user)**.
 2. Enter their email and pick the role.
 3. For a crew member, pick their **Employé (Employee)**: a crew login must be linked to an employee, so their routes and profit share are theirs.
-4. Tick **Droits de configuration (Configuration rights)** only for people who should change rates and lists. Only senior ops can grant it.
+4. Tick **Droits de configuration (Configuration rights)** only for people who should change rates and lists. Only an admin can grant it.
 5. Click **Envoyer l'invitation (Send invitation)**. They receive an email, choose a password of at least 8 characters, and are in.
 
 **Change someone's role**
@@ -40,9 +40,9 @@ Every login has one role. The role decides what the person sees and changes; the
 In **Équipe (Team)** → **Utilisateurs (Users)**, pick the new role in the **Rôle (Role)** column of their row. It applies right away, the next time their screen loads.
 
 - You can't change your own role. Ask another administrator.
-- Only senior ops can make someone senior ops, or change a senior ops login.
+- Only an admin can make someone admin, or change an admin login.
 - **Membre d'équipe (Truck team member)** is offered only once the login is linked to an employee in the **Employé (Employee)** column.
-- Moving someone off **Administration** removes their configuration rights. If they become an administrator again, senior ops has to grant those rights again.
+- Moving someone off **Direction (Senior ops)** removes their configuration rights. If they become senior ops again, an admin has to grant those rights again.
 - Every role change is recorded in the **Journal (Audit log)**.
 
 The invitation email currently comes from Supabase's own address (open question S12). A crew login that tries the web admin sees a message that it is for dispatch and administration only.
@@ -88,7 +88,7 @@ The **Équipe (Team)** page has two lists: **Employés (Employees)**, the people
 
 ## Payments, audit log and export
 
-**Paiements (Payments)** shows one day's Stripe card payments, read only. Only administration and senior ops see it. Pick a date to see:
+**Paiements (Payments)** shows one day's Stripe card payments, read only. Only admins and senior ops see it. Pick a date to see:
 
 - totals per HQ login (the crew member who took the payments): number of payments, revenue before tax, tips, amount;
 - each payment: time, Opportunity ID, amount, tip, revenue before tax, succeeded or failed, card reader or typed in, HQ login;
@@ -121,7 +121,7 @@ These rules hold for everyone, in both apps:
 | Problem | Fix |
 | --- | --- |
 | A truck, phone or person is "unknown" when dispatch pastes the tracker | Add it in Configuration or Team with the tracker's exact name, or pick it from the list in the paste preview |
-| "Lecture seule" on Configuration | The login has no configuration rights; senior ops grants them |
+| "Lecture seule" on Configuration | The login has no configuration rights; an admin grants them |
 | A crew member doesn't see their route | Their login must be linked to the right employee, and they must be on that day's route |
 | An invitation didn't arrive | Check spam; invite again from Users |
 | Profit share looks wrong | Check the values in Configuration → Partage des profits, the person's rank on the route's date, and on the route page who is ticked as trainer or for damage |

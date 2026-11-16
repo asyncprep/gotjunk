@@ -52,7 +52,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // The language saved on the account follows the person to any computer.
       void applyAccountLanguage(data?.language, i18n.language);
       setRole(data?.active ? (data.role as Role) : null);
-      setCanEditConfig(Boolean(data?.active && (data.role === 'senior_ops' || data.can_edit_config)));
+      setCanEditConfig(Boolean(data?.active && (data.role === 'admin' || data.can_edit_config)));
       setLoading(false);
     }
     loadRole();

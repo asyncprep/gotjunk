@@ -1,5 +1,5 @@
 -- Per-test fixture (runs as system inside each test's transaction).
--- Users:  a…01 ttm1 (e1), a…02 ttm2 (e2), a…03 ttm3 (e3, other shift), a…10 dispatcher, a…20 admin
+-- Users:  a…01 ttm1 (e1), a…02 ttm2 (e2), a…03 ttm3 (e3, other shift), a…10 dispatcher, a…20 senior ops
 -- Shifts: c…01 = T-01 / P-01 with e1 (lead) + e2;  c…02 = T-02 / P-02 with e3 (lead)
 reset role;
 
@@ -19,7 +19,7 @@ insert into public.app_user (user_id, employee_id, role, can_edit_config) values
   ('a0000000-0000-0000-0000-000000000002', 'b0000000-0000-0000-0000-000000000002', 'ttm', false),
   ('a0000000-0000-0000-0000-000000000003', 'b0000000-0000-0000-0000-000000000003', 'ttm', false),
   ('a0000000-0000-0000-0000-000000000010', null, 'dispatcher', false),
-  ('a0000000-0000-0000-0000-000000000020', null, 'admin', true);
+  ('a0000000-0000-0000-0000-000000000020', null, 'senior_ops', true);
 
 insert into public.employee_rank_history (employee_id, rank_id, effective_from)
 select 'b0000000-0000-0000-0000-000000000001'::uuid, rank_id, date '2025-01-01' from public.rank where code = 'recruit'

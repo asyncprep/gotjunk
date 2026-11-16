@@ -5,7 +5,7 @@ import Team from './Team';
 
 const { from, update, auth } = vi.hoisted(() => ({
   from: vi.fn(), update: vi.fn(),
-  auth: { role: 'admin', session: { user: { id: 'me' } } },
+  auth: { role: 'senior_ops', session: { user: { id: 'me' } } },
 }));
 vi.mock('../lib/supabase', async (original) => ({
   ...(await original<typeof import('../lib/supabase')>()),
@@ -14,10 +14,10 @@ vi.mock('../lib/supabase', async (original) => ({
 vi.mock('../lib/auth', () => ({ useAuth: () => auth }));
 
 const users = [
-  { user_id: 'me', email: 'me@test.ca', role: 'admin', employee_id: null, employee: null, active: true },
+  { user_id: 'me', email: 'me@test.ca', role: 'senior_ops', employee_id: null, employee: null, active: true },
   { user_id: 'd', email: 'd@test.ca', role: 'dispatcher', employee_id: null, employee: null, active: true },
   { user_id: 'c', email: 'c@test.ca', role: 'ttm', employee_id: 'e1', employee: { full_name: 'Crew One' }, active: true },
-  { user_id: 's', email: 's@test.ca', role: 'senior_ops', employee_id: null, employee: null, active: true },
+  { user_id: 's', email: 's@test.ca', role: 'admin', employee_id: null, employee: null, active: true },
 ];
 const employees = [
   { employee_id: 'e1', full_name: 'Crew One' }, { employee_id: 'e2', full_name: 'Crew Two' },
@@ -66,7 +66,7 @@ describe('Linking a login to an employee', () => {
     expect(names(picker('c@test.ca')!)).toEqual(['Crew One', 'Crew Two']);
   });
 
-  it('gives no list on your own login or on a senior ops login', async () => {
+  it('gives no list on your own login or on an admin login', async () => {
     await openUsers();
     expect(picker('me@test.ca')).toBeNull();
     expect(picker('s@test.ca')).toBeNull();
@@ -78,33 +78,33 @@ const rolePicker = (email: string) => screen.queryByRole('combobox', { name: `Ro
 describe('Changing the role of a login', () => {
   it('saves the role chosen on another login', async () => {
     await openUsers();
-    fireEvent.change(rolePicker('d@test.ca')!, { target: { value: 'admin' } });
-    await waitFor(() => expect(update).toHaveBeenCalledWith({ role: 'admin' }));
+    fireEvent.change(rolePicker('d@test.ca')!, { target: { value: 'senior_ops' } });
+    await waitFor(() => expect(update).toHaveBeenCalledWith({ role: 'senior_ops' }));
   });
 
-  it('offers crew only to a login linked to an employee, and never senior ops to an admin', async () => {
+  it('offers crew only to a login linked to an employee, and never admin to senior ops', async () => {
     await openUsers();
     const opts = (email: string) => Object.fromEntries(within(rolePicker(email)!).getAllByRole('option')
       .map((o) => [(o as HTMLOptionElement).value, (o as HTMLOptionElement).disabled]));
-    expect(opts('d@test.ca')).toEqual({ dispatcher: false, admin: false, ttm: true });
-    expect(opts('c@test.ca')).toEqual({ dispatcher: false, admin: false, ttm: false });
+    expect(opts('d@test.ca')).toEqual({ dispatcher: false, senior_ops: false, ttm: true });
+    expect(opts('c@test.ca')).toEqual({ dispatcher: false, senior_ops: false, ttm: false });
   });
 
-  it('gives no role list on your own login or on a senior ops login', async () => {
+  it('gives no role list on your own login or on an admin login', async () => {
     await openUsers();
     expect(rolePicker('me@test.ca')).toBeNull();
     expect(rolePicker('s@test.ca')).toBeNull();
   });
 
-  it('lets senior ops give senior ops', async () => {
-    auth.role = 'senior_ops';
+  it('lets an admin give admin', async () => {
+    auth.role = 'admin';
     try {
       await openUsers();
       expect(within(rolePicker('d@test.ca')!).getAllByRole('option').map((o) => (o as HTMLOptionElement).value))
-        .toContain('senior_ops');
+        .toContain('admin');
       expect(rolePicker('s@test.ca')).not.toBeNull();
     } finally {
-      auth.role = 'admin';
+      auth.role = 'senior_ops';
     }
   });
 });

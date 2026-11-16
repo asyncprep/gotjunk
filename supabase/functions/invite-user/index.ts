@@ -12,7 +12,7 @@ const cors = {
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { ...cors, 'Content-Type': 'application/json' } });
 
-const ROLES = ['ttm', 'dispatcher', 'admin', 'senior_ops'];
+const ROLES = ['ttm', 'dispatcher', 'senior_ops', 'admin'];
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
@@ -24,7 +24,7 @@ Deno.serve(async (req) => {
   });
 
   const { data: callerRole } = await caller.rpc('current_app_role');
-  if (callerRole !== 'admin' && callerRole !== 'senior_ops') {
+  if (callerRole !== 'senior_ops' && callerRole !== 'admin') {
     return json({ error: 'not_allowed: only administration can invite users' }, 403);
   }
 
@@ -39,8 +39,8 @@ Deno.serve(async (req) => {
     if (typeof user_id !== 'string' || typeof password !== 'string') return json({ error: 'invalid_request' }, 400);
     const { data: target } = await caller.from('app_user').select('role').eq('user_id', user_id).maybeSingle();
     if (!target) return json({ error: 'not_found' }, 404);
-    if (target.role === 'senior_ops' && callerRole !== 'senior_ops') {
-      return json({ error: 'not_allowed: only senior ops can change a senior ops password' }, 403);
+    if (target.role === 'admin' && callerRole !== 'admin') {
+      return json({ error: 'not_allowed: only an admin can change an admin password' }, 403);
     }
     const { error } = await admin.auth.admin.updateUserById(user_id, { password });
     if (error) return json({ error: error.message }, 400);
@@ -50,7 +50,7 @@ Deno.serve(async (req) => {
   if (typeof email !== 'string' || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return json({ error: 'invalid_email' }, 400);
   if (!ROLES.includes(role)) return json({ error: 'invalid_role' }, 400);
   if (role === 'ttm' && !employee_id) return json({ error: 'employee_required: crew logins must be linked to an employee' }, 400);
-  if (role === 'senior_ops' && callerRole !== 'senior_ops') return json({ error: 'not_allowed: only senior ops can invite senior ops' }, 403);
+  if (role === 'admin' && callerRole !== 'admin') return json({ error: 'not_allowed: only an admin can invite an admin' }, 403);
 
   // With a password the login is created ready to use (no email sent); without one, an invitation is emailed.
   const { data: invited, error: inviteError } = typeof password === 'string'

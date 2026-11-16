@@ -88,28 +88,28 @@ select tests.throws($q$
           'd0000000-0000-0000-0000-000000000001', 'c0000000-0000-0000-0000-000000000002/x.jpg')
 $q$, 'photo_shift_mismatch%');
 
--- test: only senior ops grants senior ops or config rights, and nobody edits their own access
+-- test: only an admin grants admin or config rights, and nobody edits their own access
 reset role;
 insert into auth.users (id) values ('a0000000-0000-0000-0000-000000000030'), ('a0000000-0000-0000-0000-000000000031');
 insert into app_user (user_id, role, can_edit_config) values
-  ('a0000000-0000-0000-0000-000000000030', 'senior_ops', true),
-  ('a0000000-0000-0000-0000-000000000031', 'admin', false);
+  ('a0000000-0000-0000-0000-000000000030', 'admin', true),
+  ('a0000000-0000-0000-0000-000000000031', 'senior_ops', false);
 select tests.login('a0000000-0000-0000-0000-000000000031');
 select tests.throws($q$
-  update app_user set role = 'senior_ops' where user_id = 'a0000000-0000-0000-0000-000000000031'
+  update app_user set role = 'admin' where user_id = 'a0000000-0000-0000-0000-000000000031'
 $q$, 'not_allowed: you cannot change your own access');
 select tests.throws($q$
   update app_user set can_edit_config = true where user_id = 'a0000000-0000-0000-0000-000000000010'
-$q$, 'not_allowed: only senior ops can grant configuration rights');
+$q$, 'not_allowed: only an admin can grant configuration rights');
 select tests.throws($q$
-  update app_user set role = 'senior_ops' where user_id = 'a0000000-0000-0000-0000-000000000010'
-$q$, 'not_allowed: only senior ops%');
+  update app_user set role = 'admin' where user_id = 'a0000000-0000-0000-0000-000000000010'
+$q$, 'not_allowed: only an admin%');
 update app_user set active = false where user_id = 'a0000000-0000-0000-0000-000000000010';
 select tests.login('a0000000-0000-0000-0000-000000000030');
 update app_user set can_edit_config = true where user_id = 'a0000000-0000-0000-0000-000000000031';
 reset role;
-select tests.eq((select active from app_user where user_id = 'a0000000-0000-0000-0000-000000000010'), false, 'admin deactivates dispatcher');
-select tests.eq((select can_edit_config from app_user where user_id = 'a0000000-0000-0000-0000-000000000031'), true, 'senior grants rights');
+select tests.eq((select active from app_user where user_id = 'a0000000-0000-0000-0000-000000000010'), false, 'senior ops deactivates dispatcher');
+select tests.eq((select can_edit_config from app_user where user_id = 'a0000000-0000-0000-0000-000000000031'), true, 'admin grants rights');
 
 -- test: anonymous callers cannot run the readiness checks
 set local role anon;
