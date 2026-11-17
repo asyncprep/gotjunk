@@ -227,6 +227,29 @@ class L10nFr extends L10n {
   String get rejected => 'Refusé par le serveur';
 
   @override
+  String rejectedWhat(String what) {
+    return 'Refusé par le serveur : $what';
+  }
+
+  @override
+  String get tableShift => 'la route';
+
+  @override
+  String get tableJob => 'un travail';
+
+  @override
+  String get tableVisit => 'une visite au dépotoir';
+
+  @override
+  String get tableWeighIn => 'une pesée';
+
+  @override
+  String get tableCash => 'le comptant';
+
+  @override
+  String get tablePhoto => 'une photo';
+
+  @override
   String get dismiss => 'OK';
 
   @override
@@ -395,6 +418,15 @@ class L10nFr extends L10n {
   String get deleteVisit => 'Supprimer la visite';
 
   @override
+  String deleteLineConfirm(String material, String kg) {
+    return 'Supprimer cette pesée ($material, $kg kg) ?';
+  }
+
+  @override
+  String get deleteVisitConfirm =>
+      'Supprimer cette visite au dépotoir, avec ses pesées et photos ?';
+
+  @override
   String get cash => 'Comptant';
 
   @override
@@ -430,6 +462,13 @@ class L10nFr extends L10n {
 
   @override
   String get invalidWeight => 'Poids invalide';
+
+  @override
+  String get pickMaterial => 'Choisissez la matière';
+
+  @override
+  String get noMaterialsAtSite =>
+      'Aucune matière n’a de tarif à ce site aujourd’hui. Appelez la répartition pour qu’elle ajoute le tarif.';
 
   @override
   String get done => 'Terminé';

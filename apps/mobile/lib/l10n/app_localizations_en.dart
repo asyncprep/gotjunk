@@ -225,6 +225,29 @@ class L10nEn extends L10n {
   String get rejected => 'Refused by the server';
 
   @override
+  String rejectedWhat(String what) {
+    return 'Refused by the server: $what';
+  }
+
+  @override
+  String get tableShift => 'the route';
+
+  @override
+  String get tableJob => 'a job';
+
+  @override
+  String get tableVisit => 'a dump visit';
+
+  @override
+  String get tableWeighIn => 'a weigh-in';
+
+  @override
+  String get tableCash => 'the cash';
+
+  @override
+  String get tablePhoto => 'a photo';
+
+  @override
   String get dismiss => 'OK';
 
   @override
@@ -390,6 +413,15 @@ class L10nEn extends L10n {
   String get deleteVisit => 'Delete visit';
 
   @override
+  String deleteLineConfirm(String material, String kg) {
+    return 'Delete this weigh-in ($material, $kg kg)?';
+  }
+
+  @override
+  String get deleteVisitConfirm =>
+      'Delete this dump visit, with its weigh-ins and photos?';
+
+  @override
   String get cash => 'Cash';
 
   @override
@@ -425,6 +457,13 @@ class L10nEn extends L10n {
 
   @override
   String get invalidWeight => 'Invalid weight';
+
+  @override
+  String get pickMaterial => 'Pick the material';
+
+  @override
+  String get noMaterialsAtSite =>
+      'No material has a rate at this site today. Call dispatch to add the rate.';
 
   @override
   String get done => 'Done';

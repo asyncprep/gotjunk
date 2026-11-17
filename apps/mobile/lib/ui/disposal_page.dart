@@ -70,21 +70,51 @@ class _VisitPageState extends ConsumerState<VisitPage> {
     return true;
   }
 
-  Future<void> _addLine() async {
+  /// Adds the weigh-in being typed. False when it can't be added (no material or a bad weight).
+  Future<bool> _addLine() async {
+    final t = L10n.of(context);
     final kg = parseAmount(_kg.text);
-    if (_material == null) return;
+    if (_material == null) {
+      setState(() => _kgError = t.pickMaterial);
+      return false;
+    }
     if (kg == null || kg <= 0) {
-      setState(() => _kgError = L10n.of(context).invalidWeight);
-      return;
+      setState(() => _kgError = t.invalidWeight);
+      return false;
     }
     await ref.read(repoProvider).addLine(_visitId!, _material!, kg);
     setState(() {
       _kg.clear();
       _kgError = null;
     });
+    return true;
+  }
+
+  /// A weight typed but not yet added is added when leaving, instead of being lost.
+  Future<bool> _addPendingLine() async {
+    if (_visitId == null || !widget.editable || _kg.text.trim().isEmpty) return true;
+    return _addLine();
+  }
+
+  /// A delete is one tap away from the amount, so it always asks first.
+  Future<bool> _confirm(String question) async {
+    final t = L10n.of(context);
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        content: Text(question),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(t.cancel)),
+          FilledButton(onPressed: () => Navigator.pop(context, true), child: Text(t.delete)),
+        ],
+      ),
+    );
+    return ok == true;
   }
 
   Future<void> _delete() async {
+    if (!await _confirm(L10n.of(context).deleteVisitConfirm)) return;
+    if (!mounted) return;
     await ref.read(repoProvider).deleteVisit(_visitId!);
     if (mounted) Navigator.pop(context);
   }
@@ -194,9 +224,13 @@ class _VisitPageState extends ConsumerState<VisitPage> {
                               ),
                               if (editable)
                                 IconButton(
-                                  icon: const Icon(Icons.close),
+                                  icon: const Icon(Icons.delete_outline),
                                   tooltip: t.delete,
-                                  onPressed: () => repo.deleteLine(l['id'] as String),
+                                  onPressed: () async {
+                                    final kg = (l['weight_kg'] as num).toStringAsFixed(0);
+                                    final name = '${en ? l['name_en'] : l['name_fr']}';
+                                    if (await _confirm(t.deleteLineConfirm(name, kg))) await repo.deleteLine(l['id'] as String);
+                                  },
                                 ),
                             ]),
                           ),
@@ -209,6 +243,12 @@ class _VisitPageState extends ConsumerState<VisitPage> {
                       stream: repo.materialsForSite(_siteId!),
                       builder: (context, snap) {
                         final materials = snap.data ?? [];
+                        if (snap.hasData && materials.isEmpty) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            child: Text(t.noMaterialsAtSite, style: TextStyle(color: Theme.of(context).colorScheme.error)),
+                          );
+                        }
                         return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                           Expanded(
                             flex: 3,
@@ -220,7 +260,10 @@ class _VisitPageState extends ConsumerState<VisitPage> {
                                 for (final m in materials)
                                   DropdownMenuItem(value: m['id'] as String, child: Text('${en ? m['name_en'] : m['name_fr']}')),
                               ],
-                              onChanged: (v) => setState(() => _material = v),
+                              onChanged: (v) => setState(() {
+                                _material = v;
+                                _kgError = null;
+                              }),
                             ),
                           ),
                           const SizedBox(width: 8),
@@ -231,6 +274,7 @@ class _VisitPageState extends ConsumerState<VisitPage> {
                               keyboardType: const TextInputType.numberWithOptions(decimal: true),
                               decoration: InputDecoration(
                                   labelText: t.weightKg, border: const OutlineInputBorder(), errorText: _kgError),
+                              onSubmitted: (_) => _addLine(),
                             ),
                           ),
                         ]);
@@ -246,7 +290,7 @@ class _VisitPageState extends ConsumerState<VisitPage> {
                   const SizedBox(height: 24),
                   FilledButton(
                     onPressed: () async {
-                      if (await _saveHeader() && context.mounted) Navigator.pop(context);
+                      if (await _saveHeader() && await _addPendingLine() && context.mounted) Navigator.pop(context);
                     },
                     style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
                     child: Text(t.done),

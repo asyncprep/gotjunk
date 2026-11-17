@@ -8,6 +8,7 @@ import 'package:integration_test/integration_test.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:powersync/powersync.dart';
+import 'package:truck_team_os/data/field_repo.dart';
 import 'package:truck_team_os/data/profit_share.dart';
 import 'package:truck_team_os/data/profit_share_repo.dart';
 import 'package:truck_team_os/data/repo.dart';
@@ -263,6 +264,16 @@ void main() {
     final after = (await repo.profitShareData(shiftId).first)!.compute(data.start!.add(const Duration(hours: 10)));
     expect(after.fuel, 210);
     expect(after.swingTruck, 180);
+  });
+
+  testWidgets('saving a dump visit without changes queues nothing for the server', (_) async {
+    final visitId = await repo.addVisit(shiftId, 'site-1', 'T-1');
+    await _clearQueue(db);
+    await repo.updateVisit(visitId, siteId: 'site-1', ticketNumber: 'T-1');
+    expect(await db.getNextCrudTransaction(), isNull, reason: 'an empty change used to come back as "no longer exists"');
+    await repo.updateVisit(visitId, siteId: 'site-1', ticketNumber: 'T-2');
+    final op = (await db.getNextCrudTransaction())!.crud.single;
+    expect(op.opData!['ticket_number'], 'T-2');
   });
 }
 

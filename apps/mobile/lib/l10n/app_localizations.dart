@@ -511,6 +511,48 @@ abstract class L10n {
   /// **'Refusé par le serveur'**
   String get rejected;
 
+  /// No description provided for @rejectedWhat.
+  ///
+  /// In fr, this message translates to:
+  /// **'Refusé par le serveur : {what}'**
+  String rejectedWhat(String what);
+
+  /// No description provided for @tableShift.
+  ///
+  /// In fr, this message translates to:
+  /// **'la route'**
+  String get tableShift;
+
+  /// No description provided for @tableJob.
+  ///
+  /// In fr, this message translates to:
+  /// **'un travail'**
+  String get tableJob;
+
+  /// No description provided for @tableVisit.
+  ///
+  /// In fr, this message translates to:
+  /// **'une visite au dépotoir'**
+  String get tableVisit;
+
+  /// No description provided for @tableWeighIn.
+  ///
+  /// In fr, this message translates to:
+  /// **'une pesée'**
+  String get tableWeighIn;
+
+  /// No description provided for @tableCash.
+  ///
+  /// In fr, this message translates to:
+  /// **'le comptant'**
+  String get tableCash;
+
+  /// No description provided for @tablePhoto.
+  ///
+  /// In fr, this message translates to:
+  /// **'une photo'**
+  String get tablePhoto;
+
   /// No description provided for @dismiss.
   ///
   /// In fr, this message translates to:
@@ -811,6 +853,18 @@ abstract class L10n {
   /// **'Supprimer la visite'**
   String get deleteVisit;
 
+  /// No description provided for @deleteLineConfirm.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimer cette pesée ({material}, {kg} kg) ?'**
+  String deleteLineConfirm(String material, String kg);
+
+  /// No description provided for @deleteVisitConfirm.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimer cette visite au dépotoir, avec ses pesées et photos ?'**
+  String get deleteVisitConfirm;
+
   /// No description provided for @cash.
   ///
   /// In fr, this message translates to:
@@ -876,6 +930,18 @@ abstract class L10n {
   /// In fr, this message translates to:
   /// **'Poids invalide'**
   String get invalidWeight;
+
+  /// No description provided for @pickMaterial.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisissez la matière'**
+  String get pickMaterial;
+
+  /// No description provided for @noMaterialsAtSite.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune matière n’a de tarif à ce site aujourd’hui. Appelez la répartition pour qu’elle ajoute le tarif.'**
+  String get noMaterialsAtSite;
 
   /// No description provided for @done.
   ///

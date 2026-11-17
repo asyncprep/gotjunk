@@ -665,7 +665,7 @@ class _Rejections extends StatelessWidget {
                 color: scheme.errorContainer,
                 child: ListTile(
                   leading: Icon(Icons.error_outline, color: scheme.onErrorContainer),
-                  title: Text(t.rejected, style: TextStyle(color: scheme.onErrorContainer)),
+                  title: Text(_rejectedTitle(t, r['table_name'] as String?), style: TextStyle(color: scheme.onErrorContainer)),
                   subtitle: Text(explainRejection(t, '${r['message']}', sqlState: r['code'] as String?), style: TextStyle(color: scheme.onErrorContainer)),
                   trailing: TextButton(onPressed: () => repo.dismissRejection(r['id'] as String), child: Text(t.dismiss)),
                 ),
@@ -675,6 +675,20 @@ class _Rejections extends StatelessWidget {
       },
     );
   }
+}
+
+/// Says which kind of record the server refused, so the crew (and support) know what to check.
+String _rejectedTitle(L10n t, String? table) {
+  final what = switch (table) {
+    'shift' => t.tableShift,
+    'job' => t.tableJob,
+    'disposal_visit' => t.tableVisit,
+    'disposal_material_txn' => t.tableWeighIn,
+    'cash_submission' => t.tableCash,
+    'photo' => t.tablePhoto,
+    _ => null,
+  };
+  return what == null ? t.rejected : t.rejectedWhat(what);
 }
 
 class _Message extends StatelessWidget {

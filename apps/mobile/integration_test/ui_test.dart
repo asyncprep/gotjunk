@@ -220,6 +220,33 @@ void main() {
     expect(find.text('Eco-Junk'), findsOneWidget);
   });
 
+  testWidgets('a weight typed but not added is saved when tapping Done', (tester) async {
+    await seed();
+    await tester.pumpWidget(app(const Locale('en')));
+    await settle(tester);
+
+    await openTab(tester, 'Disposal');
+    await tester.tap(find.text('Add a visit'));
+    await settle(tester);
+    await tester.tap(find.widgetWithText(DropdownButtonFormField<String>, 'Site'));
+    await settle(tester);
+    await tester.tap(find.text('Eco-Junk').last);
+    await settle(tester);
+    await tester.tap(find.widgetWithText(FilledButton, 'Save'));
+    await settle(tester);
+
+    await tester.tap(find.widgetWithText(DropdownButtonFormField<String>, 'Material'));
+    await settle(tester);
+    await tester.tap(find.text('Garbage').last);
+    await settle(tester);
+    await tester.enterText(find.widgetWithText(TextField, 'Weight (kg)'), '300');
+    await reveal(tester, find.widgetWithText(FilledButton, 'Done'));
+    await tester.tap(find.widgetWithText(FilledButton, 'Done'));
+    await settle(tester);
+    final lines = await db.getAll('SELECT weight_kg FROM disposal_material_txn');
+    expect(lines.map((r) => r['weight_kg']), [300]);
+  });
+
   testWidgets('submit lists what is missing instead of sending', (tester) async {
     await seed();
     await Repo(db).saveJob(JobDraft(shiftId: shiftId, opportunityId: 'CASH-1', outcome: 'completed',

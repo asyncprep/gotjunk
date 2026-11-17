@@ -88,8 +88,8 @@ extension FieldRepo on Repo {
   }
 
   Future<void> updateVisit(String visitId, {required String siteId, String? ticketNumber}) => db.execute(
-      'UPDATE disposal_visit SET site_id = ?, ticket_number = ? WHERE id = ?',
-      [siteId, _blankToNull(ticketNumber), visitId]);
+      'UPDATE disposal_visit SET site_id = ?, ticket_number = ? WHERE id = ? AND (site_id IS NOT ? OR ticket_number IS NOT ?)',
+      [siteId, _blankToNull(ticketNumber), visitId, siteId, _blankToNull(ticketNumber)]);
 
   Future<void> deleteVisit(String visitId) => db.writeTransaction((tx) async {
         await tx.execute('DELETE FROM disposal_material_txn WHERE disposal_visit_id = ?', [visitId]);

@@ -83,6 +83,14 @@
     }
   },
   "rejected": "Refusé par le serveur",
+  "rejectedWhat": "Refusé par le serveur : {what}",
+  "@rejectedWhat": {"placeholders": {"what": {"type": "String"}}},
+  "tableShift": "la route",
+  "tableJob": "un travail",
+  "tableVisit": "une visite au dépotoir",
+  "tableWeighIn": "une pesée",
+  "tableCash": "le comptant",
+  "tablePhoto": "une photo",
   "dismiss": "OK",
   "problem_crew_size": "Taille d’équipe invalide",
   "problem_hours_type_missing": "Type d’heures manquant",
@@ -133,6 +141,9 @@
   "netDisposal": "Dépotoir net",
   "noRate": "Aucun tarif pour cette matière à ce site",
   "deleteVisit": "Supprimer la visite",
+  "deleteLineConfirm": "Supprimer cette pesée ({material}, {kg} kg) ?",
+  "@deleteLineConfirm": {"placeholders": {"material": {"type": "String"}, "kg": {"type": "String"}}},
+  "deleteVisitConfirm": "Supprimer cette visite au dépotoir, avec ses pesées et photos ?",
   "cash": "Comptant",
   "expectedCash": "Comptant à remettre",
   "cashPhoto": "Photo du comptant",
@@ -144,6 +155,8 @@
   "reasonIs": "Raison : {reason}",
   "cameraError": "Impossible d’ouvrir la caméra",
   "invalidWeight": "Poids invalide",
+  "pickMaterial": "Choisissez la matière",
+  "noMaterialsAtSite": "Aucune matière n’a de tarif à ce site aujourd’hui. Appelez la répartition pour qu’elle ajoute le tarif.",
   "done": "Terminé",
   "@photosCount": {
     "placeholders": {
