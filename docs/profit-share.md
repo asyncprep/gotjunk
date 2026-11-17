@@ -90,8 +90,12 @@ Where the numbers come from:
 - The calculation is `apps/mobile/lib/data/profit_share.dart`; its tests reproduce the three
   routes below to the cent.
 
-Not done yet: the same figures on the admin route review, and "paperwork complete" as a
-condition (the route's acceptance checks cover it).
+The admin route page shows the same card (Nov 17): status, each person's % and amount, revenue
+per hour, COGS %, team hours, average job, cancel rate, the full COGS breakdown and the crew's
+answers. Its calculation is `apps/admin/src/lib/profitShare.ts`, a copy of the app's with the same
+tests; dumps there use the server's prices. Keep the two in step.
+
+Not done yet: "paperwork complete" as a condition (the route's acceptance checks cover it).
 
 ## Worked examples: three routes of Oct 25, 2026
 

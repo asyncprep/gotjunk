@@ -156,6 +156,7 @@ td.handle:active { cursor: grabbing; }
 .problem.error { color: var(--red); }
 .problem.warning { color: var(--amber); }
 .ok-text { color: var(--green-dark); font-weight: 500; }
+.err-text { color: var(--red); }
 
 .toasts { position: fixed; right: 20px; bottom: 20px; display: flex; flex-direction: column; gap: 8px; z-index: 50; }
 .toast {

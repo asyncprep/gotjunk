@@ -7,6 +7,7 @@ import { useAuth } from '../lib/auth';
 import AskDialog from '../components/AskDialog';
 import PhotoGallery from '../components/PhotoGallery';
 import CashPanel from '../components/CashPanel';
+import ProfitShareCard from '../components/ProfitShareCard';
 
 type Named = { name_fr: string; name_en: string } | null;
 
@@ -18,7 +19,7 @@ const toLocalInput = (iso: string) => {
 const named = (n: Named, lang: string) => (n ? (lang === 'en' ? n.name_en : n.name_fr) : '');
 
 async function loadShift(id: string) {
-  const [shift, totals, problems, jobs, visits, photos, cash, items, checks, crew, tips, reasons, employees] =
+  const [shift, totals, problems, jobs, visits, photos, cash, items, checks, crew, tips, reasons, employees, plan] =
     await Promise.all([
       must(supabase.from('shift').select('*, truck:truck_id(unit_number), phone:phone_id(label)').eq('shift_id', id).single()),
       must(supabase.from('v_shift_totals').select('*').eq('shift_id', id).maybeSingle()),
@@ -32,13 +33,14 @@ async function loadShift(id: string) {
       must(supabase.from('checklist_item').select('item_id, label_fr, label_en, required').eq('active', true).order('sort_order')),
       must(supabase.from('shift_checklist_check').select('item_id, checked').eq('shift_id', id)),
       must(supabase.from('shift_crew_member')
-        .select('shift_crew_id, employee_id, position, joined_at, left_at, tip_override, trainer, damage_hold, employee:employee_id(full_name), frozen:rank_id_snapshot(name_fr, name_en, share_to_trainer)')
+        .select('shift_crew_id, employee_id, position, joined_at, left_at, tip_override, trainer, damage_hold, employee:employee_id(full_name), frozen:rank_id_snapshot(name_fr, name_en, share_to_trainer, share_pct_low_cogs, share_pct_mid_cogs, share_pct_high_cogs)')
         .eq('shift_id', id).order('joined_at')),
       must(supabase.from('v_shift_tips_by_employee').select('employee_id, tips').eq('shift_id', id)),
       must(supabase.from('cancellation_reason').select('reason_id, name_fr, name_en').eq('active', true).order('sort_order')),
       must(supabase.from('employee').select('employee_id, full_name').eq('active', true).order('full_name')),
+      must(supabase.from('app_setting').select('value').eq('key', 'profit_share_plan').maybeSingle()),
     ]);
-  return { shift, totals, problems, jobs, visits, photos, cash, items, checks, crew, tips, reasons, employees } as any;
+  return { shift, totals, problems, jobs, visits, photos, cash, items, checks, crew, tips, reasons, employees, plan } as any;
 }
 
 export default function ShiftReview() {
@@ -159,6 +161,8 @@ export default function ShiftReview() {
           <div className="tile"><div className="v">{tot.revenue_per_hour ? money(tot.revenue_per_hour, lang) : '—'}</div><div className="k">{t('shift.rph')}</div></div>
         </div>
       </div>
+
+      <ProfitShareCard shift={s} crew={d.crew} jobs={d.jobs} totals={tot} planSetting={d.plan?.value} />
 
       <div className="card">
         <h2>{t('shift.checks')}</h2>
