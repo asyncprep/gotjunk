@@ -8,6 +8,7 @@ import AskDialog from '../components/AskDialog';
 import PhotoGallery from '../components/PhotoGallery';
 import CashPanel from '../components/CashPanel';
 import ProfitShareCard from '../components/ProfitShareCard';
+import DumpLineForm from '../components/DumpLineForm';
 
 type Named = { name_fr: string; name_en: string } | null;
 
@@ -19,7 +20,7 @@ const toLocalInput = (iso: string) => {
 const named = (n: Named, lang: string) => (n ? (lang === 'en' ? n.name_en : n.name_fr) : '');
 
 async function loadShift(id: string) {
-  const [shift, totals, problems, jobs, visits, photos, cash, items, checks, crew, tips, reasons, employees, plan] =
+  const [shift, totals, problems, jobs, visits, photos, cash, items, checks, crew, tips, reasons, employees, plan, rates] =
     await Promise.all([
       must(supabase.from('shift').select('*, truck:truck_id(unit_number), phone:phone_id(label)').eq('shift_id', id).single()),
       must(supabase.from('v_shift_totals').select('*').eq('shift_id', id).maybeSingle()),
@@ -39,8 +40,12 @@ async function loadShift(id: string) {
       must(supabase.from('cancellation_reason').select('reason_id, name_fr, name_en').eq('active', true).order('sort_order')),
       must(supabase.from('employee').select('employee_id, full_name').eq('active', true).order('full_name')),
       must(supabase.from('app_setting').select('value').eq('key', 'profit_share_plan').maybeSingle()),
+      // Materials each site takes (an active rate), for dispatch's weigh-in lines.
+      must(supabase.from('site_rate_config')
+        .select('site_id, material_type_id, effective_from, effective_to, material:material_type_id(name_fr, name_en, active)')
+        .eq('active', true)),
     ]);
-  return { shift, totals, problems, jobs, visits, photos, cash, items, checks, crew, tips, reasons, employees, plan } as any;
+  return { shift, totals, problems, jobs, visits, photos, cash, items, checks, crew, tips, reasons, employees, plan, rates } as any;
 }
 
 export default function ShiftReview() {
@@ -110,6 +115,32 @@ export default function ShiftReview() {
     }
     await must(supabase.from('shift_crew_member').update({ trainer: on }).eq('shift_crew_id', m.shift_crew_id).select());
   }, t('ui.saved'));
+  // Dispatch fixes the dump visits too (client, Nov 19): until the route is accepted, like the crew.
+  const dumpEditable = !['locked', 'reconciled', 'archived'].includes(status);
+  const materialsFor = (v: any) => {
+    const seen = new Map<string, string>();
+    for (const r of d.rates) {
+      if (r.site_id !== v.site_id || r.material?.active === false) continue;
+      if (r.effective_from > s.shift_date || (r.effective_to && r.effective_to < s.shift_date)) continue;
+      seen.set(r.material_type_id, named(r.material, lang));
+    }
+    return [...seen].map(([material_type_id, name]) => ({ material_type_id, name })).sort((a, b) => a.name.localeCompare(b.name));
+  };
+  const addLine = (v: any, materialTypeId: string, kg: number) => action.run(() => must(supabase.from('disposal_material_txn')
+    .insert({ disposal_visit_id: v.disposal_visit_id, material_type_id: materialTypeId, weight_kg: kg }).select()), t('ui.saved'));
+  const deleteLine = (l: any) => {
+    if (!window.confirm(t('shift.deleteLineConfirm', { name: named(l.material, lang), kg: l.weight_kg }))) return;
+    return action.run(() => must(supabase.from('disposal_material_txn').delete().eq('material_txn_id', l.material_txn_id).select()), t('ui.saved'));
+  };
+  const deleteVisit = (v: any) => {
+    if (!window.confirm(t('shift.deleteVisitConfirm', { site: v.site?.name ?? '', ticket: v.ticket_number ?? '—' }))) return;
+    return action.run(async () => {
+      // Its weigh-in lines go with it (cascade); its ticket photos are removed with it.
+      const photoIds = photosFor(v.disposal_visit_id).map((p: any) => p.photo_id);
+      if (photoIds.length) await must(supabase.from('photo').delete().in('photo_id', photoIds).select());
+      await must(supabase.from('disposal_visit').delete().eq('disposal_visit_id', v.disposal_visit_id).select());
+    }, t('ui.saved'));
+  };
   const checkAll = () => action.run(() => must(supabase.from('shift_checklist_check').upsert(
     d.items.map((i: any) => ({ shift_id: shiftId, item_id: i.item_id, checked: true })), { onConflict: 'shift_id,item_id' }).select()));
 
@@ -133,6 +164,12 @@ export default function ShiftReview() {
         <div className="row">
           {['submitted', 'reopened', 'returned', 'in_progress'].includes(status) && s.hours_type && !s.hours_type_confirmed_at && (
             <button disabled={action.busy} onClick={() => updateShift({ hours_type_confirmed_at: new Date().toISOString() }, t('ui.saved'))}>{t('shift.confirmHours')}</button>
+          )}
+          {['in_progress', 'returned', 'reopened'].includes(status) && (
+            // The crew didn't submit (client, Nov 19): dispatch submits it for them, then accepts it.
+            <button className="go" disabled={action.busy} onClick={() => {
+              if (window.confirm(t('shift.submitForCrewConfirm'))) updateShift({ status: 'submitted' }, t('shift.submittedForCrew'));
+            }}>{t('shift.submitForCrew')}</button>
           )}
           {status === 'submitted' && <>
             <button disabled={action.busy} onClick={() => setAsking('return')}>{t('shift.return')}</button>
@@ -227,6 +264,10 @@ export default function ShiftReview() {
                 {v.site?.requires_ticket_photo && !photosFor(v.disposal_visit_id).length && (
                   <span className="problem error small">✕ {t('shift.ticketPhotoMissing')}</span>
                 )}
+                {!v.lines.length && <span className="problem error small">✕ {t('problem.visit_no_materials')}</span>}
+                {dumpEditable && (
+                  <button className="small" disabled={action.busy} onClick={() => deleteVisit(v)}>{t('shift.deleteVisit')}</button>
+                )}
               </div>
               <PhotoGallery photos={photosFor(v.disposal_visit_id)} label={t('shift.ticketPhoto')} />
               <div className="table-wrap">
@@ -234,6 +275,7 @@ export default function ShiftReview() {
                   <thead><tr>
                     <th>{t('shift.material')}</th><th className="num">{t('shift.weight')}</th>
                     <th className="num">{t('shift.billable')}</th><th className="num">{t('shift.rate')}</th><th className="num">{t('shift.amount')}</th>
+                    {dumpEditable && <th />}
                   </tr></thead>
                   <tbody>
                     {v.lines.map((l: any) => (
@@ -243,11 +285,18 @@ export default function ShiftReview() {
                         <td className="num">{l.billable_kg}</td>
                         <td className="num">{l.rate_per_ton_applied}</td>
                         <td className="num">{money(l.signed_amount, lang)}</td>
+                        {dumpEditable && (
+                          <td><button className="small" disabled={action.busy} aria-label={t('shift.deleteLine')}
+                            title={t('shift.deleteLine')} onClick={() => deleteLine(l)}>✕</button></td>
+                        )}
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
+              {dumpEditable && (
+                <DumpLineForm materials={materialsFor(v)} busy={action.busy} onAdd={(m, kg) => addLine(v, m, kg)} />
+              )}
             </div>
           ))}
         </div>

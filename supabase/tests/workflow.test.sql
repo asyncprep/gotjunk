@@ -169,3 +169,18 @@ select tests.eq((select severity from shift_problems('c0000000-0000-0000-0000-00
 update shift set status = 'locked' where shift_id = 'c0000000-0000-0000-0000-000000000001';
 select tests.eq((select expected_cash_snapshot from cash_submission where shift_id = 'c0000000-0000-0000-0000-000000000001'),
                 114.98::numeric, 'expected cash frozen at lock');
+
+-- test: dispatch fixes a dump visit and submits the route for the crew (client, Nov 19)
+select tests.prepare_ready_shift();
+select tests.login('a0000000-0000-0000-0000-000000000010');
+delete from disposal_material_txn where disposal_visit_id = 'd0000000-0000-0000-0000-000000000001';
+select tests.throws($q$
+  update shift set status = 'submitted' where shift_id = 'c0000000-0000-0000-0000-000000000001'
+$q$, 'shift_not_ready: visit_no_materials');
+insert into disposal_material_txn (disposal_visit_id, material_type_id, weight_kg)
+select 'd0000000-0000-0000-0000-000000000001', material_type_id, 640 from material_type where code = 'garbage';
+update shift set status = 'submitted' where shift_id = 'c0000000-0000-0000-0000-000000000001';
+select tests.eq((select submitted_by from shift where shift_id = 'c0000000-0000-0000-0000-000000000001'),
+                'a0000000-0000-0000-0000-000000000010'::uuid, 'submitted by dispatch');
+select tests.ok((select signed_amount > 0 from disposal_material_txn
+                 where disposal_visit_id = 'd0000000-0000-0000-0000-000000000001'), 'dispatch line priced');

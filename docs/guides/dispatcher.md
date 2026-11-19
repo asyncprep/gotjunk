@@ -57,7 +57,7 @@ Open the route from **À réviser**. Work down the page; **Vérifications avant 
 
 1. **Hours type.** Check the route's hours type (regular junk, warehouse or non-junk) and click **Confirmer le type d'heures (Confirm hours type)**.
 2. **Jobs.** Each job shows its Opportunity ID, payment method, revenue before and including tax, and tip. A job the crew cancelled waits for you: pick the cancellation reason and click **Finaliser (Finalize)**.
-3. **Dump visits.** Each visit shows the site, ticket number, ticket photo and materials with weight, billable weight, rate and amount (costs and credits). The amounts come from the rates in Configuration.
+3. **Dump visits.** Each visit shows the site, ticket number, ticket photo and materials with weight, billable weight, rate and amount (costs and credits). The amounts come from the rates in Configuration. Until the route is accepted you can fix a visit yourself: pick the material, type the weight in kg and click **Ajouter (Add)**, delete a wrong weigh-in with ✕, or delete a whole visit (a test or a duplicate) with **Supprimer la visite (Delete visit)**, which also removes its ticket photo.
 4. **Cash.** The page shows the expected cash and the crew's cash photo. Count the envelope, enter the amount and click **Enregistrer le compte (Record count)**. The envelope label fills in by itself (date · crew lead · amount). A difference from the expected amount is a warning, not a blocker; add a note if you know why.
 5. **Crew and tips.** Check each person's position and start/end times (**Corriger les heures** to fix them), mark someone who left early, or add a member. Tips are split equally by default; click **Répartir à la main (Split by hand)** to set each person's share, which must add up to the total.
    - **Formateur (Trainer):** tick the trainer when a Recruit is on the route. The Recruit's profit share is calculated at Wingman's % and paid to the trainer. With a Recruit and no trainer ticked, the page warns you and that share is paid to nobody.
@@ -71,6 +71,7 @@ The scoreboard at the top (revenue before tax, jobs, tips, net disposal, expecte
 | Button | When | What happens |
 | --- | --- | --- |
 | **Accepter et verrouiller** (Accept & lock) | All checks pass | The route is locked: nobody can change it, and each person's rank is frozen for the profit share |
+| **Soumettre pour l'équipe** (Submit for the crew) | The crew didn't submit (route still in progress, returned or reopened) and you have everything | The route is submitted in your name; the crew can't change it any more. Then accept it as usual |
 | **Retourner pour correction** (Return for correction) | The crew must fix something (missing ticket photo, wrong amount…) | The route goes back to the phone with your reason; the crew fixes it and submits again |
 | **Rouvrir** (Reopen) | An accepted route needs a correction | The route can be edited again; the reason is kept in the audit log |
 | **Marquer rapproché** (Mark reconciled) | The accepted route has been checked against payments | Final status |
