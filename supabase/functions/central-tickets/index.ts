@@ -24,6 +24,10 @@ const FROM_CENTRAL: Record<string, string> = Object.fromEntries(Object.entries(S
 const PRIORITY: Record<string, string> = { blocker: 'urgent', high: 'high', normal: 'medium', low: 'low' };
 const KIND: Record<string, string> = { bug: 'Bug', suggestion: 'Suggestion', question: 'Question' };
 const ADMIN_URL = Deno.env.get('ADMIN_URL') ?? 'https://gotjunk.innodigital.ca';
+// The address Central calls: the admin site passes /api/central-tickets on to this function
+// (apps/admin/vercel.json), so Central sees GotJunk's own domain. Central only sends changes to the
+// host it reads the feed from.
+const FEED_URL = Deno.env.get('CENTRAL_FEED_URL') ?? `${ADMIN_URL}/api/central-tickets`;
 // Ceilings, so the response cannot grow without limit. Central keeps the latest 50 comments.
 const MAX = 500;
 const MAX_COMMENTS = 50;
@@ -98,7 +102,7 @@ async function feed(req: Request, db: SupabaseClient) {
     version: 1,
     // Comments and status changes both bump updated_at, so it is the activity clock.
     lastActivityAt: rows.length ? iso(rows[0].updated_at) : null,
-    updateUrl: `${Deno.env.get('SUPABASE_URL')}/functions/v1/central-tickets/{id}`,
+    updateUrl: `${FEED_URL}/{id}`,
     people: team,
     tickets: rows.map((r) => ({
       id: r.ticket_id,
