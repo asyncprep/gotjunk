@@ -9,7 +9,9 @@
 // reporter, the browser context, attachments or the change trail: those can hold personal details
 // and Central has no use for them.
 //
-// GotJunk tickets have no owner: they are all Khalil's. Central may still send `assignee` when it
+// GotJunk tickets have no owner of their own: they are all Khalil's, so the feed gives each one to him
+// (CENTRAL_OWNER, default "Khalil"). Central shows only tickets assigned to you, so without an
+// owner they would be hidden there. Central may still send `assignee` when it
 // hands a ticket over; it is accepted and ignored, and the ticket waits (status) instead.
 //
 // The key is the CENTRAL_FEED_KEY Edge Function secret. Unset means the feed is off (503); a wrong
@@ -36,6 +38,8 @@ const MAX_TEXT = 10_000;
 const PEOPLE_ROLES = ['admin', 'senior_ops'];
 // Central's own notes are written under this name, with no author.
 const CENTRAL = 'Central';
+// Who every ticket is assigned to in Central.
+const OWNER = Deno.env.get('CENTRAL_OWNER') ?? 'Khalil';
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const headers = {
@@ -98,6 +102,9 @@ async function feed(req: Request, db: SupabaseClient) {
     return json({ error: 'read_failed', message: (e as Error).message }, 500);
   }
 
+  // The owner's person in the team, when there is one: the name, or the email, that holds it.
+  const ownerId = team.find((p) => p.name.toLowerCase().split(/[^a-z0-9]+/).includes(OWNER.toLowerCase()))?.id ?? null;
+
   const payload = {
     version: 1,
     // Comments and status changes both bump updated_at, so it is the activity clock.
@@ -110,8 +117,8 @@ async function feed(req: Request, db: SupabaseClient) {
       status: STATUS[r.status] ?? 'open',
       priority: PRIORITY[r.priority] ?? 'medium',
       body: r.description?.trim() || null,
-      assignee: null,
-      assigneeId: null,
+      assignee: OWNER,
+      assigneeId: ownerId,
       dueDate: null,
       url: `${ADMIN_URL}/tickets/${r.number}`,
       createdAt: iso(r.created_at),
