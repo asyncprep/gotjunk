@@ -154,13 +154,21 @@ class L10nEn extends L10n {
   String get paymentMethod => 'Payment';
 
   @override
-  String get preTax => 'Amount before tax';
+  String get preTax => 'Price before tax';
 
   @override
   String get totalWithTax => 'Total including tax';
 
   @override
   String get addTax => 'Calculate tax';
+
+  @override
+  String netBeforeTax(String amount) {
+    return 'Net before tax (price − discount): \$$amount';
+  }
+
+  @override
+  String get discountTooBig => 'The discount is more than the price';
 
   @override
   String get tip => 'Tip';
@@ -185,7 +193,7 @@ class L10nEn extends L10n {
 
   @override
   String get totalBelowPreTax =>
-      'Total can\'t be lower than the amount before tax';
+      'Total can\'t be lower than the net amount before tax';
 
   @override
   String get callDispatchFirst =>

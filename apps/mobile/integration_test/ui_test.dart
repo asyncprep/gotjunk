@@ -154,7 +154,7 @@ void main() {
     await settle(tester);
     await tester.tap(find.text('Card').last);
     await settle(tester);
-    await tester.enterText(find.widgetWithText(TextFormField, 'Amount before tax'), '200');
+    await tester.enterText(find.widgetWithText(TextFormField, 'Price before tax'), '200');
     await tester.tap(find.text('Calculate tax'));
     await settle(tester);
     expect(find.text('229.95'), findsOneWidget);
@@ -179,13 +179,64 @@ void main() {
     await tester.tap(find.text('Add a job'));
     await settle(tester);
     await tester.enterText(find.widgetWithText(TextFormField, 'Opportunity ID'), 'OPP-1');
-    await tester.enterText(find.widgetWithText(TextFormField, 'Amount before tax'), '100');
+    await tester.enterText(find.widgetWithText(TextFormField, 'Price before tax'), '100');
     await tester.enterText(find.widgetWithText(TextFormField, 'Total including tax'), '90');
     await reveal(tester, find.widgetWithText(FilledButton, 'Save'));
     await tester.tap(find.widgetWithText(FilledButton, 'Save'));
     await settle(tester);
-    expect(find.text("Total can't be lower than the amount before tax"), findsOneWidget);
+    expect(find.text("Total can't be lower than the net amount before tax"), findsOneWidget);
     expect(find.text('Required'), findsOneWidget, reason: 'payment method missing');
+  });
+
+  testWidgets('a discount comes off the price: tax and revenue on the net (client, Nov 20)', (tester) async {
+    await seed();
+    await tester.pumpWidget(app(const Locale('en')));
+    await settle(tester);
+    await openTab(tester, 'Jobs');
+    await tester.tap(find.text('Add a job'));
+    await settle(tester);
+    await tester.enterText(find.widgetWithText(TextFormField, 'Opportunity ID'), 'OPP-DISC');
+    await tester.tap(find.widgetWithText(DropdownButtonFormField<String>, 'Payment'));
+    await settle(tester);
+    await tester.tap(find.text('Card').last);
+    await settle(tester);
+    await tester.enterText(find.widgetWithText(TextFormField, 'Price before tax'), '98');
+    await tester.enterText(find.widgetWithText(TextFormField, 'Discount'), '14.70');
+    await settle(tester);
+    expect(find.text('Net before tax (price − discount): \$83.30'), findsOneWidget);
+    await tester.tap(find.text('Calculate tax'));
+    await settle(tester);
+    expect(find.text('95.77'), findsOneWidget);
+    await reveal(tester, find.widgetWithText(FilledButton, 'Save'));
+    await tester.tap(find.widgetWithText(FilledButton, 'Save'));
+    await settle(tester);
+
+    final job = (await db.getAll("SELECT * FROM job WHERE opportunity_id = 'OPP-DISC'")).single;
+    expect(job['revenue_pre_tax'], 83.3);
+    expect(job['discount_amount'], 14.7);
+    expect(job['revenue_total_incl_tax'], 95.77);
+
+    // Reopening shows the price again, not the net.
+    await reveal(tester, find.text('OPP-DISC'));
+    await tester.tap(find.text('OPP-DISC'));
+    await settle(tester);
+    expect(find.widgetWithText(TextFormField, '98.00'), findsOneWidget);
+  });
+
+  testWidgets('a discount larger than the price is refused', (tester) async {
+    await seed();
+    await tester.pumpWidget(app(const Locale('en')));
+    await settle(tester);
+    await openTab(tester, 'Jobs');
+    await tester.tap(find.text('Add a job'));
+    await settle(tester);
+    await tester.enterText(find.widgetWithText(TextFormField, 'Opportunity ID'), 'OPP-2');
+    await tester.enterText(find.widgetWithText(TextFormField, 'Price before tax'), '50');
+    await tester.enterText(find.widgetWithText(TextFormField, 'Discount'), '60');
+    await reveal(tester, find.widgetWithText(FilledButton, 'Save'));
+    await tester.tap(find.widgetWithText(FilledButton, 'Save'));
+    await settle(tester);
+    expect(find.text('The discount is more than the price'), findsOneWidget);
   });
 
   testWidgets('add a disposal visit with a weigh-in; estimate shows', (tester) async {

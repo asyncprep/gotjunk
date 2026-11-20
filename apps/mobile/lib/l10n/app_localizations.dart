@@ -382,7 +382,7 @@ abstract class L10n {
   /// No description provided for @preTax.
   ///
   /// In fr, this message translates to:
-  /// **'Montant avant taxes'**
+  /// **'Prix avant taxes'**
   String get preTax;
 
   /// No description provided for @totalWithTax.
@@ -396,6 +396,18 @@ abstract class L10n {
   /// In fr, this message translates to:
   /// **'Calculer les taxes'**
   String get addTax;
+
+  /// No description provided for @netBeforeTax.
+  ///
+  /// In fr, this message translates to:
+  /// **'Net avant taxes (prix − rabais) : {amount} \$'**
+  String netBeforeTax(String amount);
+
+  /// No description provided for @discountTooBig.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le rabais dépasse le prix'**
+  String get discountTooBig;
 
   /// No description provided for @tip.
   ///
@@ -442,7 +454,7 @@ abstract class L10n {
   /// No description provided for @totalBelowPreTax.
   ///
   /// In fr, this message translates to:
-  /// **'Le total ne peut pas être inférieur au montant avant taxes'**
+  /// **'Le total ne peut pas être inférieur au montant net avant taxes'**
   String get totalBelowPreTax;
 
   /// No description provided for @callDispatchFirst.

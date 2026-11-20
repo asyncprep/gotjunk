@@ -155,13 +155,21 @@ class L10nFr extends L10n {
   String get paymentMethod => 'Paiement';
 
   @override
-  String get preTax => 'Montant avant taxes';
+  String get preTax => 'Prix avant taxes';
 
   @override
   String get totalWithTax => 'Total taxes incluses';
 
   @override
   String get addTax => 'Calculer les taxes';
+
+  @override
+  String netBeforeTax(String amount) {
+    return 'Net avant taxes (prix − rabais) : $amount \$';
+  }
+
+  @override
+  String get discountTooBig => 'Le rabais dépasse le prix';
 
   @override
   String get tip => 'Pourboire';
@@ -186,7 +194,7 @@ class L10nFr extends L10n {
 
   @override
   String get totalBelowPreTax =>
-      'Le total ne peut pas être inférieur au montant avant taxes';
+      'Le total ne peut pas être inférieur au montant net avant taxes';
 
   @override
   String get callDispatchFirst =>

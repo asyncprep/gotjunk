@@ -23,7 +23,9 @@ class JobFormPage extends StatefulWidget {
 class _JobFormPageState extends State<JobFormPage> {
   final _form = GlobalKey<FormState>();
   late final _opp = TextEditingController(text: widget.job?['opportunity_id'] as String? ?? '');
-  late final _preTax = TextEditingController(text: _fmt(widget.job?['revenue_pre_tax']));
+  // The crew types the regular price and the discount; revenue before tax is saved net of the
+  // discount (client answer J4). Reopening a job shows the price again: net + discount.
+  late final _preTax = TextEditingController(text: _fmt(_priceOf(widget.job)));
   late final _total = TextEditingController(text: _fmt(widget.job?['revenue_total_incl_tax']));
   late final _tip = TextEditingController(text: _fmt(widget.job?['tip_amount']));
   late final _discount = TextEditingController(text: _fmt(widget.job?['discount_amount']));
@@ -32,12 +34,24 @@ class _JobFormPageState extends State<JobFormPage> {
   String? _oppError;
 
   static String _fmt(Object? v) => v == null || v == 0 || v == 0.0 ? '' : (v as num).toStringAsFixed(2);
+  static num? _priceOf(Map<String, dynamic>? job) {
+    final net = job?['revenue_pre_tax'] as num?;
+    return net == null ? null : net + ((job?['discount_amount'] as num?) ?? 0);
+  }
+
+  /// Price minus discount, to the cent; null until the price is a valid amount.
+  double? get _net {
+    final price = parseAmount(_preTax.text);
+    if (price == null) return null;
+    final discount = parseAmount(_discount.text) ?? 0;
+    return ((price - discount) * 100).roundToDouble() / 100;
+  }
 
   Future<void> _addTax() async {
-    final pre = parseAmount(_preTax.text);
-    if (pre == null) return;
+    final net = _net;
+    if (net == null || net < 0) return;
     final rate = await widget.repo.salesTaxRate();
-    setState(() => _total.text = (pre * (1 + rate)).toStringAsFixed(2));
+    setState(() => _total.text = (net * (1 + rate)).toStringAsFixed(2));
   }
 
   Future<void> _save() async {
@@ -52,7 +66,7 @@ class _JobFormPageState extends State<JobFormPage> {
       opportunityId: _opp.text.trim(),
       outcome: _completed ? 'completed' : 'cancelled_pending',
       paymentMethod: _completed ? _method : null,
-      preTax: _completed ? parseAmount(_preTax.text) : null,
+      preTax: _completed ? _net : null,
       total: _completed ? parseAmount(_total.text) : null,
       tip: _completed ? (parseAmount(_tip.text) ?? 0) : 0,
       discount: _completed ? (parseAmount(_discount.text) ?? 0) : 0,
@@ -127,12 +141,38 @@ class _JobFormPageState extends State<JobFormPage> {
                 },
               ),
               const SizedBox(height: 16),
-              TextFormField(
-                controller: _preTax,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                decoration: InputDecoration(labelText: t.preTax, border: const OutlineInputBorder(), prefixText: r'$ '),
-                validator: (v) => amount(v, required: true),
-              ),
+              Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Expanded(
+                  child: TextFormField(
+                    controller: _preTax,
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    decoration: InputDecoration(labelText: t.preTax, border: const OutlineInputBorder(), prefixText: r'$ '),
+                    onChanged: (_) => setState(() {}),
+                    validator: (v) => amount(v, required: true),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: TextFormField(
+                    controller: _discount,
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    decoration: InputDecoration(labelText: t.discount, border: const OutlineInputBorder(), prefixText: r'$ '),
+                    onChanged: (_) => setState(() {}),
+                    validator: (v) {
+                      final base = amount(v);
+                      if (base != null) return base;
+                      final net = _net;
+                      return net != null && net < 0 ? t.discountTooBig : null;
+                    },
+                  ),
+                ),
+              ]),
+              if ((parseAmount(_discount.text) ?? 0) > 0 && (_net ?? -1) >= 0)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8, left: 4),
+                  child: Text(t.netBeforeTax(_net!.toStringAsFixed(2)),
+                      style: Theme.of(context).textTheme.titleSmall),
+                ),
               const SizedBox(height: 16),
               Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Expanded(
@@ -143,8 +183,8 @@ class _JobFormPageState extends State<JobFormPage> {
                     validator: (v) {
                       final base = amount(v, required: true);
                       if (base != null) return base;
-                      final pre = parseAmount(_preTax.text);
-                      return pre != null && parseAmount(v!)! < pre ? t.totalBelowPreTax : null;
+                      final net = _net;
+                      return net != null && parseAmount(v!)! < net ? t.totalBelowPreTax : null;
                     },
                   ),
                 ),
@@ -155,25 +195,12 @@ class _JobFormPageState extends State<JobFormPage> {
                 ),
               ]),
               const SizedBox(height: 16),
-              Row(children: [
-                Expanded(
-                  child: TextFormField(
-                    controller: _tip,
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    decoration: InputDecoration(labelText: t.tip, border: const OutlineInputBorder(), prefixText: r'$ '),
-                    validator: amount,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: TextFormField(
-                    controller: _discount,
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    decoration: InputDecoration(labelText: t.discount, border: const OutlineInputBorder(), prefixText: r'$ '),
-                    validator: amount,
-                  ),
-                ),
-              ]),
+              TextFormField(
+                controller: _tip,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                decoration: InputDecoration(labelText: t.tip, border: const OutlineInputBorder(), prefixText: r'$ '),
+                validator: amount,
+              ),
             ],
             const SizedBox(height: 24),
             FilledButton(

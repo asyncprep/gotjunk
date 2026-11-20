@@ -36,7 +36,7 @@ Tap **Ajouter un travail (Add a job)** for each job.
 
 1. Enter the **Opportunity ID** from Pipeline. Each number can be used only once per route.
 2. Choose **Complété (Completed)** and the payment method (credit card, debit, cash, invoice, e-transfer…).
-3. Enter the **amount before tax** and the discount if any. **Calculer les taxes (Calculate tax)** fills in the total including tax; check it against the receipt.
+3. Enter the regular **Prix avant taxes (Price before tax)** and, right beside it, the **Rabais (Discount)** if any. The app shows the net amount (price − discount); that's the job's revenue. **Calculer les taxes (Calculate tax)** fills in the total including tax on the net amount; check it against the receipt.
 4. Enter the **tip**, then **Save**.
 
 **A job that didn't convert:** call dispatch before you leave the client. Then choose **Annulé / pas de vente (Cancelled / no sale)**. The job shows **waiting for dispatch** until dispatch confirms the reason.

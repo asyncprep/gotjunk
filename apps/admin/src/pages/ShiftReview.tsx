@@ -221,7 +221,7 @@ export default function ShiftReview() {
             <table>
               <thead><tr>
                 <th>{t('shift.opportunity')}</th><th>{t('shift.outcome')}</th><th>{t('shift.method')}</th>
-                <th className="num">{t('shift.preTax')}</th><th className="num">{t('shift.inclTax')}</th><th className="num">{t('shift.tip')}</th><th />
+                <th className="num">{t('shift.discount')}</th><th className="num">{t('shift.preTax')}</th><th className="num">{t('shift.inclTax')}</th><th className="num">{t('shift.tip')}</th><th />
               </tr></thead>
               <tbody>
                 {d.jobs.map((j: any) => (
@@ -229,6 +229,7 @@ export default function ShiftReview() {
                     <td>{j.opportunity_id}</td>
                     <td>{t(`outcome.${j.outcome ?? 'draft'}`)}{j.reason && <div className="muted small">{named(j.reason, lang)}</div>}</td>
                     <td>{j.payment_method_code ?? '—'}</td>
+                    <td className="num">{Number(j.discount_amount) > 0 ? `−${money(j.discount_amount, lang)}` : '—'}</td>
                     <td className="num">{money(j.revenue_pre_tax, lang)}</td>
                     <td className="num">{money(j.revenue_total_incl_tax, lang)}</td>
                     <td className="num">{money(j.tip_amount, lang)}</td>
@@ -247,7 +248,7 @@ export default function ShiftReview() {
                     </td>
                   </tr>
                 ))}
-                {!d.jobs.length && <tr><td colSpan={7} className="muted">{t('common.none')}</td></tr>}
+                {!d.jobs.length && <tr><td colSpan={8} className="muted">{t('common.none')}</td></tr>}
               </tbody>
             </table>
           </div>
