@@ -112,8 +112,10 @@ A separate production project (also ca-central-1, Pro plan) is planned before th
 
 ## Tickets and Central
 
-Tickets work like the other projects (The Seed Guardians): the `ticket` and `ticket_comment` tables, the private `ticket-files` bucket, and the Report button on every admin page. Central reads them through the `central-tickets` Edge Function, which follows Central's connector spec (read-only, no `updateUrl`):
+Tickets work like the other projects (The Seed Guardians): the `ticket` and `ticket_comment` tables, the private `ticket-files` bucket, and the Report button on every admin page. Central reads them through the `central-tickets` Edge Function, which follows Central's connector spec, and changes them through the same function (`PATCH /central-tickets/{id}`):
 
 - Feed URL: `https://vrtvjnaykhlzyfbrllup.supabase.co/functions/v1/central-tickets`
 - Key: set the `CENTRAL_FEED_KEY` secret on the Supabase project (Edge Functions → Secrets) to a long random value, then enter the same value as the project's API key in Central. Until it is set, the feed answers 503 (switched off).
-- The feed sends titles, status, priority, dates and descriptions only; never reporters, browser details, files or comments.
+- The feed sends titles, status, priority, dates, descriptions and comments (author name and text). Never reporters, browser details, files or the change trail.
+- `people` is the active admins and senior ops (employee name, else email). Tickets have no owner: they are all Khalil's, so `assignee` is always empty.
+- Central can set a ticket's status, add a note signed "Central", or add a reply signed "<name> (via Central)" as one of `people`. Anything else is refused before anything is written.
